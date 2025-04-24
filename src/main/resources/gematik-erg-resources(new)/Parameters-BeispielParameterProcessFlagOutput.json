@@ -1,0 +1,41 @@
+{
+  "resourceType": "Parameters",
+  "id": "BeispielParameterProcessFlagOutput",
+  "parameter": [
+    {
+      "name": "meta",
+      "valueMeta": {
+        "versionId": "2",
+        "lastUpdated": "2024-05-31T13:00:00.123+02:00",
+        "tag": [
+          {
+            "system": "https://gematik.de/fhir/erg/CodeSystem/erg-rechnungsstatus-cs",
+            "code": "erledigt"
+          }
+        ],
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erg/StructureDefinition/erg-documentreference-markierung",
+            "extension": [
+              {
+                "url": "markierung",
+                "valueCoding": {
+                  "system": "https://gematik.de/fhir/erg/CodeSystem/erg-rechnung-markierung-cs",
+                  "code": "bezahlt"
+                }
+              },
+              {
+                "url": "zeitpunkt",
+                "valueDateTime": "2024-05-30T13:00:00.123+02:00"
+              },
+              {
+                "url": "details",
+                "valueString": "Bezahlt mit falschem Betreff"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
