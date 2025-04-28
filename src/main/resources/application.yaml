@@ -79,6 +79,7 @@ spring:
 #      hibernate.search.backend.analysis.configurer: ca.uhn.fhir.jpa.search.HapiHSearchAnalysisConfigurers$HapiElasticAnalysisConfigurer
 hapi:
   fhir:
+    custom-bean-package: ca.uhn.fhir.jpa.starter.custom.interceptor
     ### This flag when enabled to true, will avail evaluate measure operations from CR Module.
     ### Flag is false by default, can be passed as command line argument to override.
     cr:
@@ -305,6 +306,9 @@ hapi:
     #      responses_enabled: true
     #    binary_storage_enabled: true
     inline_resource_storage_below_size: 4000
+    custom-bean-packages: ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth
+    custom-interceptor-classes: ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor
+    custom-provider-classes:
 #    bulk_export_enabled: true
 #    subscription:
 #      resthook_enabled: true

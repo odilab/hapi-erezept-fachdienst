@@ -81,6 +81,12 @@ spring:
 
 hapi:
   fhir:
+    auth:
+      discovery_url: https://localhost:10000/.well-known/openid-configuration
+      update_interval_seconds: 43200
+    custom-bean-packages: ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth
+    custom-interceptor-classes: ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor
+    custom-provider-classes:
     ### This enables the swagger-ui at /fhir/swagger-ui/index.html as well as the /fhir/api-docs (see https://hapifhir.io/hapi-fhir/docs/server_plain/openapi.html)
     openapi_enabled: true
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
