@@ -1,0 +1,113 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-CS-ERP-ZusatzdatenEinheitPreiskennzeichen",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzdatenEinheitPreiskennzeichen",
+  "version": "1.5",
+  "name": "DAV_CS_ERP_ZusatzdatenEinheitPreiskennzeichen",
+  "status": "active",
+  "date": "2024-05-16",
+  "content": "complete",
+  "count": 24,
+  "concept": [
+    {
+      "code": "11",
+      "display": "Apothekeneinkaufspreis nach der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "12",
+      "display": "Von der Apotheke mit dem pharmazeutischen Unternehmer vereinbarter Preis (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "13",
+      "display": "Von der Apotheke tatsächlich geleisteter Einkaufspreis (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "14",
+      "display": "Abrechnungspreis nach dem Vertrag über die Preisbildung für Stoffe und Zubereitungen aus Stoffen (§§ 4 und 5 AMPreisV) (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "15",
+      "display": "Zwischen Apotheke und Krankenkasse vereinbarter Preis nach § 129 Abs. 5 SGB V (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "16",
+      "display": "Vertragspreise auf Grundlage von § 129a SGB V (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "17",
+      "display": "Abrechnungspreis, wenn 'Preis 2' nach der Technischen Beschreibung zum Verzeichnis über mg-Preise eingesetzt werden muss (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "21",
+      "display": "Abrechnungspreis, wenn Wirkstoff mit Rabattvertrag nach § 130a Abs. 8c SGB V vom Rabattvertragspartner (Anbieter) zum 'Preis 1' nach der Technischen Beschreibung zum Verzeichnis über mg-Preise an die Apotheke abgegeben wird (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "22",
+      "display": "Abrechnungspreis, wenn Wirkstoff mit Rabattvertrag nach § 130a Abs. 8c SGB V vom Rabattvertragspartner (Anbieter) zum 'Preis 2' nach der Technischen Beschreibung zum Verzeichnis über mg-Preise an die Apotheke abgegeben wird (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "23",
+      "display": "Abrechnungspreis nach dem Vertrag über die Preisbildung für Stoffe und Zubereitungen aus Stoffen (§§ 4 und 5 AMPreisV), wenn rabattbegünstigtes Arzneimittel zum Zeitpunkt der Vorlage der Verordnung nicht lieferbar ist (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "24",
+      "display": "Abrechnungspreis nach dem Vertrag über die Preisbildung für Stoffe und Zubereitungen aus Stoffen (§§ 4 und 5 AMPreisV), wenn rabattbegünstigte Arzneimittel aufgrund pharmazeutischer Bedenken nicht abgegeben werden kann (§ 4 Abs. 3 Satz 2 des Rahmenvertrages nach § 129 SGB V) (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "41",
+      "display": "bundeseinheitlicher Preis nach § 132e SGB V (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "61",
+      "display": "Zuschlag nach § 5 Absatz 3 Nummer 1 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "62",
+      "display": "Zuschlag nach § 5 Absatz 3 Nummer 2 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "63",
+      "display": "Zuschlag nach § 5 Absatz 3 Nummer 3 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "70",
+      "display": "Zuschlag nach § 5 Absatz 1 Nummer 3 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "71",
+      "display": "Zuschlag nach § 5 Absatz 6 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)",
+      "definition": "Zu verwenden, sofern keine Vereinbarung nach dem Vertrag über die Preisbildung für Stoffe und Zubereitungen aus Stoffen (§§ 4 und 5 AMPreisV) über den Zuschlag für parenterale Zubereitungen besteht"
+    },
+    {
+      "code": "74",
+      "display": "Zuschlag nach dem Vertrag über die Preisbildung für Stoffe und Zubereitungen aus Stoffen (§§ 4 und 5 AMPreisV) (Ohne Umsatzsteuer)",
+      "definition": "Zu verwenden, sofern eine Vereinbarung nach dem Vertrag über die Preisbildung für Stoffe und Zubereitungen aus Stoffen (§§ 4 und 5 AMPreisV) über den Zuschlag für parenterale Zubereitungen besteht"
+    },
+    {
+      "code": "75",
+      "display": "Zwischen Apotheke und Krankenkasse vereinbarter Zuschlag nach § 129 Abs. 5 SGB V (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "76",
+      "display": "Zuschlag auf Grundlage von § 129a SGB V (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "80",
+      "display": "Zuschlag nach § 6 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)",
+      "definition": "Sofern der Zuschlag ein Bruttobetrag ist, ist der jeweilige Betrag um die Umsatzsteuer zu mindern."
+    },
+    {
+      "code": "81",
+      "display": "Zuschlag nach § 7 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)",
+      "definition": "Sofern der Zuschlag ein Bruttobetrag ist, ist der jeweilige Betrag um die Umsatzsteuer zu mindern."
+    },
+    {
+      "code": "82",
+      "display": "Zuschlag nach § 8 der Arzneimittelpreisverordnung (Ohne Umsatzsteuer)"
+    },
+    {
+      "code": "83",
+      "display": "Zuschlag nach § 129 Absatz 5g SGB V (Ohne Umsatzsteuer)"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "id": "DAV-VS-ERP-ZusatzattributSchluesselMehrkostenuebernahme",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-ZusatzattributSchluesselMehrkostenuebernahme",
+  "version": "1.3",
+  "name": "DAV_VS_ERP_ZusatzattributSchluesselMehrkostenuebernahme",
+  "status": "active",
+  "date": "2022-12-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzattributSchluesselMehrkostenuebernahme"
+      }
+    ]
+  }
+}

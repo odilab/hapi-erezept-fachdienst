@@ -26,7 +26,6 @@ import java.util.List;
 import java.io.InputStream;
 import java.nio.file.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import ca.uhn.fhir.context.support.IValidationSupport;
 import java.util.Arrays;
@@ -51,25 +50,44 @@ public class CustomValidator {
             // Alle lokalen Ressourcen aus dem resources-Verzeichnis laden
             loadAllResources(this.prePopulatedSupport);
             
-            // Alle FHIR-Ressourcen aus den package-Ordnern laden
-            loadAllPackageResources(this.prePopulatedSupport);
+            // KBV Darreichungsform und DMP manuell laden (nicht als NPM verfügbar)
+            loadKbvDarreichungsformResources(this.prePopulatedSupport);
+            loadKbvDmpResources(this.prePopulatedSupport);
+            
+            // ABDA 1.4.0 manuell laden (nicht als NPM verfügbar)
+            loadAbdaErezeptabgabedatenResources(this.prePopulatedSupport);
             
             // NPM Package Support erstellen und .tgz Packages laden
             NpmPackageValidationSupport npmPackageSupport = new NpmPackageValidationSupport(ctx);
             
-            // Bestehende Packages
+            // Bestehende Packages aus dem Hauptverzeichnis
             npmPackageSupport.loadPackageFromClasspath("classpath:package/de.basisprofil.r4-1.5.3.tgz");
             npmPackageSupport.loadPackageFromClasspath("classpath:package/de.ihe-d.terminology-3.0.1.tgz");
             npmPackageSupport.loadPackageFromClasspath("classpath:package/dvmd.kdl.r4-2024.0.0.tgz");
             
-            // Neue NPM Packages aus dem npm packages Verzeichnis
+            // Neues Basisprofil mit EKG-Observation
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.basisprofil.r4-1.5.4.tgz");
+            
+            // NPM Packages aus dem npm packages Verzeichnis
+            // KBV Packages
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.basis-1.7.0.tgz");
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.ita.for-1.2.0.tgz");
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.ita.erp-1.4.0-alpha.tgz");
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.itv.evdga-1.2.1.tgz");
+            
+            // ABDA Packages
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.abda.erezeptabgabedaten-1.4.1-rc.tgz");
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.abda.erezeptabgabedaten-1.5.0.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.abda.erezeptabgabedatenbasis-1.4.2.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.abda.erezeptabgabedatenbasis-1.5.0.tgz");
+            
+            // Gematik Packages
             npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.gematik.erezept-workflow.r4-1.5.2.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.gematik.erezept-patientenrechnung.r4-1.1.0.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.gematik.erezept.eu-1.0.0.tgz");
+            
+            // GKVSV Package
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.gkvsv.erezeptabrechnungsdaten-1.4.2 (1).tgz");
             
             logger.info("NPM Packages geladen - inklusive KBV FOR, ERP, EVDGA, ABDA und Gematik Packages");
             
@@ -185,7 +203,7 @@ public class CustomValidator {
             instanceValidator.setBestPracticeWarningLevel(org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel.Ignore);
             validator.registerValidatorModule(instanceValidator);
             logger.info("Validator erfolgreich konfiguriert mit flexibler Versionsbehandlung");
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             logger.error("Fehler beim Laden der FHIR-Packages", e);
             throw new BeanCreationException("Fehler beim Laden der FHIR-Packages", e);
         }
@@ -346,89 +364,131 @@ public class CustomValidator {
         }
     }
 
-    // Hilfsmethode zum rekursiven Laden aller FHIR-Ressourcen aus den package-Ordnern
-    private void loadAllPackageResources(PrePopulatedValidationSupport prePopulatedSupport) throws IOException, URISyntaxException {
-        logger.info("Lade alle FHIR-Ressourcen aus den package-Ordnern...");
+    // Hilfsmethode zum Laden von KBV Darreichungsform Ressourcen
+    private void loadKbvDarreichungsformResources(PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
+        logger.info("Lade KBV Darreichungsform Ressourcen...");
         
-        // Das /package Verzeichnis aus den Resources finden
-        URI packageUri = getClass().getResource("/package").toURI();
-        Path packagePath;
+        // Lade CodeSystem
+        String csContent = loadResourceAsString("/package/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM_V1.15/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM_V1.15.xml");
+        CodeSystem cs = (CodeSystem) ctx.newXmlParser().parseResource(csContent);
+        prePopulatedSupport.addCodeSystem(cs);
+        logger.info("KBV Darreichungsform CodeSystem geladen: {}", cs.getUrl());
         
-        // Unterstützung für JAR und normale Dateisysteme
-        if (packageUri.getScheme().equals("jar")) {
-            FileSystem fileSystem = FileSystems.newFileSystem(packageUri, Collections.emptyMap());
-            packagePath = fileSystem.getPath("/package");
-        } else {
-            packagePath = Paths.get(packageUri);
-        }
-        
-        // Rekursiv alle .json und .xml Dateien finden und laden
-        loadResourcesFromPath(packagePath, prePopulatedSupport);
-        
-        logger.info("Fertig mit dem Laden aller package-Ressourcen");
+        // Lade ValueSet
+        String vsContent = loadResourceAsString("/package/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM_V1.15/KBV_VS_SFHIR_KBV_DARREICHUNGSFORM_V1.15.xml");
+        ValueSet vs = (ValueSet) ctx.newXmlParser().parseResource(vsContent);
+        prePopulatedSupport.addValueSet(vs);
+        logger.info("KBV Darreichungsform ValueSet geladen: {}", vs.getUrl());
     }
     
-    // Rekursive Hilfsmethode zum Laden von Ressourcen aus einem Pfad
-    private void loadResourcesFromPath(Path path, PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
-        if (!Files.exists(path)) {
-            logger.warn("Pfad nicht gefunden: {}", path);
-            return;
-        }
+    // Hilfsmethode zum Laden von KBV DMP Ressourcen  
+    private void loadKbvDmpResources(PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
+        logger.info("Lade KBV DMP Ressourcen...");
         
-        try (var stream = Files.walk(path)) {
-            stream.filter(Files::isRegularFile)
-                  .filter(file -> {
-                      String fileName = file.getFileName().toString().toLowerCase();
-                      return fileName.endsWith(".json") || fileName.endsWith(".xml");
-                  })
-                  .forEach(file -> {
-                      try {
-                          loadResourceFromFile(file, prePopulatedSupport);
-                      } catch (Exception e) {
-                          logger.error("Fehler beim Laden der Datei {}: {}", file, e.getMessage());
-                      }
-                  });
-        }
+        // Lade CodeSystem
+        String csContent = loadResourceAsString("/package/KBV_CS_SFHIR_KBV_DMP_V1.06 (1)/KBV_CS_SFHIR_KBV_DMP_V1.06.xml");
+        CodeSystem cs = (CodeSystem) ctx.newXmlParser().parseResource(csContent);
+        prePopulatedSupport.addCodeSystem(cs);
+        logger.info("KBV DMP CodeSystem geladen: {}", cs.getUrl());
+        
+        // Lade ValueSet
+        String vsContent = loadResourceAsString("/package/KBV_CS_SFHIR_KBV_DMP_V1.06 (1)/KBV_VS_SFHIR_KBV_DMP_V1.06.xml");
+        ValueSet vs = (ValueSet) ctx.newXmlParser().parseResource(vsContent);
+        prePopulatedSupport.addValueSet(vs);
+        logger.info("KBV DMP ValueSet geladen: {}", vs.getUrl());
     }
     
-    // Hilfsmethode zum Laden einer einzelnen Ressource aus einer Datei
-    private void loadResourceFromFile(Path file, PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
-        String fileName = file.getFileName().toString();
-        String fileContent = Files.readString(file);
+    // Hilfsmethode zum Laden von ABDA eRezeptAbgabedaten 1.4.0 Ressourcen
+    private void loadAbdaErezeptabgabedatenResources(PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
+        logger.info("Lade ABDA eRezeptAbgabedaten 1.4.0 Ressourcen...");
         
-        try {
-            IBaseResource resource;
-            
-            // JSON oder XML Parser verwenden je nach Dateiendung
-            if (fileName.toLowerCase().endsWith(".json")) {
-                resource = ctx.newJsonParser().parseResource(fileContent);
-            } else if (fileName.toLowerCase().endsWith(".xml")) {
-                resource = ctx.newXmlParser().parseResource(fileContent);
-            } else {
-                logger.debug("Überspringe Datei mit unbekannter Endung: {}", fileName);
-                return;
-            }
-            
-            // Nur relevante FHIR-Ressourcen hinzufügen
-            if (resource instanceof StructureDefinition) {
-                StructureDefinition sd = (StructureDefinition) resource;
+        String basePath = "/package/npm packages/de.abda.eRezeptAbgabedaten/";
+        
+        // Lade alle Profile (StructureDefinitions)
+        String[] profiles = {
+            "Profile-DAV-PR-ERP-AbgabedatenBundle.json",
+            "Profile-DAV-PR-ERP-AbgabedatenComposition.json",
+            "Profile-DAV-PR-ERP-Abgabeinformationen.json",
+            "Profile-DAV-PR-ERP-Abrechnungszeilen.json",
+            "Profile-DAV-PR-ERP-Apotheke.json",
+            "Profile-DAV-PR-ERP-ZusatzdatenEinheit.json",
+            "Profile-DAV-PR-ERP-ZusatzdatenHerstellung.json"
+        };
+        
+        for (String profileFile : profiles) {
+            try {
+                String content = loadResourceAsString(basePath + profileFile);
+                StructureDefinition sd = (StructureDefinition) ctx.newJsonParser().parseResource(content);
                 prePopulatedSupport.addStructureDefinition(sd);
-                logger.info("StructureDefinition '{}' aus Datei '{}' geladen", sd.getUrl(), fileName);
-            } else if (resource instanceof ValueSet) {
-                ValueSet vs = (ValueSet) resource;
-                prePopulatedSupport.addValueSet(vs);
-                logger.info("ValueSet '{}' aus Datei '{}' geladen", vs.getUrl(), fileName);
-            } else if (resource instanceof CodeSystem) {
-                CodeSystem cs = (CodeSystem) resource;
-                prePopulatedSupport.addCodeSystem(cs);
-                logger.info("CodeSystem '{}' aus Datei '{}' geladen", cs.getUrl(), fileName);
-            } else {
-                logger.debug("Überspringe Ressource vom Typ '{}' in Datei '{}'", resource.fhirType(), fileName);
+                logger.info("ABDA Profil geladen: {} Version: {}", sd.getUrl(), sd.getVersion());
+            } catch (Exception e) {
+                logger.error("Fehler beim Laden von {}: {}", profileFile, e.getMessage());
             }
-            
-        } catch (Exception e) {
-            logger.error("Fehler beim Parsen der Datei {}: {}", fileName, e.getMessage());
         }
+        
+        // Lade alle CodeSystems
+        String[] codeSystems = {
+            "CodeSystem-DAV-CS-ERP-ArtRezeptaenderung.json",
+            "CodeSystem-DAV-CS-ERP-KostenVersicherterKategorie.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzattributFAMSchluesselImportFAM.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzattributFAMSchluesselMarkt.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzattributSchluesselMehrkostenuebernahme.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzattributSchluesselZuzahlungsstatus.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzattributTarifkennzeichen.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzdatenEinheitFaktorkennzeichen.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzdatenEinheitPreiskennzeichen.json",
+            "CodeSystem-DAV-CS-ERP-ZusatzdatenHerstellungHerstellerSchluessel.json"
+        };
+        
+        for (String csFile : codeSystems) {
+            try {
+                String content = loadResourceAsString(basePath + csFile);
+                CodeSystem cs = (CodeSystem) ctx.newJsonParser().parseResource(content);
+                prePopulatedSupport.addCodeSystem(cs);
+                logger.info("ABDA CodeSystem geladen: {}", cs.getUrl());
+            } catch (Exception e) {
+                logger.error("Fehler beim Laden von {}: {}", csFile, e.getMessage());
+            }
+        }
+        
+        // Lade alle ValueSets
+        String[] valueSets = {
+            "ValueSet-DAV-VS-ERP-ArtRezeptaenderung.json",
+            "ValueSet-DAV-VS-ERP-KostenVersicherterKategorie.json",
+            "ValueSet-DAV-VS-ERP-ZusatzattributFAMSchluesselAbgaberangfolge.json",
+            "ValueSet-DAV-VS-ERP-ZusatzattributFAMSchluesselImportFAM.json",
+            "ValueSet-DAV-VS-ERP-ZusatzattributFAMSchluesselMarkt.json",
+            "ValueSet-DAV-VS-ERP-ZusatzattributSchluesselMehrkostenuebernahme.json",
+            "ValueSet-DAV-VS-ERP-ZusatzattributSchluesselZuzahlungsstatus.json",
+            "ValueSet-DAV-VS-ERP-ZusatzattributTarifkennzeichen.json",
+            "ValueSet-DAV-VS-ERP-ZusatzdatenEinheitFaktorkennzeichen.json",
+            "ValueSet-DAV-VS-ERP-ZusatzdatenEinheitPreiskennzeichen.json",
+            "ValueSet-DAV-VS-ERP-ZusatzdatenHerstellungHerstellerSchluessel.json"
+        };
+        
+        for (String vsFile : valueSets) {
+            try {
+                String content = loadResourceAsString(basePath + vsFile);
+                ValueSet vs = (ValueSet) ctx.newJsonParser().parseResource(content);
+                prePopulatedSupport.addValueSet(vs);
+                logger.info("ABDA ValueSet geladen: {}", vs.getUrl());
+            } catch (Exception e) {
+                logger.error("Fehler beim Laden von {}: {}", vsFile, e.getMessage());
+            }
+        }
+        
+        // Lade Extension
+        try {
+            String content = loadResourceAsString(basePath + "Extension-DAV-EX-ERP-Chargenbezeichnung.json");
+            StructureDefinition ext = (StructureDefinition) ctx.newJsonParser().parseResource(content);
+            prePopulatedSupport.addStructureDefinition(ext);
+            logger.info("ABDA Extension geladen: {}", ext.getUrl());
+        } catch (Exception e) {
+            logger.error("Fehler beim Laden der Extension: {}", e.getMessage());
+        }
+        
+        logger.info("ABDA eRezeptAbgabedaten 1.4.0 Ressourcen vollständig geladen");
     }
     
     /**

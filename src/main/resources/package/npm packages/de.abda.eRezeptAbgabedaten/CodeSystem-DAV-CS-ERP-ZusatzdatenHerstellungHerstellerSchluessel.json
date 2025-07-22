@@ -1,0 +1,23 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-CS-ERP-ZusatzdatenHerstellungHerstellerSchluessel",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzdatenHerstellungHerstellerSchluessel",
+  "version": "1.3",
+  "name": "DAV_CS_ERP_ZusatzdatenHerstellungHerstellerSchluessel",
+  "status": "active",
+  "date": "2022-12-21",
+  "content": "complete",
+  "count": 2,
+  "concept": [
+    {
+      "code": "1",
+      "display": "Eigenfertigung",
+      "definition": "Abrechnende Apotheke ist auch Hersteller"
+    },
+    {
+      "code": "2",
+      "display": "Fremdfertigung",
+      "definition": "Abrechnende Apotheke ist nicht Hersteller"
+    }
+  ]
+}

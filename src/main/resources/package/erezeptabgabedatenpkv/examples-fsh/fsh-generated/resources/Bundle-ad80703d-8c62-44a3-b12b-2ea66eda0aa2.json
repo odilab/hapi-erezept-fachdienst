@@ -3,7 +3,7 @@
   "id": "ad80703d-8c62-44a3-b12b-2ea66eda0aa2",
   "meta": {
     "profile": [
-      "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.4"
+      "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.5"
     ],
     "tag": [
       {
@@ -27,7 +27,7 @@
         "id": "72183b44-61cf-4fe7-8f74-1e37d58fcea8",
         "meta": {
           "profile": [
-            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.4"
+            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.5"
           ]
         },
         "status": "final",
@@ -73,7 +73,7 @@
         "id": "5dc67a4f-c936-4c26-a7c0-967673a70740",
         "meta": {
           "profile": [
-            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.4"
+            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.5"
           ]
         },
         "identifier": [
@@ -117,7 +117,7 @@
         "id": "335784b4-3f89-47cc-b32f-bc386a212e11",
         "meta": {
           "profile": [
-            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.4"
+            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.5"
           ]
         },
         "status": "completed",
@@ -181,7 +181,7 @@
         "id": "cfd49ec7-fd9c-4ab3-865f-f0aaf010ca19",
         "meta": {
           "profile": [
-            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.4"
+            "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.5"
           ]
         },
         "status": "issued",

@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "id": "DAV-VS-ERP-ZusatzdatenEinheitFaktorkennzeichen",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-ZusatzdatenEinheitFaktorkennzeichen",
+  "version": "1.4",
+  "name": "DAV_VS_ERP_ZusatzdatenEinheitFaktorkennzeichen",
+  "status": "active",
+  "date": "2024-03-21",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzdatenEinheitFaktorkennzeichen"
+      }
+    ]
+  }
+}
