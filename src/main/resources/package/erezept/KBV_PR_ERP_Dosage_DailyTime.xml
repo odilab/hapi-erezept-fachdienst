@@ -1,0 +1,264 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-PR-ERP-Dosage-DailyTime" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Dosage_DailyTime" />
+  <version value="1.4.0" />
+  <name value="KBV_PR_ERP_Dosage_DailyTime" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="complex-type" />
+  <abstract value="false" />
+  <type value="Dosage" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Dosage" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Dosage.extension">
+      <path value="Dosage.extension" />
+      <min value="1" />
+    </element>
+    <element id="Dosage.extension:DosieranweisungKategorie">
+      <path value="Dosage.extension" />
+      <sliceName value="DosieranweisungKategorie" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageCategory" />
+      </type>
+    </element>
+    <element id="Dosage.extension:DosieranweisungKategorie.value[x]:valueCoding">
+      <path value="Dosage.extension.value[x]" />
+      <sliceName value="valueCoding" />
+    </element>
+    <element id="Dosage.extension:DosieranweisungKategorie.value[x]:valueCoding.code">
+      <path value="Dosage.extension.value[x].code" />
+      <fixedCode value="DAILY_TIME" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.sequence">
+      <path value="Dosage.sequence" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.text">
+      <path value="Dosage.text" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.additionalInstruction">
+      <path value="Dosage.additionalInstruction" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.patientInstruction">
+      <path value="Dosage.patientInstruction" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing">
+      <path value="Dosage.timing" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.timing.event">
+      <path value="Dosage.timing.event" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat">
+      <path value="Dosage.timing.repeat" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]">
+      <path value="Dosage.timing.repeat.bounds[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]:boundsDuration">
+      <path value="Dosage.timing.repeat.bounds[x]" />
+      <sliceName value="boundsDuration" />
+      <type>
+        <code value="Duration" />
+      </type>
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]:boundsDuration.value">
+      <path value="Dosage.timing.repeat.bounds[x].value" />
+      <short value="Wert der Dauer der Dosieranweisung" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]:boundsDuration.comparator">
+      <path value="Dosage.timing.repeat.bounds[x].comparator" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]:boundsDuration.unit">
+      <path value="Dosage.timing.repeat.bounds[x].unit" />
+      <short value="Einheit der Dauer der Dosieranweisung" />
+      <min value="1" />
+      <mustSupport value="true" />
+      <binding>
+        <strength value="required" />
+        <valueSet value="https://fhir.kbv.de/ValueSet/KBV_VS_ERP_DosageInstruction_UnitsOfTime_German" />
+      </binding>
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]:boundsDuration.system">
+      <path value="Dosage.timing.repeat.bounds[x].system" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.bounds[x]:boundsDuration.code">
+      <path value="Dosage.timing.repeat.bounds[x].code" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.count">
+      <path value="Dosage.timing.repeat.count" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.countMax">
+      <path value="Dosage.timing.repeat.countMax" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.duration">
+      <path value="Dosage.timing.repeat.duration" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.durationMax">
+      <path value="Dosage.timing.repeat.durationMax" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.durationUnit">
+      <path value="Dosage.timing.repeat.durationUnit" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.frequency">
+      <path value="Dosage.timing.repeat.frequency" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.frequencyMax">
+      <path value="Dosage.timing.repeat.frequencyMax" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.period">
+      <path value="Dosage.timing.repeat.period" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.periodMax">
+      <path value="Dosage.timing.repeat.periodMax" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.periodUnit">
+      <path value="Dosage.timing.repeat.periodUnit" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.dayOfWeek">
+      <path value="Dosage.timing.repeat.dayOfWeek" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.timeOfDay">
+      <path value="Dosage.timing.repeat.timeOfDay" />
+      <short value="Uhrzeit der Anwendung" />
+      <min value="1" />
+      <max value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.timing.repeat.when">
+      <path value="Dosage.timing.repeat.when" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.repeat.offset">
+      <path value="Dosage.timing.repeat.offset" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.timing.code">
+      <path value="Dosage.timing.code" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.asNeeded[x]">
+      <path value="Dosage.asNeeded[x]" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.site">
+      <path value="Dosage.site" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.route">
+      <path value="Dosage.route" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.method">
+      <path value="Dosage.method" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.doseAndRate">
+      <path value="Dosage.doseAndRate" />
+      <min value="1" />
+      <max value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.type">
+      <path value="Dosage.doseAndRate.type" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.doseAndRate.dose[x]">
+      <path value="Dosage.doseAndRate.dose[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.dose[x]:doseQuantity">
+      <path value="Dosage.doseAndRate.dose[x]" />
+      <sliceName value="doseQuantity" />
+      <min value="1" />
+      <type>
+        <code value="Quantity" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.dose[x]:doseQuantity.value">
+      <path value="Dosage.doseAndRate.dose[x].value" />
+      <short value="Wert der Menge pro Anwendung" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.dose[x]:doseQuantity.unit">
+      <path value="Dosage.doseAndRate.dose[x].unit" />
+      <short value="Einheit der Menge pro Anwendung" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.dose[x]:doseQuantity.system">
+      <path value="Dosage.doseAndRate.dose[x].system" />
+      <min value="1" />
+      <fixedUri value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_BMP_DOSIEREINHEIT" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.dose[x]:doseQuantity.code">
+      <path value="Dosage.doseAndRate.dose[x].code" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Dosage.doseAndRate.rate[x]">
+      <path value="Dosage.doseAndRate.rate[x]" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.maxDosePerPeriod">
+      <path value="Dosage.maxDosePerPeriod" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.maxDosePerAdministration">
+      <path value="Dosage.maxDosePerAdministration" />
+      <max value="0" />
+    </element>
+    <element id="Dosage.maxDosePerLifetime">
+      <path value="Dosage.maxDosePerLifetime" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

@@ -1,0 +1,52 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-EX-ERP-Irrlaeufer",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Irrlaeufer",
+  "version": "1.5.1",
+  "name": "GKVSV_EX_ERP_Irrlaeufer",
+  "title": "GKVSV_EX_ERP_Irrlaeufer",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Kennzeichen Irrläuferrezept",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Invoice"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Kennzeichen Irrläufer",
+        "definition": "Kennzeichen für Irrläuferrezept: false = kein Irrläuferrezept; true = Irrläuferrezept",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Irrlaeufer"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Kennzeichen für Irrläuferrezepte",
+        "definition": "Kennzeichen für Irrläuferrezepte: false = kein Irrläuferrezept; true = Irrläuferrezept",
+        "min": 1,
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      }
+    ]
+  }
+}

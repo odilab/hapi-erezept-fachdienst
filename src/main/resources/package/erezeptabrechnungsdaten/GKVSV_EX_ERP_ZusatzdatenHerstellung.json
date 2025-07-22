@@ -1,0 +1,420 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-EX-ERP-ZusatzdatenHerstellung",
+  "url": "http://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_ZusatzdatenHerstellung",
+  "version": "1.5.1",
+  "name": "GKVSV_EX_ERP_ZusatzdatenHerstellung",
+  "title": "GKVSV_EX_ERP_ZusatzdatenHerstellung",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Zusatzdaten Herstellung",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Invoice"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Zusatzdaten Herstellung",
+        "definition": "Zu-/Abschläge auf parenterale Zubereitungen, wirtschaftlichen Einzelmengen etc."
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 2
+      },
+      {
+        "id": "Extension.extension:zaehlerHerstellung",
+        "path": "Extension.extension",
+        "sliceName": "zaehlerHerstellung",
+        "short": "Zähler Herstellung",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:zaehlerHerstellung.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "zaehlerHerstellung"
+      },
+      {
+        "id": "Extension.extension:zaehlerHerstellung.value[x]",
+        "path": "Extension.extension.value[x]",
+        "short": "Zähler Herstellung",
+        "min": 1,
+        "type": [
+          {
+            "code": "positiveInt"
+          }
+        ],
+        "minValuePositiveInt": 1,
+        "maxValuePositiveInt": 99
+      },
+      {
+        "id": "Extension.extension:einheit",
+        "path": "Extension.extension",
+        "sliceName": "einheit",
+        "short": "Einheit",
+        "min": 1
+      },
+      {
+        "id": "Extension.extension:einheit.extension",
+        "path": "Extension.extension.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 2
+      },
+      {
+        "id": "Extension.extension:einheit.extension:zaehlerEinheit",
+        "path": "Extension.extension.extension",
+        "sliceName": "zaehlerEinheit",
+        "short": "Zähler Einheit",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:zaehlerEinheit.url",
+        "path": "Extension.extension.extension.url",
+        "fixedUri": "zaehlerEinheit"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:zaehlerEinheit.value[x]",
+        "path": "Extension.extension.extension.value[x]",
+        "short": "Zähler Einheit",
+        "min": 1,
+        "type": [
+          {
+            "code": "positiveInt"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition",
+        "path": "Extension.extension.extension",
+        "sliceName": "abrechnungsposition",
+        "short": "Abrechnungsposition",
+        "min": 1
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension",
+        "path": "Extension.extension.extension.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zaehlerAbrechnungsposition",
+        "path": "Extension.extension.extension.extension",
+        "sliceName": "zaehlerAbrechnungsposition",
+        "short": "Zähler Abrechnungsposition",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zaehlerAbrechnungsposition.url",
+        "path": "Extension.extension.extension.extension.url",
+        "fixedUri": "zaehlerAbrechnungsposition"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zaehlerAbrechnungsposition.value[x]",
+        "path": "Extension.extension.extension.extension.value[x]",
+        "short": "Zähler Abrechnungsposition",
+        "min": 1,
+        "type": [
+          {
+            "code": "positiveInt"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft",
+        "path": "Extension.extension.extension.extension",
+        "sliceName": "verwurf_geprueft",
+        "short": "Verwurf geprüft",
+        "definition": "Kennzeichen gemäß Vertrag über die Preis-bildung für Stoffe und Zubereitungen aus Stoffen (Hilfstaxe) Anlage 3 Teil 1 Anhang 3.\r\nDieses Feld ist zu füllen, wenn ein unvermeidbarer Verwurf abgerechnet wird (Faktorkennzeichen = 99).\r\n1 = Entspricht den Regelungen\r\n2 = Prüfung nachgelagert durch zentrale Stelle\r\n3 = Unzulässige Menge Verwurf (Verwurf größer als kleinste Packungseinheit)\r\n4 = Nicht in HA3 enthalten und damit nicht prüfbar\r\n5 = Apotheke stellt nicht selbst her und es werden andere Stoffe als in Anhang 1 verwendet\r\n6 = Zeitspanne zu klein für erneuten Verwurf\r\n7 = Kennzeichen des Herstellenden nach DAV-Vergabe existiert nicht und Verwurf damit nicht prüfbar",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.url",
+        "path": "Extension.extension.extension.extension.url",
+        "fixedUri": "verwurf_geprueft"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x]",
+        "path": "Extension.extension.extension.extension.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "description": "Der Code muss aus dem ValueSet 'GKVSV_VS_ERP_Verwurf' gewählt werden.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Verwurf"
+        }
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x].coding",
+        "path": "Extension.extension.extension.extension.value[x].coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x].coding.system",
+        "path": "Extension.extension.extension.extension.value[x].coding.system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Verwurf"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x].coding.version",
+        "path": "Extension.extension.extension.extension.value[x].coding.version",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x].coding.code",
+        "path": "Extension.extension.extension.extension.value[x].coding.code",
+        "short": "Verwurf geprüft",
+        "definition": "Kennzeichen gemäß Vertrag über die Preis-bildung für Stoffe und Zubereitungen aus Stoffen (Hilfstaxe) Anlage 3 Teil 1 Anhang 3. Dieses Feld ist zu füllen, wenn ein unvermeidbarer Verwurf abgerechnet wird (Faktorkennzeichen = 99). \r\n1 = Entspricht den Regelungen \r\n2 = Prüfung nachgelagert durch zentrale Stelle \r\n3 = Unzulässige Menge Verwurf (Verwurf größer als kleinste Packungseinheit) \r\n4 = Nicht in HA3 enthalten und damit nicht prüfbar \r\n5 = Apotheke stellt nicht selbst her und es werden andere Stoffe als in Anhang 1 verwendet \r\n6 = Zeitspanne zu klein für erneuten Verwurf \r\n7 = Kennzeichen des Herstellenden nach DAV-Vergabe existiert nicht und Verwurf damit nicht prüfbar",
+        "min": 1
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x].coding.userSelected",
+        "path": "Extension.extension.extension.extension.value[x].coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:verwurf_geprueft.value[x].text",
+        "path": "Extension.extension.extension.extension.value[x].text",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten",
+        "path": "Extension.extension.extension.extension",
+        "sliceName": "zuAbschlaegeZusatzdaten",
+        "short": "Zu- und Abschläge auf Zusatzdaten",
+        "min": 0
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension",
+        "path": "Extension.extension.extension.extension.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 3
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode",
+        "path": "Extension.extension.extension.extension.extension",
+        "sliceName": "zuAbschlagCode",
+        "short": "Zu-/Abschlag",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.url",
+        "path": "Extension.extension.extension.extension.extension.url",
+        "fixedUri": "zuAbschlagCode"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x]",
+        "path": "Extension.extension.extension.extension.extension.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "description": "Der Code muss aus dem ValueSet 'GKVSV_VS_ERP_ZuAbschlagKey' gewählt werden.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_ZuAbschlagKey"
+        }
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x].coding",
+        "path": "Extension.extension.extension.extension.extension.value[x].coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x].coding.system",
+        "path": "Extension.extension.extension.extension.extension.value[x].coding.system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_ZuAbschlagKey"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x].coding.version",
+        "path": "Extension.extension.extension.extension.extension.value[x].coding.version",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x].coding.code",
+        "path": "Extension.extension.extension.extension.extension.value[x].coding.code",
+        "short": "Zu-/Abschlag",
+        "definition": "R001 = Apothekenabschlag nach § 130 SGB V; \r\nR003 = Sonstiger Abschlag/Rabatt; \r\nR004 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 1 und Absatz 1a SGB V; \r\nR005 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 3a SGB V; \r\nR006 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 3b SGB V; \r\nR007 = Rabattangabe der vom Kostenträger aufgrund von Verträgen nach § 130a Abs. 8 i.V.m. § 31 Abs. 2 SGB V zusätzlich übernommenen Mehrkosten; \r\nR008 = Rabattangabe aufgrund von Verträgen nach § 130a Abs. 8 SGB V ohne Berücksichtigung der Rabattangaben nach Schlüssel R007; \r\nR009 = Gesetzlicher Herstellerabschlag nach § 130a Abs. 2 SGB V",
+        "min": 1
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x].coding.userSelected",
+        "path": "Extension.extension.extension.extension.extension.value[x].coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagCode.value[x].text",
+        "path": "Extension.extension.extension.extension.extension.value[x].text",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagKennzeichen",
+        "path": "Extension.extension.extension.extension.extension",
+        "sliceName": "zuAbschlagKennzeichen",
+        "short": "Kennzeichen Zu-/Abschlag",
+        "definition": "Kennzeichen Zu-/Abschlag\r\n\r\nsurcharge  = Zuschlag;\r\ndeduction = Abschlag\r\n\r\nDas Kennzeichen Zu- oder Abschlag dient als zusätzliche Information zum Betrag, der ein negatives Vorzeichen (Abschlag) haben kann.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagKennzeichen.url",
+        "path": "Extension.extension.extension.extension.extension.url",
+        "fixedUri": "zuAbschlagKennzeichen"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagKennzeichen.value[x]",
+        "path": "Extension.extension.extension.extension.extension.value[x]",
+        "short": "surcharge | deduction",
+        "definition": "Kennzeichen Zu-/Abschlag\r\n\r\nsurcharge  = Zuschlag;\r\ndeduction = Abschlag\r\n\r\nDas Kennzeichen Zu- oder Abschlag dient als zusätzliche Information zum Betrag, der ein negatives Vorzeichen (Abschlag) haben kann.",
+        "min": 1,
+        "type": [
+          {
+            "code": "code"
+          }
+        ],
+        "constraint": [
+          {
+            "key": "surchargeOrDeduction",
+            "severity": "error",
+            "human": "Es sind nur die Kennzeichen \"surcharge\" (Zuschlag) oder \"deduction\" (Abschlag) zulässig.",
+            "expression": "matches('^surcharge$') or matches('^deduction$')",
+            "source": "Extension"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "description": "Codes indicating the kind of the price component.",
+          "valueSet": "http://hl7.org/fhir/ValueSet/invoice-priceComponentType|4.0.1"
+        }
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagBetrag",
+        "path": "Extension.extension.extension.extension.extension",
+        "sliceName": "zuAbschlagBetrag",
+        "short": "Betrag Zu-/Abschlag",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagBetrag.url",
+        "path": "Extension.extension.extension.extension.extension.url",
+        "fixedUri": "zuAbschlagBetrag"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagBetrag.value[x]",
+        "path": "Extension.extension.extension.extension.extension.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Money",
+            "profile": [
+              "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-ERP-PreisangabeEUR"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension:zuAbschlagBetrag.value[x].value",
+        "path": "Extension.extension.extension.extension.extension.value[x].value",
+        "short": "Betrag Zu-/Abschlag"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.url",
+        "path": "Extension.extension.extension.extension.url",
+        "fixedUri": "zuAbschlaegeZusatzdaten"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.value[x]",
+        "path": "Extension.extension.extension.extension.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.url",
+        "path": "Extension.extension.extension.url",
+        "fixedUri": "abrechnungsposition"
+      },
+      {
+        "id": "Extension.extension:einheit.extension:abrechnungsposition.value[x]",
+        "path": "Extension.extension.extension.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:einheit.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "einheit"
+      },
+      {
+        "id": "Extension.extension:einheit.value[x]",
+        "path": "Extension.extension.value[x]",
+        "max": "0"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "http://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_ZusatzdatenHerstellung"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "max": "0"
+      }
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="DAV-PKV-EX-ERP-Bankverbindung" />
+  <url value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-EX-ERP-Bankverbindung" />
+  <version value="1.4.0" />
+  <name value="DAV_PKV_EX_ERP_Bankverbindung" />
+  <title value="DAV_PKV_EX_ERP_Bankverbindung" />
+  <status value="active" />
+  <date value="2025-03-31" />
+  <publisher value="Deutscher Apothekerverband e.V. (DAV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="complex-type" />
+  <abstract value="false" />
+  <context>
+    <type value="element" />
+    <expression value="Organization" />
+  </context>
+  <type value="Extension" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Extension.extension">
+      <path value="Extension.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="3" />
+      <max value="3" />
+    </element>
+    <element id="Extension.extension:Kontoinhaber">
+      <path value="Extension.extension" />
+      <sliceName value="Kontoinhaber" />
+      <min value="1" />
+      <max value="1" />
+    </element>
+    <element id="Extension.extension:Kontoinhaber.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="Kontoinhaber" />
+    </element>
+    <element id="Extension.extension:Kontoinhaber.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <min value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <maxLength value="64" />
+    </element>
+    <element id="Extension.extension:IBAN">
+      <path value="Extension.extension" />
+      <sliceName value="IBAN" />
+      <min value="1" />
+      <max value="1" />
+    </element>
+    <element id="Extension.extension:IBAN.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="IBAN" />
+    </element>
+    <element id="Extension.extension:IBAN.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <min value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <maxLength value="22" />
+    </element>
+    <element id="Extension.extension:BIC">
+      <path value="Extension.extension" />
+      <sliceName value="BIC" />
+      <min value="1" />
+      <max value="1" />
+    </element>
+    <element id="Extension.extension:BIC.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="BIC" />
+    </element>
+    <element id="Extension.extension:BIC.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <min value="1" />
+      <type>
+        <code value="string" />
+      </type>
+      <maxLength value="11" />
+    </element>
+    <element id="Extension.url">
+      <path value="Extension.url" />
+      <fixedUri value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-EX-ERP-Bankverbindung" />
+    </element>
+    <element id="Extension.value[x]">
+      <path value="Extension.value[x]" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

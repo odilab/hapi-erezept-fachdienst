@@ -1,0 +1,35 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "GKVSV-CS-ERP-TA7",
+  "url": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_TA7",
+  "version": "1.5.1",
+  "name": "GKVSV_CS_ERP_TA7",
+  "status": "active",
+  "experimental": false,
+  "date": "2025-03-31",
+  "publisher": "GKV-Spitzenverband",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gkv-spitzenverband.de/"
+        }
+      ]
+    }
+  ],
+  "description": "Codes zur Technischen Anlage 7 (TA7)",
+  "copyright": "GKV-Spitzenverband",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "LR",
+      "display": "Liste der Rechnungen"
+    },
+    {
+      "code": "RB",
+      "display": "Rezept-Bundle"
+    }
+  ]
+}

@@ -1,0 +1,991 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-PR-ERP-Prescription" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription" />
+  <version value="1.4.0" />
+  <name value="KBV_PR_ERP_Prescription" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="resource" />
+  <abstract value="false" />
+  <type value="MedicationRequest" />
+  <baseDefinition value="https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_MedicationRequest|1.7.0" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="MedicationRequest">
+      <path value="MedicationRequest" />
+      <constraint>
+        <key value="-erp-begrenzungDate" />
+        <severity value="error" />
+        <human value="Begrenzung der Datumsangabe auf 10 Zeichen JJJJ-MM-TT" />
+        <expression value="authoredOn.toString().length()=10" />
+      </constraint>
+      <constraint>
+        <key value="-erp-unfalltagDatum" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ MedicationRequest enthält einen Unfalltag, dieser darf nicht nach dem Ausstellungsdatum liegen." />
+        <expression value="extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfalltag').exists() implies (extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident').extension('Unfalltag').value as date) &lt;= authoredOn" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeDosierungKennzeichenTrue" />
+        <severity value="error" />
+        <human value="Wenn das Dosierungskennzeichen true ist, muss eine Dosieranweisung vorhanden sein." />
+        <expression value="extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag').exists().not() or ((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag').value as boolean)=true implies dosageInstruction.exists())" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeDosierungKennzeichenFalse" />
+        <severity value="error" />
+        <human value="Wenn das Dosierungskennzeichen false ist, darf keine Dosieranweisung vorhanden sein." />
+        <expression value="extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag').exists().not() or ((extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag').value as boolean)=false implies dosageInstruction.exists().not())" />
+      </constraint>
+      <constraint>
+        <key value="-erp-dosieranweisungEineKategorie" />
+        <severity value="error" />
+        <human value="Es müssen alle Dosieranweisungen von derselben Kategorie sein." />
+        <expression value="dosageInstruction.exists().not() or dosageInstruction.extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageCategory').valueCoding.code.all($this = %context.dosageInstruction.extension('https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageCategory').valueCoding.code.first())" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeDosieranweisungDauer" />
+        <severity value="error" />
+        <human value="Wenn mehrere Dosieranweisungen existieren und eine Dauer angegeben wird, dann muss die Dauer in allen Dosieranweisungen identisch sein." />
+        <expression value="dosageInstruction.timing.repeat.boundsDuration.exists() implies dosageInstruction.timing.repeat.boundsDuration.distinct().count() = 1" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeDosieranweisungWochentag" />
+        <severity value="error" />
+        <human value="Wenn mehrere Dosieranweisungen mit einer Wochentagsangabe existieren, darf jeder Wochentag insgesamt höchstens einmal vorkommen." />
+        <expression value="dosageInstruction.timing.repeat.dayOfWeek.exists() implies dosageInstruction.timing.repeat.dayOfWeek.distinct().count() = dosageInstruction.timing.repeat.dayOfWeek.count()" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeDosieranweisungViererschema" />
+        <severity value="error" />
+        <human value="Wenn mehrere Dosieranweisungen mit einer Tageszeitangabe (Vierer-Schema) existieren, darf jede Tageszeit (Morgens, Mittags, Abends, Nachts) insgesamt höchstens einmal vorkommen." />
+        <expression value="dosageInstruction.timing.repeat.when.exists() implies dosageInstruction.timing.repeat.when.distinct().count() = dosageInstruction.timing.repeat.when.count()" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeDosieranweisungUhrzeit" />
+        <severity value="error" />
+        <human value="Wenn mehrere Dosieranweisungen mit einer Uhrzeitangabe existieren, darf jede Uhrzeit insgesamt höchstens einmal vorkommen." />
+        <expression value="dosageInstruction.timing.repeat.timeOfDay.exists() implies dosageInstruction.timing.repeat.timeOfDay.distinct().count() = dosageInstruction.timing.repeat.timeOfDay.count()" />
+      </constraint>
+    </element>
+    <element id="MedicationRequest.id">
+      <path value="MedicationRequest.id" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.meta">
+      <path value="MedicationRequest.meta" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.meta.versionId">
+      <path value="MedicationRequest.meta.versionId" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.meta.lastUpdated">
+      <path value="MedicationRequest.meta.lastUpdated" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.meta.source">
+      <path value="MedicationRequest.meta.source" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.meta.profile">
+      <path value="MedicationRequest.meta.profile" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="open" />
+      </slicing>
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.meta.profile:erpProfile">
+      <path value="MedicationRequest.meta.profile" />
+      <sliceName value="erpProfile" />
+      <min value="1" />
+      <max value="1" />
+      <fixedCanonical value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.4" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.meta.security">
+      <path value="MedicationRequest.meta.security" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.meta.tag">
+      <path value="MedicationRequest.meta.tag" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.implicitRules">
+      <path value="MedicationRequest.implicitRules" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.language">
+      <path value="MedicationRequest.language" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.text">
+      <path value="MedicationRequest.text" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.contained">
+      <path value="MedicationRequest.contained" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.extension">
+      <path value="MedicationRequest.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="3" />
+      <max value="9" />
+    </element>
+    <element id="MedicationRequest.extension:Zuzahlungsstatus">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="Zuzahlungsstatus" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_StatusCoPayment" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Zuzahlungsstatus.value[x]">
+      <path value="MedicationRequest.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Zuzahlungsstatus.value[x]:valueCoding">
+      <path value="MedicationRequest.extension.value[x]" />
+      <sliceName value="valueCoding" />
+      <mustSupport value="true" />
+      <binding>
+        <strength value="required" />
+        <valueSet value="https://fhir.kbv.de/ValueSet/KBV_VS_ERP_StatusCoPayment" />
+      </binding>
+    </element>
+    <element id="MedicationRequest.extension:Zuzahlungsstatus.value[x]:valueCoding.system">
+      <path value="MedicationRequest.extension.value[x].system" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Zuzahlungsstatus.value[x]:valueCoding.code">
+      <path value="MedicationRequest.extension.value[x].code" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Notdienstgebuehr">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="Notdienstgebuehr" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Notdienstgebuehr.value[x]">
+      <path value="MedicationRequest.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Notdienstgebuehr.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:SER">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="SER" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_SER" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:SER.value[x]">
+      <path value="MedicationRequest.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:SER.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="Unfallinformationen" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Accident" />
+      </type>
+      <constraint>
+        <key value="-erp-angabeUnfallbetriebPflicht" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ MedicationRequest enthält keinen Namen des Unfallbetriebs, dieser ist aber Pflicht falls ein Unfallkennzeichen mit dem Wert &quot;2&quot; (Arbeitsunfall) angegeben ist." />
+        <expression value="(extension('Unfallkennzeichen').value as Coding).code = '2' implies extension('Unfallbetrieb').exists()" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeUnfallbetriebVerbot" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ MedicationRequest enthält einen Namen des Unfallbetriebs, dieser darf aber nicht angegeben werden, falls ein Unfallkennzeichen mit dem Wert ungleich &quot;2&quot; (Arbeitsunfall) angegeben ist." />
+        <expression value="(extension('Unfallkennzeichen').value as Coding).code != '2' implies extension('Unfallbetrieb').exists().not()" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeUnfalltagPflicht" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ MedicationRequest enthält keinen Unfalltag, dieser ist aber Pflicht falls ein Unfallkennzeichen mit dem Wert &quot;1&quot; (Unfall) oder &quot;2&quot; (Arbeitsunfall) angegeben ist." />
+        <expression value="((extension('Unfallkennzeichen').value as Coding).code = '1' or (extension('Unfallkennzeichen').value as Coding).code = '2') implies extension('Unfalltag').exists()" />
+      </constraint>
+      <constraint>
+        <key value="-erp-angabeUnfalltagVerbot" />
+        <severity value="error" />
+        <human value="Die Ressource vom Typ MedicationRequest enthält einen Unfalltag, dieser darf aber nicht angegeben werden, falls ein Unfallkennzeichen mit dem Wert ungleich &quot;1&quot; (Unfall) oder ungleich &quot;2&quot; (Arbeitsunfall) angegeben ist." />
+        <expression value="(extension('Unfallkennzeichen').value as Coding).code != '1' and (extension('Unfallkennzeichen').value as Coding).code != '2' implies extension('Unfalltag').exists().not()" />
+      </constraint>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallkennzeichen">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Unfallkennzeichen" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueCoding" />
+      <mustSupport value="true" />
+      <binding>
+        <strength value="required" />
+        <valueSet value="https://fhir.kbv.de/ValueSet/KBV_VS_ERP_Accident_Type" />
+      </binding>
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding.system">
+      <path value="MedicationRequest.extension.extension.value[x].system" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallkennzeichen.value[x]:valueCoding.code">
+      <path value="MedicationRequest.extension.extension.value[x].code" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallbetrieb">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Unfallbetrieb" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallbetrieb.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfallbetrieb.value[x]:valueString">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueString" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfalltag">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Unfalltag" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfalltag.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Unfallinformationen.extension:Unfalltag.value[x]:valueDate">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueDate" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="Mehrfachverordnung" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Kennzeichen">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Kennzeichen" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Kennzeichen.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Kennzeichen.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Nummerierung" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung.value[x]:valueRatio">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueRatio" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung.value[x]:valueRatio.numerator">
+      <path value="MedicationRequest.extension.extension.value[x].numerator" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung.value[x]:valueRatio.numerator.value">
+      <path value="MedicationRequest.extension.extension.value[x].numerator.value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung.value[x]:valueRatio.denominator">
+      <path value="MedicationRequest.extension.extension.value[x].denominator" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Nummerierung.value[x]:valueRatio.denominator.value">
+      <path value="MedicationRequest.extension.extension.value[x].denominator.value" />
+      <definition value="Das Feld dient der Kennzeichnung der Länge der Serie einer Mehrfachverordnung. Beispiel: &quot;4&quot; in &quot;2 von 4&quot;" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Zeitraum">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Zeitraum" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Zeitraum.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Zeitraum.value[x]:valuePeriod">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valuePeriod" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Zeitraum.value[x]:valuePeriod.start">
+      <path value="MedicationRequest.extension.extension.value[x].start" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:Zeitraum.value[x]:valuePeriod.end">
+      <path value="MedicationRequest.extension.extension.value[x].end" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:ID">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="ID" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:ID.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:ID.value[x]:valueIdentifier">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueIdentifier" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:ID.value[x]:valueIdentifier.system">
+      <path value="MedicationRequest.extension.extension.value[x].system" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Mehrfachverordnung.extension:ID.value[x]:valueIdentifier.value">
+      <path value="MedicationRequest.extension.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:VerschreiberID">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="VerschreiberID" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Prescriber_ID" />
+      </type>
+      <mustSupport value="true" />
+      <isModifier value="false" />
+    </element>
+    <element id="MedicationRequest.extension:VerschreiberID.value[x]">
+      <path value="MedicationRequest.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:VerschreiberID.value[x]:valueIdentifier">
+      <path value="MedicationRequest.extension.value[x]" />
+      <sliceName value="valueIdentifier" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:VerschreiberID.value[x]:valueIdentifier.value">
+      <path value="MedicationRequest.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="Betaeubungsmittel" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Narcotic" />
+      </type>
+      <mustSupport value="true" />
+      <isModifier value="false" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:BtM-Sonderkennzeichen">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="BtM-Sonderkennzeichen" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:BtM-Sonderkennzeichen.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:BtM-Sonderkennzeichen.value[x]:valueCoding">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueCoding" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:BtM-Sonderkennzeichen.value[x]:valueCoding.system">
+      <path value="MedicationRequest.extension.extension.value[x].system" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:BtM-Sonderkennzeichen.value[x]:valueCoding.code">
+      <path value="MedicationRequest.extension.extension.value[x].code" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:ErgaenzendeAngabenSubstitutionsmittel">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="ErgaenzendeAngabenSubstitutionsmittel" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:ErgaenzendeAngabenSubstitutionsmittel.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Betaeubungsmittel.extension:ErgaenzendeAngabenSubstitutionsmittel.value[x]:valueString">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueString" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="T-Rezept" />
+      <short value="T-Rezept" />
+      <definition value="Abbildung der Angaben zur Verordnung eines teratogenen Arzneimittels (T-Rezept)" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Teratogenic" />
+      </type>
+      <mustSupport value="true" />
+      <isModifier value="false" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:Off-Label">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="Off-Label" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:Off-Label.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:Off-Label.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:Off-Label.value[x]:valueBoolean.value">
+      <path value="MedicationRequest.extension.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:GebaerfaehigeFrau">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="GebaerfaehigeFrau" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:GebaerfaehigeFrau.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:GebaerfaehigeFrau.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:GebaerfaehigeFrau.value[x]:valueBoolean.value">
+      <path value="MedicationRequest.extension.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:EinhaltungSicherheitsmassnahmen">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="EinhaltungSicherheitsmassnahmen" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:EinhaltungSicherheitsmassnahmen.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:EinhaltungSicherheitsmassnahmen.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:EinhaltungSicherheitsmassnahmen.value[x]:valueBoolean.value">
+      <path value="MedicationRequest.extension.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:AushaendigungInformationsmaterialien">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="AushaendigungInformationsmaterialien" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:AushaendigungInformationsmaterialien.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:AushaendigungInformationsmaterialien.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:AushaendigungInformationsmaterialien.value[x]:valueBoolean.value">
+      <path value="MedicationRequest.extension.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:ErklaerungSachkenntnis">
+      <path value="MedicationRequest.extension.extension" />
+      <sliceName value="ErklaerungSachkenntnis" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:ErklaerungSachkenntnis.value[x]">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:ErklaerungSachkenntnis.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:T-Rezept.extension:ErklaerungSachkenntnis.value[x]:valueBoolean.value">
+      <path value="MedicationRequest.extension.extension.value[x].value" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Dosierungskennzeichen">
+      <path value="MedicationRequest.extension" />
+      <sliceName value="Dosierungskennzeichen" />
+      <short value="Dosierkennzeichen" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Dosierungskennzeichen.value[x]">
+      <path value="MedicationRequest.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.extension:Dosierungskennzeichen.value[x]:valueBoolean">
+      <path value="MedicationRequest.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <definition value="Abbildung, ob eine Dosierungsanweisung in der Verordung angegeben ist true - Dosierung gemäß Angaben in dieser Verordnung (dosageInstruction.text) false - Dosieranweisung/Medikationsplan mitgegeben" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.identifier">
+      <path value="MedicationRequest.identifier" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.status">
+      <path value="MedicationRequest.status" />
+      <fixedCode value="active" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.statusReason">
+      <path value="MedicationRequest.statusReason" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.intent">
+      <path value="MedicationRequest.intent" />
+      <fixedCode value="order" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.category">
+      <path value="MedicationRequest.category" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.priority">
+      <path value="MedicationRequest.priority" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.doNotPerform">
+      <path value="MedicationRequest.doNotPerform" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.reported[x]">
+      <path value="MedicationRequest.reported[x]" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.medication[x]">
+      <path value="MedicationRequest.medication[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_FreeText|1.4" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Compounding|1.4" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.4" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Ingredient|1.4" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.medication[x]:medicationReference">
+      <path value="MedicationRequest.medication[x]" />
+      <sliceName value="medicationReference" />
+      <min value="1" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_FreeText|1.4" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Compounding|1.4" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.4" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_Ingredient|1.4" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.medication[x]:medicationReference.reference">
+      <path value="MedicationRequest.medication[x].reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.medication[x]:medicationReference.type">
+      <path value="MedicationRequest.medication[x].type" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.medication[x]:medicationReference.identifier">
+      <path value="MedicationRequest.medication[x].identifier" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.medication[x]:medicationReference.display">
+      <path value="MedicationRequest.medication[x].display" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.subject">
+      <path value="MedicationRequest.subject" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.2" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.subject.reference">
+      <path value="MedicationRequest.subject.reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.subject.type">
+      <path value="MedicationRequest.subject.type" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.subject.identifier">
+      <path value="MedicationRequest.subject.identifier" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.subject.display">
+      <path value="MedicationRequest.subject.display" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.encounter">
+      <path value="MedicationRequest.encounter" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.supportingInformation">
+      <path value="MedicationRequest.supportingInformation" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.authoredOn">
+      <path value="MedicationRequest.authoredOn" />
+      <definition value="Ausstellungsdatum der Verordnung" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.requester">
+      <path value="MedicationRequest.requester" />
+      <min value="1" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner|1.2" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.requester.reference">
+      <path value="MedicationRequest.requester.reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.requester.type">
+      <path value="MedicationRequest.requester.type" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.requester.identifier">
+      <path value="MedicationRequest.requester.identifier" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.requester.display">
+      <path value="MedicationRequest.requester.display" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.performer">
+      <path value="MedicationRequest.performer" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.performerType">
+      <path value="MedicationRequest.performerType" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.recorder">
+      <path value="MedicationRequest.recorder" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.reasonCode">
+      <path value="MedicationRequest.reasonCode" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.reasonReference">
+      <path value="MedicationRequest.reasonReference" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.instantiatesCanonical">
+      <path value="MedicationRequest.instantiatesCanonical" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.instantiatesUri">
+      <path value="MedicationRequest.instantiatesUri" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.basedOn">
+      <path value="MedicationRequest.basedOn" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.groupIdentifier">
+      <path value="MedicationRequest.groupIdentifier" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.courseOfTherapyType">
+      <path value="MedicationRequest.courseOfTherapyType" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.insurance">
+      <path value="MedicationRequest.insurance" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage|1.2" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.insurance.reference">
+      <path value="MedicationRequest.insurance.reference" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.insurance.type">
+      <path value="MedicationRequest.insurance.type" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.insurance.identifier">
+      <path value="MedicationRequest.insurance.identifier" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.insurance.display">
+      <path value="MedicationRequest.insurance.display" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.note">
+      <path value="MedicationRequest.note" />
+      <max value="1" />
+      <constraint>
+        <key value="-erp-begrenzungText" />
+        <severity value="error" />
+        <human value="Der Abgabehinweise darf aus maximal 500 Zeichen bestehen." />
+        <expression value="text.toString().length() &lt;= 500" />
+      </constraint>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.note.author[x]">
+      <path value="MedicationRequest.note.author[x]" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.note.time">
+      <path value="MedicationRequest.note.time" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.note.text">
+      <path value="MedicationRequest.note.text" />
+      <definition value="Über die Dosierung hinausgehende Abgabehinweise an die Apotheke" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dosageInstruction">
+      <path value="MedicationRequest.dosageInstruction" />
+      <short value="How the medication is/was taken or should be taken" />
+      <definition value="Indicates how the medication is/was taken or should be taken by the patient." />
+      <type>
+        <code value="Dosage" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Dosage_Interval" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Dosage_DailyTime" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Dosage_Weekday" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Dosage_DailyFourScheme" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Dosage_FreeText" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest">
+      <path value="MedicationRequest.dispenseRequest" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.initialFill">
+      <path value="MedicationRequest.dispenseRequest.initialFill" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.dispenseInterval">
+      <path value="MedicationRequest.dispenseRequest.dispenseInterval" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.validityPeriod">
+      <path value="MedicationRequest.dispenseRequest.validityPeriod" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.numberOfRepeatsAllowed">
+      <path value="MedicationRequest.dispenseRequest.numberOfRepeatsAllowed" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.quantity">
+      <path value="MedicationRequest.dispenseRequest.quantity" />
+      <min value="1" />
+      <constraint>
+        <key value="-erp-begrenzungValue" />
+        <severity value="error" />
+        <human value="Die Anzahl der verordneten Packungen darf aus maximal 6 Zeichen bestehen." />
+        <expression value="value.toString().length() &lt;= 6" />
+      </constraint>
+      <constraint>
+        <key value="-erp-begrenzungIntegerValue" />
+        <severity value="error" />
+        <human value="Die Anzahl der verordneten Packungen darf nur aus ganzen Zahlen bestehen und muss größer als 0 sein." />
+        <expression value="value.toString().matches('^[1-9][0-9]*$')" />
+      </constraint>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.quantity.value">
+      <path value="MedicationRequest.dispenseRequest.quantity.value" />
+      <definition value="Anzahl der verordneten Packungen" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.quantity.unit">
+      <path value="MedicationRequest.dispenseRequest.quantity.unit" />
+      <min value="1" />
+      <fixedString value="Packung" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.quantity.system">
+      <path value="MedicationRequest.dispenseRequest.quantity.system" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.quantity.code">
+      <path value="MedicationRequest.dispenseRequest.quantity.code" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.expectedSupplyDuration">
+      <path value="MedicationRequest.dispenseRequest.expectedSupplyDuration" />
+      <short value="Reichdauer" />
+      <definition value="In diesem Feld kann bei Betäubungsmitteln die Reichdauer des Substitutionsmittels in Tagen bzw. bei teratogenen Arzneimitteln die Reichdauer in Wochen angegeben werden." />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.expectedSupplyDuration.value">
+      <path value="MedicationRequest.dispenseRequest.expectedSupplyDuration.value" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.expectedSupplyDuration.comparator">
+      <path value="MedicationRequest.dispenseRequest.expectedSupplyDuration.comparator" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.expectedSupplyDuration.unit">
+      <path value="MedicationRequest.dispenseRequest.expectedSupplyDuration.unit" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.expectedSupplyDuration.system">
+      <path value="MedicationRequest.dispenseRequest.expectedSupplyDuration.system" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.expectedSupplyDuration.code">
+      <path value="MedicationRequest.dispenseRequest.expectedSupplyDuration.code" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.dispenseRequest.performer">
+      <path value="MedicationRequest.dispenseRequest.performer" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.substitution">
+      <path value="MedicationRequest.substitution" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.substitution.allowed[x]">
+      <path value="MedicationRequest.substitution.allowed[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <ordered value="false" />
+        <rules value="closed" />
+      </slicing>
+      <type>
+        <code value="boolean" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.substitution.allowed[x]:allowedBoolean">
+      <path value="MedicationRequest.substitution.allowed[x]" />
+      <sliceName value="allowedBoolean" />
+      <definition value="In diesem Feld wird angegeben ob das Arzneimittel austauschbar ist oder nicht&#xD;&#xA;&#xD;&#xA;true:  aut idem möglich (austauschbar)&#xD;&#xA;false: aut idem ausgeschlossen (nicht austauschbar)" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="MedicationRequest.substitution.reason">
+      <path value="MedicationRequest.substitution.reason" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.priorPrescription">
+      <path value="MedicationRequest.priorPrescription" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.detectedIssue">
+      <path value="MedicationRequest.detectedIssue" />
+      <max value="0" />
+    </element>
+    <element id="MedicationRequest.eventHistory">
+      <path value="MedicationRequest.eventHistory" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

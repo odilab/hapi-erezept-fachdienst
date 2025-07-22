@@ -1,0 +1,236 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-PR-TA7-Rechnung-List",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_TA7_Rechnung_List",
+  "version": "1.5.1",
+  "name": "GKVSV_PR_TA7_Rechnung_List",
+  "title": "GKVSV_PR_TA7_Rechnung_List",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Die Liste führt alle TA7_Rechnung_Bundles auf.",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "List",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/List",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "List.meta",
+        "path": "List.meta",
+        "min": 1
+      },
+      {
+        "id": "List.meta.profile",
+        "path": "List.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1
+      },
+      {
+        "id": "List.meta.profile:erpProfile",
+        "path": "List.meta.profile",
+        "sliceName": "erpProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_TA7_Rechnung_List|1.5"
+      },
+      {
+        "id": "List.implicitRules",
+        "path": "List.implicitRules",
+        "max": "0"
+      },
+      {
+        "id": "List.language",
+        "path": "List.language",
+        "max": "0"
+      },
+      {
+        "id": "List.text",
+        "path": "List.text",
+        "max": "0"
+      },
+      {
+        "id": "List.contained",
+        "path": "List.contained",
+        "max": "0"
+      },
+      {
+        "id": "List.identifier",
+        "path": "List.identifier",
+        "short": "Rechnungsnummer",
+        "max": "0"
+      },
+      {
+        "id": "List.identifier.use",
+        "path": "List.identifier.use",
+        "max": "0"
+      },
+      {
+        "id": "List.identifier.type",
+        "path": "List.identifier.type",
+        "max": "0"
+      },
+      {
+        "id": "List.identifier.period",
+        "path": "List.identifier.period",
+        "max": "0"
+      },
+      {
+        "id": "List.identifier.assigner",
+        "path": "List.identifier.assigner",
+        "max": "0"
+      },
+      {
+        "id": "List.status",
+        "path": "List.status",
+        "fixedCode": "current"
+      },
+      {
+        "id": "List.mode",
+        "path": "List.mode",
+        "fixedCode": "working"
+      },
+      {
+        "id": "List.title",
+        "path": "List.title",
+        "max": "0"
+      },
+      {
+        "id": "List.code",
+        "path": "List.code",
+        "max": "0"
+      },
+      {
+        "id": "List.subject",
+        "path": "List.subject",
+        "max": "0"
+      },
+      {
+        "id": "List.encounter",
+        "path": "List.encounter",
+        "max": "0"
+      },
+      {
+        "id": "List.date",
+        "path": "List.date",
+        "max": "0"
+      },
+      {
+        "id": "List.source",
+        "path": "List.source",
+        "max": "0"
+      },
+      {
+        "id": "List.orderedBy",
+        "path": "List.orderedBy",
+        "max": "0"
+      },
+      {
+        "id": "List.note",
+        "path": "List.note",
+        "max": "0"
+      },
+      {
+        "id": "List.entry",
+        "path": "List.entry",
+        "short": "Liste der TA7_Rechnung_Bundle",
+        "definition": "Hier werden alle TA7_Rechnung_Bundle einer Gesamtlieferung mittels ihres Dateinamens referenziert.",
+        "min": 1
+      },
+      {
+        "id": "List.entry.flag",
+        "path": "List.entry.flag",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.deleted",
+        "path": "List.entry.deleted",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.date",
+        "path": "List.entry.date",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.reference",
+        "path": "List.entry.item.reference",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.type",
+        "path": "List.entry.item.type",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.identifier",
+        "path": "List.entry.item.identifier",
+        "min": 1
+      },
+      {
+        "id": "List.entry.item.identifier.use",
+        "path": "List.entry.item.identifier.use",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.identifier.type",
+        "path": "List.entry.item.identifier.type",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.identifier.system",
+        "path": "List.entry.item.identifier.system",
+        "short": "Dateiname",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/NamingSystem/GKVSV_NS_Dateiname"
+      },
+      {
+        "id": "List.entry.item.identifier.value",
+        "path": "List.entry.item.identifier.value",
+        "short": "Dateiname",
+        "definition": "Dateiname eines TA7_Rechnung_Bundle der Gesamtlieferung",
+        "min": 1,
+        "maxLength": 11,
+        "constraint": [
+          {
+            "key": "Dateiname",
+            "severity": "error",
+            "human": "Der Dateiname muss den Konventionen der TA7 entsprechen.",
+            "expression": "toString().matches('^((ARZ|APO|KKR|KRZ|SON)(FHR|FK[1-9])(\\\\d{2})(\\\\d{3}|[A-Z]\\\\d{2}))|((B|C|D|K|R)([0-9]|[A-Z]){2}(FHR|FK[1-9])(\\\\d{2})([0-9]|[A-Z]){3})$') and toString().matches('^((ARZ|APO|KKR|KRZ|SON)(FHR|FK[1-9])(\\\\d{2})(000))|((B|C|D|K|R)(00)(FHR|FK[1-9])(\\\\d{2})(000))$').not()",
+            "source": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_TA7_Rechnung_List"
+          }
+        ]
+      },
+      {
+        "id": "List.entry.item.identifier.period",
+        "path": "List.entry.item.identifier.period",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.identifier.assigner",
+        "path": "List.entry.item.identifier.assigner",
+        "max": "0"
+      },
+      {
+        "id": "List.entry.item.display",
+        "path": "List.entry.item.display",
+        "short": "Dateiname des TA7_Rechnung_Bundle",
+        "max": "0"
+      },
+      {
+        "id": "List.emptyReason",
+        "path": "List.emptyReason",
+        "max": "0"
+      }
+    ]
+  }
+}

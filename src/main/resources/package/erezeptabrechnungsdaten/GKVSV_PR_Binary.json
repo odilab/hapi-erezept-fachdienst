@@ -1,0 +1,55 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-PR-Binary",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_Binary",
+  "version": "1.5.1",
+  "name": "GKVSV_PR_Binary",
+  "status": "active",
+  "date": "2025-03-31",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Binary",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Binary",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Binary.meta",
+        "path": "Binary.meta"
+      },
+      {
+        "id": "Binary.meta.profile",
+        "path": "Binary.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1
+      },
+      {
+        "id": "Binary.meta.profile:erpProfile",
+        "path": "Binary.meta.profile",
+        "sliceName": "erpProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_Binary|1.5"
+      },
+      {
+        "id": "Binary.contentType",
+        "path": "Binary.contentType",
+        "fixedCode": "application/pkcs7-mime"
+      },
+      {
+        "id": "Binary.data",
+        "path": "Binary.data",
+        "min": 1
+      }
+    ]
+  }
+}

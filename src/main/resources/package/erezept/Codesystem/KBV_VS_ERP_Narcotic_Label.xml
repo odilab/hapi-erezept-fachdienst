@@ -1,0 +1,15 @@
+<ValueSet xmlns="http://hl7.org/fhir">
+  <id value="KBV-VS-ERP-Narcotic-Label" />
+  <url value="https://fhir.kbv.de/ValueSet/KBV_VS_ERP_Narcotic_Label" />
+  <version value="1.4.0" />
+  <name value="KBV_VS_ERP_Narcotic_Label" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <description value="ValueSet für Sonderkennzeichen bei einer BtM-Verordnung" />
+  <compose>
+    <include>
+      <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Narcotic_Label" />
+    </include>
+  </compose>
+</ValueSet>

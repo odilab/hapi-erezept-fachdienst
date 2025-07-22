@@ -1,0 +1,39 @@
+<CodeSystem xmlns="http://hl7.org/fhir">
+  <id value="KBV-CS-ERP-Dosage-Category" />
+  <url value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Dosage_Category" />
+  <version value="1.4.0" />
+  <name value="KBV_CS_ERP_Dosage_Category" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <contact>
+    <telecom>
+      <system value="url" />
+      <value value="http://www.kbv.de" />
+    </telecom>
+  </contact>
+  <description value="Kategorie der Dosieranweisung" />
+  <copyright value="Kassenärztliche Bundesvereinigung" />
+  <caseSensitive value="true" />
+  <content value="complete" />
+  <concept>
+    <code value="FREE_TEXT" />
+    <display value="Dosieranweisung als Freitext" />
+  </concept>
+  <concept>
+    <code value="DAILY_FOUR_SCHEME" />
+    <display value="Strukturierte Dosieranweisung für die tägliche Anwendung mit Tageszeitbezug (Vierer-Schema)" />
+  </concept>
+  <concept>
+    <code value="DAILY_TIME" />
+    <display value="Strukturierte Dosieranweisung für die tägliche Anwendung mit Uhrzeitbezug" />
+  </concept>
+  <concept>
+    <code value="INTERVAL" />
+    <display value="Strukturierte Dosieranweisung für die Anwendung in wiederkehrendem Zeitintervall" />
+  </concept>
+  <concept>
+    <code value="WEEKDAY" />
+    <display value="Strukturierte Dosieranweisung für die Anwendung mit Wochentagbezug" />
+  </concept>
+</CodeSystem>

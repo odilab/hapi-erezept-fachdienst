@@ -1,0 +1,30 @@
+{
+  "resourceType": "ValueSet",
+  "id": "GKVSV-VS-ERP-Rechnungsart",
+  "url": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Rechnungsart",
+  "version": "1.5.1",
+  "name": "GKVSV_VS_ERP_Rechnungsart",
+  "title": "GKVSV_VS_ERP_Rechnungsart",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "GKV-Spitzenverband",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gkv-spitzenverband.de/"
+        }
+      ]
+    }
+  ],
+  "description": "Kennzeichnung der Art der Abrechnung",
+  "copyright": "GKV-Spitzenverband",
+  "compose": {
+    "include": [
+      {
+        "system": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Rechnungsart"
+      }
+    ]
+  }
+}

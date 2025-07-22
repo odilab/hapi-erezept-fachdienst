@@ -1,0 +1,264 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-PR-ERP-Medication-FreeText" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_FreeText" />
+  <version value="1.4.0" />
+  <name value="KBV_PR_ERP_Medication_FreeText" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="resource" />
+  <abstract value="false" />
+  <type value="Medication" />
+  <baseDefinition value="https://fhir.kbv.de/StructureDefinition/KBV_PR_Base_Medication|1.7.0" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Medication.id">
+      <path value="Medication.id" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.meta">
+      <path value="Medication.meta" />
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.meta.versionId">
+      <path value="Medication.meta.versionId" />
+      <max value="0" />
+    </element>
+    <element id="Medication.meta.lastUpdated">
+      <path value="Medication.meta.lastUpdated" />
+      <max value="0" />
+    </element>
+    <element id="Medication.meta.source">
+      <path value="Medication.meta.source" />
+      <max value="0" />
+    </element>
+    <element id="Medication.meta.profile">
+      <path value="Medication.meta.profile" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="open" />
+      </slicing>
+      <min value="1" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.meta.profile:erpProfile">
+      <path value="Medication.meta.profile" />
+      <sliceName value="erpProfile" />
+      <min value="1" />
+      <max value="1" />
+      <fixedCanonical value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_FreeText|1.4" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.meta.security">
+      <path value="Medication.meta.security" />
+      <max value="0" />
+    </element>
+    <element id="Medication.meta.tag">
+      <path value="Medication.meta.tag" />
+      <max value="0" />
+    </element>
+    <element id="Medication.implicitRules">
+      <path value="Medication.implicitRules" />
+      <max value="0" />
+    </element>
+    <element id="Medication.language">
+      <path value="Medication.language" />
+      <max value="0" />
+    </element>
+    <element id="Medication.text">
+      <path value="Medication.text" />
+      <max value="0" />
+    </element>
+    <element id="Medication.contained">
+      <path value="Medication.contained" />
+      <max value="0" />
+    </element>
+    <element id="Medication.extension">
+      <path value="Medication.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="2" />
+      <max value="2" />
+    </element>
+    <element id="Medication.extension:Kategorie">
+      <path value="Medication.extension" />
+      <sliceName value="Kategorie" />
+      <max value="0" />
+    </element>
+    <element id="Medication.extension:Normgroesse">
+      <path value="Medication.extension" />
+      <sliceName value="Normgroesse" />
+      <max value="0" />
+    </element>
+    <element id="Medication.extension:Arzneimittelkategorie">
+      <path value="Medication.extension" />
+      <sliceName value="Arzneimittelkategorie" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Category" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Arzneimittelkategorie.value[x]">
+      <path value="Medication.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Arzneimittelkategorie.value[x]:valueCoding">
+      <path value="Medication.extension.value[x]" />
+      <sliceName value="valueCoding" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Arzneimittelkategorie.value[x]:valueCoding.system">
+      <path value="Medication.extension.value[x].system" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Arzneimittelkategorie.value[x]:valueCoding.code">
+      <path value="Medication.extension.value[x].code" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Impfstoff">
+      <path value="Medication.extension" />
+      <sliceName value="Impfstoff" />
+      <min value="1" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Vaccine" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Impfstoff.value[x]">
+      <path value="Medication.extension.value[x]" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.extension:Impfstoff.value[x]:valueBoolean">
+      <path value="Medication.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.identifier">
+      <path value="Medication.identifier" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code">
+      <path value="Medication.code" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.code.coding">
+      <path value="Medication.code.coding" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <max value="1" />
+    </element>
+    <element id="Medication.code.coding:pzn">
+      <path value="Medication.code.coding" />
+      <sliceName value="pzn" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code.coding:snomed">
+      <path value="Medication.code.coding" />
+      <sliceName value="snomed" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code.coding:atc">
+      <path value="Medication.code.coding" />
+      <sliceName value="atc" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code.coding:verordnungskategorieCode">
+      <path value="Medication.code.coding" />
+      <sliceName value="verordnungskategorieCode" />
+      <min value="1" />
+      <max value="1" />
+      <patternCoding>
+        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Medication_Type" />
+      </patternCoding>
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.code.coding:verordnungskategorieCode.system">
+      <path value="Medication.code.coding.system" />
+      <min value="1" />
+      <fixedUri value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Medication_Type" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.code.coding:verordnungskategorieCode.version">
+      <path value="Medication.code.coding.version" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code.coding:verordnungskategorieCode.code">
+      <path value="Medication.code.coding.code" />
+      <short value="Kennzeichnung Freitextverordnung" />
+      <definition value="Anhand des &quot;Fixed value&quot; kann die Medication als Freitextverordnung identifiziert werden." />
+      <min value="1" />
+      <fixedCode value="freitext" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.code.coding:verordnungskategorieCode.display">
+      <path value="Medication.code.coding.display" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code.coding:verordnungskategorieCode.userSelected">
+      <path value="Medication.code.coding.userSelected" />
+      <max value="0" />
+    </element>
+    <element id="Medication.code.text">
+      <path value="Medication.code.text" />
+      <short value="Freitextverordnung" />
+      <definition value="Entweder für eine Rezeptur oder Wirkstoffverordnung, die nicht strukturiert erfasst werden können oder für sonstige Verordnungen wie zum Beispiel importierte Arzneimittel ohne PZN" />
+      <min value="1" />
+      <maxLength value="500" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.status">
+      <path value="Medication.status" />
+      <max value="0" />
+    </element>
+    <element id="Medication.manufacturer">
+      <path value="Medication.manufacturer" />
+      <max value="0" />
+    </element>
+    <element id="Medication.form">
+      <path value="Medication.form" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.form.coding">
+      <path value="Medication.form.coding" />
+      <max value="0" />
+    </element>
+    <element id="Medication.form.text">
+      <path value="Medication.form.text" />
+      <short value="Darreichungsform Freitext" />
+      <definition value="Angabe der Darreichungsform als Freitext" />
+      <min value="1" />
+      <maxLength value="30" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Medication.amount">
+      <path value="Medication.amount" />
+      <max value="0" />
+    </element>
+    <element id="Medication.ingredient">
+      <path value="Medication.ingredient" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

@@ -1,0 +1,23 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "DAV-CS-ERP-ZusatzattributSchluesselMehrkostenuebernahme",
+  "url": "http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-ZusatzattributSchluesselMehrkostenuebernahme",
+  "version": "1.5.0",
+  "name": "DAV_CS_ERP_ZusatzattributSchluesselMehrkostenuebernahme",
+  "title": "Schluessel Mehrkostenuebernahme",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "Deutscher Apothekerverband e.V. (DAV)",
+  "content": "complete",
+  "count": 2,
+  "concept": [
+    {
+      "code": "1",
+      "display": "Ja, nach § 129 Abs. 4c SGB V"
+    },
+    {
+      "code": "2",
+      "display": "Ja, nach Rabattvertrag"
+    }
+  ]
+}

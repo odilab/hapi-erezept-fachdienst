@@ -1,0 +1,53 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="DAV-PKV-PR-ERP-ZusatzdatenHerstellung" />
+  <url value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-ZusatzdatenHerstellung" />
+  <version value="1.4.0" />
+  <name value="DAV_PKV_PR_ERP_ZusatzdatenHerstellung" />
+  <title value="DAV_PKV_PR_ERP_ZusatzdatenHerstellung" />
+  <status value="active" />
+  <date value="2025-03-31" />
+  <publisher value="Deutscher Apothekerverband e.V. (DAV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="resource" />
+  <abstract value="false" />
+  <type value="MedicationDispense" />
+  <baseDefinition value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-Base-ZusatzdatenHerstellung" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="MedicationDispense.meta">
+      <path value="MedicationDispense.meta" />
+    </element>
+    <element id="MedicationDispense.meta.profile:pkvProfile">
+      <path value="MedicationDispense.meta.profile" />
+      <sliceName value="pkvProfile" />
+      <min value="1" />
+      <max value="1" />
+      <fixedCanonical value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-ZusatzdatenHerstellung|1.4" />
+    </element>
+    <element id="MedicationDispense.extension:ZaehlerHerstellung">
+      <path value="MedicationDispense.extension" />
+      <sliceName value="ZaehlerHerstellung" />
+      <definition value="Bei parenteralen Zubereitungen ist jeder Herstellungsvorgang beginnend mit „1“ lückenlos fortlaufend zu nummerieren.&#xD;&#xA;Bei sonstigen Rezepturen und der Abgabe von Teilmengen ist der Wert &quot;1&quot; anzugeben." />
+    </element>
+    <element id="MedicationDispense.extension:Einheit">
+      <path value="MedicationDispense.extension" />
+      <sliceName value="Einheit" />
+    </element>
+    <element id="MedicationDispense.extension:Einheit.value[x]">
+      <path value="MedicationDispense.extension.value[x]" />
+      <type>
+        <code value="Reference" />
+        <targetProfile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-ZusatzdatenEinheit" />
+      </type>
+    </element>
+    <element id="MedicationDispense.performer">
+      <path value="MedicationDispense.performer" />
+      <max value="0" />
+    </element>
+    <element id="MedicationDispense.whenPrepared">
+      <path value="MedicationDispense.whenPrepared" />
+      <definition value="Die Angabe muss im Format ISO 8601 (z.B.: YYYY-MM-DDTHH:MM:00Z oder YYYY-MM-DDThh:mm:ss+zz:zz) erfolgen.&#xD;&#xA;Pflichtfeld bei parenteralen Zubereitungen; &#xD;&#xA;keine Angabe bei sonstigen Rezepturen und Abgabe von Teilmengen." />
+      <mustSupport value="true" />
+    </element>
+  </differential>
+</StructureDefinition>

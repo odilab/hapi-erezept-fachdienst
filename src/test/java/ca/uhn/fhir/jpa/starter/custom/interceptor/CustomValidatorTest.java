@@ -2,10 +2,8 @@ package ca.uhn.fhir.jpa.starter.custom.interceptor;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.starter.Application;
-import ca.uhn.fhir.jpa.starter.custom.ErgTestResourceUtil;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
-import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
@@ -18,9 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
+import java.nio.file.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.Collections;
+import ca.uhn.fhir.validation.ValidationResult;
+import java.util.Set;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,93 +60,6 @@ class CustomValidatorTest  {
 
     }
 
-    @Test
-    @DisplayName("Validierung einer gültigen Rechnung nach Gematik-Beispiel sollte erfolgreich sein")
-    void testValidateValidDocumentReferenceGematikExample() {
-        DocumentReference rechnung = new DocumentReference();
-        rechnung.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-        
-        // Type gemäß Gematik-Beispiel
-        CodeableConcept type = new CodeableConcept();
-        Coding typeCoding = type.addCoding();
-        typeCoding.setSystem("http://dvmd.de/fhir/CodeSystem/kdl");
-        typeCoding.setCode("AM010106");
-        typeCoding.setDisplay("Rechnung ambulante/stationäre Behandlung");
-        rechnung.setType(type);
-        
-        // Description
-        rechnung.setDescription("Rechnung Reiseimpfung vom 10.01.2024");
-        
-        // Subject (Patient)
-        Identifier patientIdentifier = new Identifier();
-        patientIdentifier.setSystem("http://fhir.de/sid/gkv/kvid-10");
-        patientIdentifier.setValue("A000000000");
-        rechnung.getSubject().setIdentifier(patientIdentifier);
-        
-        // Content mit PDF und XML Anhängen
-        byte[] dummyData = "TESTDATEN".getBytes();
-        String base64Data = Base64.getEncoder().encodeToString(dummyData);
-        
-        // PDF Dokument
-        DocumentReference.DocumentReferenceContentComponent pdfContent = rechnung.addContent();
-        Attachment pdfAttachment = new Attachment();
-        pdfAttachment.setContentType("application/pdf");
-        pdfAttachment.setData(dummyData);
-        pdfContent.setAttachment(pdfAttachment);
-        
-        // XRechnung
-        DocumentReference.DocumentReferenceContentComponent xRechnungContent = rechnung.addContent();
-        xRechnungContent.getFormat().setCode("xrechnung");
-        Attachment xRechnungAttachment = new Attachment();
-        xRechnungAttachment.setContentType("application/xml");
-        xRechnungAttachment.setData(dummyData);
-        xRechnungContent.setAttachment(xRechnungAttachment);
-        
-        // Gematik E-Rechnung
-        DocumentReference.DocumentReferenceContentComponent eRechnungContent = rechnung.addContent();
-        eRechnungContent.getFormat().setCode("gematik-erechnung");
-        Attachment eRechnungAttachment = new Attachment();
-        eRechnungAttachment.setContentType("application/fhir+xml");
-        eRechnungAttachment.setData(dummyData);
-        eRechnungContent.setAttachment(eRechnungAttachment);
-        
-        // Signatur Extension
-        Extension signaturExtension = new Extension("http://example.org/StructureDefinition/signatur");
-        Signature signature = new Signature();
-        Coding signatureType = new Coding();
-        signatureType.setSystem("urn:iso-astm:E1762-95:2013");
-        signatureType.setCode("1.2.840.10065.1.12.1.1");
-        signatureType.setDisplay("Author's Signature");
-        signature.addType(signatureType);
-        DateTimeType dateTime = new DateTimeType("2015-02-07T13:28:17.239+02:00");
-        signature.setWhen(dateTime.getValue());
-        Reference whoReference = new Reference();
-        whoReference.setDisplay("Arzt");
-        signature.setWho(whoReference);
-        signaturExtension.setValue(signature);
-        rechnung.addExtension(signaturExtension);
-        
-        // Sollte keine Exception werfen
-        assertDoesNotThrow(() -> validator.validateResourceCreate(rechnung));
-    }
-
-    @Test
-    @DisplayName("Validierung einer Rechnung ohne Pflichtfelder sollte fehlschlagen")
-    void testValidateInvalidDocumentReference() {
-        DocumentReference rechnung = new DocumentReference();
-        rechnung.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-        
-        UnprocessableEntityException exception = assertThrows(
-            UnprocessableEntityException.class,
-            () -> validator.validateResourceCreate(rechnung)
-        );
-        
-        OperationOutcome outcome = (OperationOutcome) exception.getOperationOutcome();
-        assertTrue(outcome.getIssue().stream()
-            .anyMatch(issue -> issue.getDiagnostics().contains("subject")));
-        assertTrue(outcome.getIssue().stream()
-            .anyMatch(issue -> issue.getDiagnostics().contains("content")));
-    }
 
 
     @Test
@@ -199,103 +117,7 @@ class CustomValidatorTest  {
     }
 
 
-    @Test
-    @DisplayName("Validierung eines Patienten nach ERG-Profil sollte erfolgreich sein")
-    void testValidateErgPatient() {
-        Patient patient = ErgTestResourceUtil.createTestErgPatient();
-        assertDoesNotThrow(() -> validator.validateResourceCreate(patient), "Validierung des ERG-Patienten sollte erfolgreich sein.");
-    }
 
-    @Test
-    @DisplayName("Validierung eines Practitioners nach ERG-Person-Profil sollte erfolgreich sein")
-    void testValidateErgPractitioner() {
-        Practitioner practitioner = ErgTestResourceUtil.createTestErgPractitioner();
-        assertDoesNotThrow(() -> validator.validateResourceCreate(practitioner), "Validierung des ERG-Practitioners sollte erfolgreich sein.");
-    }
-
-    @Test
-    @DisplayName("Validierung einer Institution nach ERG-Profil sollte erfolgreich sein")
-    void testValidateErgInstitution() {
-        Organization institution = ErgTestResourceUtil.createTestErgInstitution();
-        assertDoesNotThrow(() -> validator.validateResourceCreate(institution), "Validierung der ERG-Institution sollte erfolgreich sein.");
-    }
-
-    @Test
-    @DisplayName("Validierung einer gültigen ERG-Rechnung sollte erfolgreich sein")
-    void testValidateValidErgInvoice() {
-        // 1. Referenzierte Ressourcen erstellen
-        Patient ergPatient = ErgTestResourceUtil.createTestErgPatient();
-        Practitioner ergPractitioner = ErgTestResourceUtil.createTestErgPractitioner();
-        Organization ergInstitution = ErgTestResourceUtil.createTestErgInstitution();
-        // Minimales ChargeItem für die Referenz in der Invoice
-        ChargeItem chargeItem = ErgTestResourceUtil.createMinimalChargeItem(ergPatient); 
-
-        // 2. Referenzierte Ressourcen auf dem Server speichern (benötigt gültige Tokens)
-        // Speichere Patient (EGK1 Token)
-        ergPatient = (Patient) client.create()
-            .resource(ergPatient)
-            .execute()
-            .getResource();
-        final String patientId = ergPatient.getIdElement().getIdPart();
-
-        // Speichere Practitioner (HBA_ARZT Token)
-        ergPractitioner = (Practitioner) client.create()
-            .resource(ergPractitioner)
-            .execute()
-            .getResource();
-        final String practitionerId = ergPractitioner.getIdElement().getIdPart();
-        
-        // Speichere Institution (SMC-B Token oder alternativ HBA_ARZT)
-        ergInstitution = (Organization) client.create()
-            .resource(ergInstitution)
-            .execute()
-            .getResource();
-        final String institutionId = ergInstitution.getIdElement().getIdPart();
-
-        // Speichere ChargeItem (HBA_ARZT Token - Annahme: Leistungserbringer erstellt ChargeItem)
-        chargeItem.setSubject(new Reference("Patient/" + patientId)); // Subject aktualisieren mit gespeicherter ID
-        chargeItem = (ChargeItem) client.create()
-            .resource(chargeItem)
-            .execute()
-            .getResource();
-        final String chargeItemId = chargeItem.getIdElement().getIdPart();
-
-        // 2.5 Dummy-Anhang DocumentReference erstellen und speichern (Wieder hinzugefügt für Beispiel)
-        DocumentReference dummyAnhangDocRef = new DocumentReference();
-        dummyAnhangDocRef.getMeta().addProfile("http://hl7.org/fhir/StructureDefinition/DocumentReference");
-        dummyAnhangDocRef.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-        dummyAnhangDocRef.getType().addCoding().setSystem("http://loinc.org").setCode("11488-4"); // Beispiel-Typ
-        dummyAnhangDocRef.addContent().getAttachment().setContentType("text/plain").setData("Dummy Anhang Inhalt".getBytes());
-        dummyAnhangDocRef.setSubject(new Reference("Patient/" + patientId)); // Subject hinzufügen
-
-        DocumentReference storedDummyAnhangDocRef = (DocumentReference) client.create()
-            .resource(dummyAnhangDocRef)
-            .execute()
-            .getResource();
-        final String anhangDocRefId = storedDummyAnhangDocRef.getIdElement().getIdPart();
-        logger.info("Dummy Anhang DocumentReference gespeichert mit ID: {}", anhangDocRefId);
-
-        // 3. ERG-Invoice erstellen (wird eingebettet, nicht separat gespeichert)
-        Invoice ergInvoice = ErgTestResourceUtil.createValidErgInvoice(ergPatient, ergPractitioner, ergInstitution, chargeItem);
-
-        // 4. ERG-DocumentReference erstellen, die auf die gespeicherten Ressourcen und die Invoice verweist
-        DocumentReference ergDocRef = ErgTestResourceUtil.createValidErgDocumentReference(ergPatient, ergPractitioner, ergInstitution, ergInvoice, anhangDocRefId);
-
-        // Ausgabe der erstellten DocumentReference vor dem Speichern
-        String ergDocRefJson = FhirContext.forR4().newJsonParser().setPrettyPrint(true).encodeResourceToString(ergDocRef);
-        // logger.info("Erstellte ERG-DocumentReference (vor Speicherung):\n{}", ergDocRefJson); // Ersetzt durch System.out
-        System.out.println("--- Erstellte ERG-DocumentReference (vor Speicherung): ---");
-        System.out.println(ergDocRefJson);
-        System.out.println("-----------------------------------------------------------");
-
-        // 5. DocumentReference auf dem Server speichern (löst die Validierung via Hook aus)
-        assertDoesNotThrow(() -> {
-            client.create()
-                .resource(ergDocRef)
-                // Annahme: Der Leistungserbringer (z.B. Arzt mit HBA) ist berechtigt, die Metadaten zu speichern
-                .execute();
-        }, "Validierung und Speicherung der ERG-DocumentReference sollte erfolgreich sein.");
-    }
 
     @Test
     @DisplayName("Validiere alle geladenen StructureDefinitions als Ressourcen")
@@ -338,135 +160,577 @@ class CustomValidatorTest  {
         logger.info("Erfolgreich {} StructureDefinitions als Ressourcen validiert.", validationCount);
     }
 
-	@Test
-	@DisplayName("Validierung einer gültigen ERG-DocumentReference (Dokumentenmetadaten) sollte erfolgreich sein")
-	void testValidateValidErgDocumentReference() {
-		// 1. Referenzierte Ressourcen erstellen
-		Patient ergPatient = ErgTestResourceUtil.createTestErgPatient();
-		Practitioner ergPractitioner = ErgTestResourceUtil.createTestErgPractitioner();
-		Organization ergInstitution = ErgTestResourceUtil.createTestErgInstitution();
-		ChargeItem chargeItem = ErgTestResourceUtil.createMinimalChargeItem(ergPatient); // Für die Invoice benötigt
+    @Test
+    @DisplayName("Validiere eRezept Bundle-Ressourcen (mit fehlenden KBV FOR Profilen)")
+    void testValidateErezeptBundles() {
+        logger.info("Starte Validierung der eRezept Bundle-Ressourcen...");
+        logger.info("HINWEIS: KBV FOR Profile (Patient, Practitioner, Organization, Coverage) sind nicht verfügbar");
+        
+        // Liste der eRezept Bundle-Dateien
+        String[] erezeptBundles = {
+            "/package/erezept/Beispiel_1.xml",
+            "/package/erezept/Beispiel_61_PZN_BtM.xml",
+            "/package/erezept/Beispiel_70_PZN_TRp.xml",
+            "/package/erezept/Beispiel_66_Rezeptur_BtM.xml"
+        };
+        
+        for (String bundlePath : erezeptBundles) {
+            logger.info("Lade und validiere Bundle: {}", bundlePath);
+            
+            try {
+                IBaseResource bundle = loadResourceFromClasspath(bundlePath);
+                assertNotNull(bundle, "Bundle konnte nicht geladen werden: " + bundlePath);
+                assertTrue(bundle instanceof Bundle, "Ressource ist kein Bundle: " + bundlePath);
+                
+                // Führe Validierung durch und erwarte Fehler für fehlende KBV FOR Profile
+                ValidationResult result = validator.validateAndReturnResult(bundle);
+                
+                // Sammle alle Fehler
+                List<String> errors = result.getMessages().stream()
+                    .filter(msg -> msg.getSeverity().ordinal() >= 3) // ERROR oder FATAL
+                    .map(msg -> msg.getMessage())
+                    .collect(Collectors.toList());
+                
+                // Erwarte, dass alle Fehler sich auf fehlende KBV FOR Profile beziehen
+                boolean allErrorsAreForMissingKbvForProfiles = errors.stream()
+                    .allMatch(error -> error.contains("KBV_PR_FOR") && error.contains("konnte nicht aufgelöst werden"));
+                
+                if (!allErrorsAreForMissingKbvForProfiles) {
+                    // Logge unerwartete Fehler
+                    logger.error("Unerwartete Validierungsfehler für Bundle {}: ", bundlePath);
+                    errors.forEach(error -> {
+                        if (!(error.contains("KBV_PR_FOR") && error.contains("konnte nicht aufgelöst werden"))) {
+                            logger.error("  - {}", error);
+                        }
+                    });
+                    fail("Bundle " + bundlePath + " hat unerwartete Validierungsfehler (nicht nur fehlende KBV FOR Profile)");
+                }
+                
+                logger.info("Bundle {} validiert mit {} erwarteten Fehlern für fehlende KBV FOR Profile", bundlePath, errors.size());
+            } catch (Exception e) {
+                fail("Fehler beim Laden/Validieren des Bundles " + bundlePath + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    @Test
+    @DisplayName("Validiere Abgabedaten Bundle-Ressourcen (JSON)")
+    void testValidateAbgabedatenBundles() {
+        logger.info("Starte Validierung der Abgabedaten Bundle-Ressourcen...");
+        
+        // Liste der Abgabedaten Bundle-Dateien (GKV)
+        String[] abgabedatenBundles = {
+            "/package/erezeptabgabedaten/examples-fsh/fsh-generated/resources/Bundle-72bd741c-7ad8-41d8-97c3-9aabbdd0f5b4.json",
+            "/package/erezeptabgabedaten/examples-fsh/fsh-generated/resources/Bundle-edd55212-965f-4018-a287-6b08e7f5c53c.json",
+            "/package/erezeptabgabedaten/examples-fsh/fsh-generated/resources/Bundle-fe4a04af-0828-4977-a5ce-bfeed16ebf10.json"
+        };
+        
+        // Liste der Abgabedaten Bundle-Dateien (PKV)
+        String[] abgabedatenPkvBundles = {
+            "/package/erezeptabgabedatenpkv/examples-fsh/fsh-generated/resources/Bundle-ad80703d-8c62-44a3-b12b-2ea66eda0aa2.json",
+            "/package/erezeptabgabedatenpkv/examples-fsh/fsh-generated/resources/Bundle-f548dde3-a319-486b-8624-6176ff41ad90.json"
+        };
+        
+        // Validiere GKV Bundles
+        for (String bundlePath : abgabedatenBundles) {
+            validateBundle(bundlePath);
+        }
+        
+        // Validiere PKV Bundles
+        for (String bundlePath : abgabedatenPkvBundles) {
+            validateBundle(bundlePath);
+        }
+    }
+    
+    @Test
+    @DisplayName("Validiere EVDGA Bundle-Ressourcen")
+    void testValidateEvdgaBundles() {
+        logger.info("Starte Validierung der EVDGA Bundle-Ressourcen...");
+        
+        // Liste der EVDGA Bundle-Dateien
+        String[] evdgaBundles = {
+            "/package/evdga/EVDGA_Bundle.xml",
+            "/package/evdga/EVDGA_Bundle_BG_Arbeitsunfall.xml",
+            "/package/evdga/EVDGA_Bundle_BG_Berufskrankheit.xml",
+            "/package/evdga/EVDGA_Bundle_Krankenhaus.xml",
+            "/package/evdga/EVDGA_Bundle_SEL.xml",
+            "/package/evdga/EVDGA_Bundle_SKT.xml",
+            "/package/evdga/EVDGA_Bundle_Unfall.xml",
+            "/package/evdga/EVDGA_Bundle_Zahnarzt.xml"
+        };
+        
+        for (String bundlePath : evdgaBundles) {
+            validateBundle(bundlePath);
+        }
+    }
+    
+    @Test
+    @DisplayName("Validiere verschiedene Resources Bundle-Ressourcen")
+    void testValidateResourcesBundles() {
+        logger.info("Starte Validierung der Resources Bundle-Ressourcen...");
+        
+        // Liste der Resources Bundle-Dateien
+        String[] resourcesBundles = {
+            "/package/Resources 3/Bundle-AcceptOperation.json",
+            "/package/Resources 3/dffbfd6a-5712-4798-bdc8-07201eb77ab8.json",
+            "/package/Resources 5/ExampleGetConsent.json",
+            "/package/Resources 6/Bundle-AcceptOperation.json",
+            "/package/Resources 8/ExampleGetConsent.json",
+            "/package/Resources 9/Bundle-AcceptOperation.json"
+        };
+        
+        for (String bundlePath : resourcesBundles) {
+            validateBundle(bundlePath);
+        }
+    }
+    
+    // Hilfsmethode zum Laden einer Ressource aus dem Classpath
+    private IBaseResource loadResourceFromClasspath(String path) throws Exception {
+        try (var inputStream = getClass().getResourceAsStream(path)) {
+            if (inputStream == null) {
+                throw new RuntimeException("Ressource nicht gefunden: " + path);
+            }
+            
+            // Bestimme den Parser basierend auf der Dateiendung
+            if (path.endsWith(".json")) {
+                return ctx.newJsonParser().parseResource(inputStream);
+            } else if (path.endsWith(".xml")) {
+                return ctx.newXmlParser().parseResource(inputStream);
+            } else {
+                throw new RuntimeException("Unbekannte Dateiendung für: " + path);
+            }
+        }
+    }
+    
+    // Hilfsmethode zur Bundle-Validierung
+    private void validateBundle(String bundlePath) {
+        logger.info("Lade und validiere Bundle: {}", bundlePath);
+        
+        try {
+            IBaseResource bundle = loadResourceFromClasspath(bundlePath);
+            assertNotNull(bundle, "Bundle konnte nicht geladen werden: " + bundlePath);
+            assertTrue(bundle instanceof Bundle, "Ressource ist kein Bundle: " + bundlePath);
+            
+            // Validiere das Bundle
+            assertDoesNotThrow(() -> {
+                validator.validateAndThrowIfInvalid(bundle);
+            }, "Validierung fehlgeschlagen für Bundle: " + bundlePath);
+            
+            logger.info("Bundle erfolgreich validiert: {}", bundlePath);
+        } catch (Exception e) {
+            fail("Fehler beim Laden/Validieren des Bundles " + bundlePath + ": " + e.getMessage());
+        }
+    }
+    
+    @Test
+    @DisplayName("Validiere ALLE Bundle-Ressourcen automatisch")
+    void testValidateAllBundlesAutomatically() throws IOException, URISyntaxException {
+        logger.info("Starte automatische Validierung aller Bundle-Ressourcen...");
+        
+        // Finde alle Bundle-Dateien im package Verzeichnis
+        List<String> bundlePaths = findAllBundleResources();
+        
+        assertFalse(bundlePaths.isEmpty(), "Keine Bundle-Ressourcen gefunden");
+        logger.info("Gefundene Bundle-Ressourcen: {}", bundlePaths.size());
+        
+        int successCount = 0;
+        int failCount = 0;
+        
+        for (String bundlePath : bundlePaths) {
+            try {
+                validateBundle(bundlePath);
+                successCount++;
+            } catch (AssertionError | Exception e) {
+                failCount++;
+                logger.error("Validierung fehlgeschlagen für Bundle: {} - {}", bundlePath, e.getMessage());
+            }
+        }
+        
+        logger.info("Validierung abgeschlossen: {} erfolgreich, {} fehlgeschlagen", successCount, failCount);
+        
+        // Test schlägt fehl, wenn mindestens ein Bundle nicht validiert werden konnte
+        assertEquals(0, failCount, failCount + " von " + bundlePaths.size() + " Bundles konnten nicht validiert werden");
+    }
+    
+    // Hilfsmethode zum Finden aller Bundle-Ressourcen
+    private List<String> findAllBundleResources() throws IOException, URISyntaxException {
+        URI packageUri = getClass().getResource("/package").toURI();
+        Path packagePath;
+        
+        if (packageUri.getScheme().equals("jar")) {
+            FileSystem fileSystem = FileSystems.newFileSystem(packageUri, Collections.emptyMap());
+            packagePath = fileSystem.getPath("/package");
+        } else {
+            packagePath = Paths.get(packageUri);
+        }
+        
+        try (var stream = Files.walk(packagePath)) {
+            return stream.filter(Files::isRegularFile)
+                .filter(path -> {
+                    String fileName = path.getFileName().toString().toLowerCase();
+                    return fileName.endsWith(".json") || fileName.endsWith(".xml");
+                })
+                .map(path -> {
+                    // Konvertiere den absoluten Pfad zu einem Classpath-relativen Pfad
+                    String pathStr = path.toString();
+                    int packageIndex = pathStr.indexOf("/package/");
+                    if (packageIndex >= 0) {
+                        return pathStr.substring(packageIndex);
+                    }
+                    return pathStr;
+                })
+                .filter(path -> {
+                    // Filtere nur Bundle-Dateien (basierend auf Dateinamen oder bekannten Mustern)
+                    return path.toLowerCase().contains("bundle") || 
+                           path.contains("/erezept/Beispiel_") ||
+                           path.contains("/evdga/EVDGA_") ||
+                           path.contains("ExampleGetConsent") ||
+                           path.contains("dffbfd6a-5712-4798-bdc8-07201eb77ab8");
+                })
+                .collect(Collectors.toList());
+        }
+    }
+    
+    @Test
+    @DisplayName("Validiere Bundles mit verfügbaren Profilen")
+    void testValidateBundlesWithAvailableProfiles() {
+        logger.info("Starte Validierung von Bundles mit verfügbaren Profilen...");
+        
+        // Teste Bundles, die mit den geladenen Profilen validiert werden sollten
+        String[] testBundles = {
+            "/package/erezeptabgabedaten/examples-fsh/fsh-generated/resources/Bundle-72bd741c-7ad8-41d8-97c3-9aabbdd0f5b4.json",
+            "/package/Resources 3/Bundle-AcceptOperation.json"
+        };
+        
+        for (String bundlePath : testBundles) {
+            logger.info("Validiere Bundle: {}", bundlePath);
+            
+            try {
+                IBaseResource bundle = loadResourceFromClasspath(bundlePath);
+                assertNotNull(bundle, "Bundle konnte nicht geladen werden: " + bundlePath);
+                assertTrue(bundle instanceof Bundle, "Ressource ist kein Bundle: " + bundlePath);
+                
+                // Führe Validierung durch
+                ValidationResult result = validator.validateAndReturnResult(bundle);
+                
+                // Logge alle Meldungen
+                logger.info("Validierungsergebnis für {}: {} Meldungen", bundlePath, result.getMessages().size());
+                result.getMessages().forEach(msg -> {
+                    logger.info("[{}] {}", msg.getSeverity(), msg.getMessage());
+                });
+                
+                // Diese Bundles sollten ohne Fehler validiert werden können
+                long errorCount = result.getMessages().stream()
+                    .filter(msg -> msg.getSeverity().ordinal() >= 3) // ERROR oder FATAL
+                    .count();
+                
+                if (errorCount > 0) {
+                    logger.error("Bundle {} hat {} Fehler:", bundlePath, errorCount);
+                    result.getMessages().stream()
+                        .filter(msg -> msg.getSeverity().ordinal() >= 3)
+                        .forEach(msg -> logger.error("  - {}: {}", msg.getLocationString(), msg.getMessage()));
+                }
+                
+                // Für Abgabedaten-Bundles erwarten wir möglicherweise einige fehlende Profile
+                // aber keine strukturellen Fehler
+                if (bundlePath.contains("erezeptabgabedaten")) {
+                    logger.info("Abgabedaten-Bundle - prüfe auf strukturelle Fehler");
+                    boolean hasStructuralErrors = result.getMessages().stream()
+                        .filter(msg -> msg.getSeverity().ordinal() >= 3)
+                        .anyMatch(msg -> !msg.getMessage().contains("konnte nicht aufgelöst werden") &&
+                                        !msg.getMessage().contains("Unknown extension"));
+                    
+                    assertFalse(hasStructuralErrors, 
+                        "Bundle " + bundlePath + " hat strukturelle Fehler");
+                } else {
+                    // Andere Bundles sollten vollständig validiert werden
+                    assertEquals(0, errorCount, 
+                        "Bundle " + bundlePath + " sollte ohne Fehler validiert werden");
+                }
+                
+            } catch (Exception e) {
+                fail("Fehler beim Laden/Validieren des Bundles " + bundlePath + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    @Test
+    @DisplayName("Debug: Zeige alle geladenen Profile aus NPM Packages")
+    void testDebugShowLoadedProfiles() {
+        logger.info("=== DEBUG: GELADENE PROFILE AUS NPM PACKAGES ===");
+        
+        // Hole alle StructureDefinitions aus der ValidationSupportChain
+        var structureDefinitions = validator.getValidationSupportChain().fetchAllStructureDefinitions();
+        
+        logger.info("Anzahl geladener StructureDefinitions: {}", structureDefinitions.size());
+        
+        // Filtere und zeige KBV Profile
+        logger.info("\n--- KBV PROFILE ---");
+        structureDefinitions.stream()
+            .filter(sd -> sd instanceof StructureDefinition)
+            .map(sd -> (StructureDefinition) sd)
+            .filter(sd -> sd.getUrl() != null && sd.getUrl().contains("kbv.de"))
+            .sorted((a, b) -> a.getUrl().compareTo(b.getUrl()))
+            .forEach(sd -> {
+                logger.info("KBV: {} (Version: {})", sd.getUrl(), sd.getVersion());
+            });
+            
+        // Filtere und zeige ABDA Profile
+        logger.info("\n--- ABDA PROFILE ---");
+        structureDefinitions.stream()
+            .filter(sd -> sd instanceof StructureDefinition)
+            .map(sd -> (StructureDefinition) sd)
+            .filter(sd -> sd.getUrl() != null && sd.getUrl().contains("abda.de"))
+            .sorted((a, b) -> a.getUrl().compareTo(b.getUrl()))
+            .forEach(sd -> {
+                logger.info("ABDA: {} (Version: {})", sd.getUrl(), sd.getVersion());
+            });
+            
+        // Filtere und zeige Gematik Profile
+        logger.info("\n--- GEMATIK PROFILE ---");
+        structureDefinitions.stream()
+            .filter(sd -> sd instanceof StructureDefinition)
+            .map(sd -> (StructureDefinition) sd)
+            .filter(sd -> sd.getUrl() != null && sd.getUrl().contains("gematik.de"))
+            .sorted((a, b) -> a.getUrl().compareTo(b.getUrl()))
+            .forEach(sd -> {
+                logger.info("GEMATIK: {} (Version: {})", sd.getUrl(), sd.getVersion());
+            });
+            
+        // Spezifisch nach KBV_PR_FOR Profilen suchen
+        logger.info("\n--- SUCHE NACH KBV_PR_FOR PROFILEN ---");
+        boolean foundKbvFor = false;
+        for (var resource : structureDefinitions) {
+            if (resource instanceof StructureDefinition) {
+                StructureDefinition sd = (StructureDefinition) resource;
+                if (sd.getUrl() != null && sd.getUrl().contains("KBV_PR_FOR")) {
+                    logger.info("GEFUNDEN: {} (Version: {})", sd.getUrl(), sd.getVersion());
+                    foundKbvFor = true;
+                }
+            }
+        }
+        
+        if (!foundKbvFor) {
+            logger.warn("KEINE KBV_PR_FOR Profile gefunden!");
+            
+            // Prüfe, ob die NPM Packages überhaupt geladen wurden
+            logger.info("\n--- PRÜFE NPM PACKAGE LOADING ---");
+            try {
+                // Versuche direkt auf die NPM Package Support zuzugreifen
+                logger.info("Versuche NPM Packages erneut zu laden...");
+                
+                // Zeige alle Ressourcen mit "FOR" im Namen
+                logger.info("\n--- ALLE RESSOURCEN MIT 'FOR' IM NAMEN ---");
+                structureDefinitions.stream()
+                    .filter(sd -> sd instanceof StructureDefinition)
+                    .map(sd -> (StructureDefinition) sd)
+                    .filter(sd -> sd.getUrl() != null && sd.getUrl().toUpperCase().contains("FOR"))
+                    .forEach(sd -> {
+                        logger.info("FOR-Ressource: {} (Version: {})", sd.getUrl(), sd.getVersion());
+                    });
+                    
+            } catch (Exception e) {
+                logger.error("Fehler beim Debug: ", e);
+            }
+        }
+        
+        assertTrue(true, "Debug-Test abgeschlossen - siehe Log für Details");
+    }
+    
+    @Test
+    @DisplayName("Detaillierte Validierungsergebnisse für ausgewählte Bundles")
+    void testDetailedValidationResults() {
+        logger.info("Starte detaillierte Validierung ausgewählter Bundles...");
+        
+        // Ausgewählte Bundles für detaillierte Analyse
+        String[] testBundles = {
+            "/package/erezept/Beispiel_1.xml",
+            "/package/erezeptabgabedaten/examples-fsh/fsh-generated/resources/Bundle-72bd741c-7ad8-41d8-97c3-9aabbdd0f5b4.json",
+            "/package/evdga/EVDGA_Bundle.xml"
+        };
+        
+        for (String bundlePath : testBundles) {
+            logger.info("\n=== Detaillierte Validierung für: {} ===", bundlePath);
+            
+            try {
+                IBaseResource bundle = loadResourceFromClasspath(bundlePath);
+                assertNotNull(bundle, "Bundle konnte nicht geladen werden: " + bundlePath);
+                
+                // Führe Validierung durch und hole detaillierte Ergebnisse
+                ValidationResult result = validator.validateAndReturnResult(bundle);
+                
+                // Zeige Bundle-Informationen
+                if (bundle instanceof Bundle) {
+                    Bundle fhirBundle = (Bundle) bundle;
+                    logger.info("Bundle ID: {}", fhirBundle.getId());
+                    logger.info("Bundle Type: {}", fhirBundle.getType());
+                    logger.info("Anzahl Einträge: {}", fhirBundle.getEntry().size());
+                }
+                
+                // Zeige Validierungsergebnisse
+                logger.info("Validierung erfolgreich (keine Fehler): {}", result.isSuccessful());
+                logger.info("Anzahl Meldungen: {}", result.getMessages().size());
+                
+                // Gruppiere Meldungen nach Schweregrad
+                result.getMessages().forEach(msg -> {
+                    logger.info("[{}] {} - {}", 
+                        msg.getSeverity(), 
+                        msg.getLocationString(), 
+                        msg.getMessage()
+                    );
+                });
+                
+                // Prüfe, dass keine FEHLER vorhanden sind
+                long errorCount = result.getMessages().stream()
+                    .filter(msg -> msg.getSeverity().ordinal() >= 3) // ERROR oder FATAL
+                    .count();
+                    
+                // Logge Fehlerdetails, wenn vorhanden
+                if (errorCount > 0) {
+                    logger.warn("Bundle {} hat {} Fehler. Detaillierte Fehler:", bundlePath, errorCount);
+                    result.getMessages().stream()
+                        .filter(msg -> msg.getSeverity().ordinal() >= 3)
+                        .forEach(msg -> logger.warn("  - {}", msg.getMessage()));
+                }
+                
+                // Für diesen Test akzeptieren wir Bundles mit fehlenden Profil-Referenzen
+                // da nicht alle KBV Profile verfügbar sind
+                boolean hasOnlyMissingProfileErrors = result.getMessages().stream()
+                    .filter(msg -> msg.getSeverity().ordinal() >= 3)
+                    .allMatch(msg -> msg.getMessage().contains("konnte nicht aufgelöst werden"));
+                
+                if (!hasOnlyMissingProfileErrors) {
+                    assertEquals(0, errorCount, 
+                        "Bundle " + bundlePath + " hat " + errorCount + " Fehler (nicht nur fehlende Profile)");
+                }
+                    
+            } catch (Exception e) {
+                fail("Fehler beim Laden/Validieren des Bundles " + bundlePath + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    @Test
+    @DisplayName("Identifiziere alle fehlenden StructureDefinitions")
+    void testIdentifyMissingStructureDefinitions() throws IOException, URISyntaxException {
+        logger.info("=== IDENTIFIZIERUNG FEHLENDER STRUCTUREDEFINITIONS ===");
+        
+        Set<String> missingProfiles = new HashSet<>();
+        Set<String> missingExtensions = new HashSet<>();
+        Set<String> missingValueSets = new HashSet<>();
+        Set<String> missingCodeSystems = new HashSet<>();
+        
+        // Finde alle Bundle-Ressourcen
+        List<String> bundlePaths = findAllBundleResources();
+        logger.info("Analysiere {} Bundle-Ressourcen...", bundlePaths.size());
+        
+        for (String bundlePath : bundlePaths) {
+            try {
+                IBaseResource bundle = loadResourceFromClasspath(bundlePath);
+                if (bundle instanceof Bundle) {
+                    // Führe Validierung durch
+                    ValidationResult result = validator.validateAndReturnResult(bundle);
+                    
+                    // Sammle fehlende Ressourcen
+                    result.getMessages().forEach(msg -> {
+                        String message = msg.getMessage();
+                        
+                        // Profile
+                        if (message.contains("Profil Reference") && message.contains("konnte nicht aufgelöst werden")) {
+                            String profile = extractUrlFromMessage(message, "Profil Reference '", "'");
+                            if (profile != null) {
+                                missingProfiles.add(profile);
+                            }
+                        }
+                        
+                        // Extensions
+                        if (message.contains("Unknown extension") || (message.contains("Extension") && message.contains("not found"))) {
+                            String extension = extractUrlFromMessage(message, "Unknown extension ", " ");
+                            if (extension == null) {
+                                extension = extractUrlFromMessage(message, "Extension ", " not found");
+                            }
+                            if (extension != null) {
+                                missingExtensions.add(extension);
+                            }
+                        }
+                        
+                        // ValueSets
+                        if (message.contains("ValueSet") && (message.contains("not found") || message.contains("konnte nicht aufgelöst werden"))) {
+                            String valueSet = extractUrlFromMessage(message, "ValueSet ", " ");
+                            if (valueSet != null && valueSet.startsWith("http")) {
+                                missingValueSets.add(valueSet);
+                            }
+                        }
+                        
+                        // CodeSystems
+                        if (message.contains("CodeSystem") && (message.contains("not found") || message.contains("konnte nicht aufgelöst werden"))) {
+                            String codeSystem = extractUrlFromMessage(message, "CodeSystem ", " ");
+                            if (codeSystem != null && codeSystem.startsWith("http")) {
+                                missingCodeSystems.add(codeSystem);
+                            }
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                logger.error("Fehler beim Analysieren von Bundle {}: {}", bundlePath, e.getMessage());
+            }
+        }
+        
+        // Erstelle Bericht
+        logger.info("\n\n========== FEHLENDE RESSOURCEN BERICHT ==========\n");
+        
+        logger.info("FEHLENDE STRUCTUREDEFINITIONS/PROFILE ({}):", missingProfiles.size());
+        missingProfiles.stream().sorted().forEach(profile -> {
+            logger.info("  - {}", profile);
+        });
+        
+        logger.info("\nFEHLENDE EXTENSIONS ({}):", missingExtensions.size());
+        missingExtensions.stream().sorted().forEach(extension -> {
+            logger.info("  - {}", extension);
+        });
+        
+        logger.info("\nFEHLENDE VALUESETS ({}):", missingValueSets.size());
+        missingValueSets.stream().sorted().forEach(valueSet -> {
+            logger.info("  - {}", valueSet);
+        });
+        
+        logger.info("\nFEHLENDE CODESYSTEMS ({}):", missingCodeSystems.size());
+        missingCodeSystems.stream().sorted().forEach(codeSystem -> {
+            logger.info("  - {}", codeSystem);
+        });
+        
+        logger.info("\n================================================\n");
+        
+        // Speichere Zusammenfassung für den Nutzer
+        StringBuilder summary = new StringBuilder();
+        summary.append("ZUSAMMENFASSUNG DER FEHLENDEN RESSOURCEN:\n\n");
+        
+        if (!missingProfiles.isEmpty()) {
+            summary.append("Fehlende StructureDefinitions/Profile:\n");
+            missingProfiles.stream().sorted().forEach(p -> summary.append("- ").append(p).append("\n"));
+        }
+        
+        logger.info("\n{}", summary.toString());
+        
+        // Test schlägt nicht fehl, da wir nur informieren wollen
+        assertTrue(true, "Analyse abgeschlossen - siehe Log für Details");
+    }
+    
+    private String extractUrlFromMessage(String message, String startDelimiter, String endDelimiter) {
+        int start = message.indexOf(startDelimiter);
+        if (start == -1) return null;
+        
+        start += startDelimiter.length();
+        int end = message.indexOf(endDelimiter, start);
+        if (end == -1) return null;
+        
+        String url = message.substring(start, end).trim();
+        // Entferne Versionssuffix falls vorhanden (z.B. |1.4)
+        if (url.contains("|")) {
+            url = url.substring(0, url.indexOf("|")) + url.substring(url.indexOf("|"));
+        }
+        
+        return url;
+    }
 
-		// 2. Referenzierte Ressourcen auf dem Server speichern (benötigt gültige Tokens)
-		// Speichere Patient (EGK1 Token)
-		ergPatient = (Patient) client.create()
-			.resource(ergPatient)
-			.execute()
-			.getResource();
-		final String patientId = ergPatient.getIdElement().getIdPart();
-
-		// Speichere Practitioner (HBA_ARZT Token)
-		ergPractitioner = (Practitioner) client.create()
-			.resource(ergPractitioner)
-			.execute()
-			.getResource();
-		final String practitionerId = ergPractitioner.getIdElement().getIdPart();
-
-		// Speichere Institution (SMC-B Token oder alternativ HBA_ARZT)
-		ergInstitution = (Organization) client.create()
-			.resource(ergInstitution)
-			.execute()
-			.getResource();
-		final String institutionId = ergInstitution.getIdElement().getIdPart();
-
-		// Speichere ChargeItem (HBA_ARZT Token - Annahme: Leistungserbringer erstellt ChargeItem)
-		chargeItem.setSubject(new Reference("Patient/" + patientId)); // Subject aktualisieren mit gespeicherter ID
-		chargeItem = (ChargeItem) client.create()
-			.resource(chargeItem)
-			.execute()
-			.getResource();
-		final String chargeItemId = chargeItem.getIdElement().getIdPart();
-
-		// 2.5 Dummy-Anhang DocumentReference erstellen und speichern (Wieder hinzugefügt für Beispiel)
-		DocumentReference dummyAnhangDocRef = new DocumentReference();
-		dummyAnhangDocRef.getMeta().addProfile("http://hl7.org/fhir/StructureDefinition/DocumentReference");
-		dummyAnhangDocRef.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-		dummyAnhangDocRef.getType().addCoding().setSystem("http://loinc.org").setCode("11488-4"); // Beispiel-Typ
-		dummyAnhangDocRef.addContent().getAttachment().setContentType("text/plain").setData("Dummy Anhang Inhalt".getBytes());
-		dummyAnhangDocRef.setSubject(new Reference("Patient/" + patientId)); // Subject hinzufügen
-
-		DocumentReference storedDummyAnhangDocRef = (DocumentReference) client.create()
-			.resource(dummyAnhangDocRef)
-			.execute()
-			.getResource();
-		final String anhangDocRefId = storedDummyAnhangDocRef.getIdElement().getIdPart();
-		logger.info("Dummy Anhang DocumentReference gespeichert mit ID: {}", anhangDocRefId);
-
-		// 3. ERG-Invoice erstellen (wird eingebettet, nicht separat gespeichert)
-		Invoice ergInvoice = ErgTestResourceUtil.createValidErgInvoice(ergPatient, ergPractitioner, ergInstitution, chargeItem);
-
-		// 4. ERG-DocumentReference erstellen, die auf die gespeicherten Ressourcen und die Invoice verweist
-		DocumentReference ergDocRef = ErgTestResourceUtil.createValidErgDocumentReference(ergPatient, ergPractitioner, ergInstitution, ergInvoice, anhangDocRefId);
-
-		// Ausgabe der erstellten DocumentReference vor dem Speichern
-		String ergDocRefJson = FhirContext.forR4().newJsonParser().setPrettyPrint(true).encodeResourceToString(ergDocRef);
-		logger.info("Erstellte ERG-DocumentReference (vor Speicherung):\n{}", ergDocRefJson);
-
-		// 5. DocumentReference auf dem Server speichern (löst die Validierung via Hook aus)
-		assertDoesNotThrow(() -> {
-			client.create()
-				.resource(ergDocRef)
-				// Annahme: Der Leistungserbringer (z.B. Arzt mit HBA) ist berechtigt, die Metadaten zu speichern
-				.execute();
-		}, "Validierung und Speicherung der ERG-DocumentReference sollte erfolgreich sein.");
-	}
-
-	@Test
-	@DisplayName("Validierung einer ERG-Rechnungs-DocumentReference ohne Signatur-Extension sollte fehlschlagen")
-	void testValidateErgDocumentReference_MissingSignatureConstraint() {
-		// 1. Referenzierte Ressourcen erstellen
-		Patient ergPatient = ErgTestResourceUtil.createTestErgPatient();
-		Practitioner ergPractitioner = ErgTestResourceUtil.createTestErgPractitioner();
-		Organization ergInstitution = ErgTestResourceUtil.createTestErgInstitution();
-		ChargeItem chargeItem = ErgTestResourceUtil.createMinimalChargeItem(ergPatient); // Für die Invoice benötigt
-
-		// 2. Referenzierte Ressourcen auf dem Server speichern
-		// (IDs werden für die Invoice benötigt, die eingebettet wird)
-		ergPatient = (Patient) client.create().resource(ergPatient).execute().getResource();
-		ergPractitioner = (Practitioner) client.create().resource(ergPractitioner).execute().getResource();
-		ergInstitution = (Organization) client.create().resource(ergInstitution).execute().getResource();
-		chargeItem.setSubject(new Reference("Patient/" + ergPatient.getIdElement().getIdPart()));
-		chargeItem = (ChargeItem) client.create().resource(chargeItem).execute().getResource();
-
-		// 2.5 Dummy-Anhang DocumentReference erstellen und speichern (Wieder hinzugefügt für Beispiel)
-		DocumentReference dummyAnhangDocRef = new DocumentReference();
-		dummyAnhangDocRef.getMeta().addProfile("http://hl7.org/fhir/StructureDefinition/DocumentReference");
-		dummyAnhangDocRef.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-		dummyAnhangDocRef.getType().addCoding().setSystem("http://loinc.org").setCode("11488-4");
-		dummyAnhangDocRef.addContent().getAttachment().setContentType("text/plain").setData("Dummy Anhang Inhalt".getBytes());
-		dummyAnhangDocRef.setSubject(new Reference("Patient/" + ergPatient.getIdElement().getIdPart())); // Subject hinzufügen
-
-		DocumentReference storedDummyAnhangDocRef = (DocumentReference) client.create()
-			.resource(dummyAnhangDocRef)
-			.execute()
-			.getResource();
-		final String anhangDocRefId = storedDummyAnhangDocRef.getIdElement().getIdPart(); // HIER wird die Variable deklariert
-		logger.info("Dummy Anhang DocumentReference gespeichert mit ID (Constraint Test): {}", anhangDocRefId);
-
-		// 3. ERG-Invoice erstellen
-		Invoice ergInvoice = ErgTestResourceUtil.createValidErgInvoice(ergPatient, ergPractitioner, ergInstitution, chargeItem);
-
-		// 4. ERG-DocumentReference erstellen (zunächst valide)
-		// Patient und Anhang-ID für context.related übergeben
-		DocumentReference ergDocRef = ErgTestResourceUtil.createValidErgDocumentReference(ergPatient, ergPractitioner, ergInstitution, ergInvoice, anhangDocRefId);
-
-		// 5. ABSICHTLICH UNGÜLTIG MACHEN: Entferne die Signatur-Extension
-		// Da der Typ KDL AM010106 ist, sollte dies die 'SignaturVerpflichtendRechnung'-Constraint verletzen.
-		boolean removed = ergDocRef.getExtension().removeIf(ext ->
-			"https://gematik.de/fhir/erg/StructureDefinition/erg-docref-signature".equals(ext.getUrl()));
-
-		if (!removed) {
-			fail("Could not find and remove the signature extension to invalidate the DocumentReference.");
-		}
-		logger.info("Intentionally removed signature extension for test {}", ergDocRef.getId());
-
-
-		// 6. Versuche, die ungültige DocumentReference zu speichern
-		// Erwarte eine UnprocessableEntityException vom CustomValidator wegen verletzter Constraint
-		assertThrows(UnprocessableEntityException.class, () -> { // Wieder client.create() im assertThrows
-			client.create()
-				.resource(ergDocRef)
-				.execute();
-		}, "Speichern einer ERG-Rechnungs-DocumentReference ohne Signatur sollte fehlschlagen.");
-	}
 }

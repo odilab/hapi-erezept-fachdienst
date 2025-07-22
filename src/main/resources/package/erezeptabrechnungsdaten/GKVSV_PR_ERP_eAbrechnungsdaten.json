@@ -1,0 +1,714 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-PR-ERP-eAbrechnungsdaten",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_ERP_eAbrechnungsdaten",
+  "version": "1.5.1",
+  "name": "GKVSV_PR_ERP_eAbrechnungsdaten",
+  "title": "GKVSV_PR_ERP_eAbrechnungsdaten",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "eRezept - elektronische Abrechnungsdaten",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Invoice",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Invoice",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Invoice",
+        "path": "Invoice",
+        "constraint": [
+          {
+            "key": "line-item-seq",
+            "severity": "error",
+            "human": "Jedes Line Item ist beginnend mit \\\"1\\\" lückenlos fortlaufend zu nummerieren.",
+            "expression": "lineItem.sequence.first() = 1 and lineItem.sequence.last() = lineItem.sequence.count() and lineItem.sequence.isDistinct() and lineItem.sequence.all($this <= %resource.lineItem.sequence.count())"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.meta",
+        "path": "Invoice.meta",
+        "min": 1
+      },
+      {
+        "id": "Invoice.meta.profile",
+        "path": "Invoice.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1
+      },
+      {
+        "id": "Invoice.meta.profile:erpProfile",
+        "path": "Invoice.meta.profile",
+        "sliceName": "erpProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_ERP_eAbrechnungsdaten|1.5"
+      },
+      {
+        "id": "Invoice.implicitRules",
+        "path": "Invoice.implicitRules",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.language",
+        "path": "Invoice.language",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.text",
+        "path": "Invoice.text",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.contained",
+        "path": "Invoice.contained",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.extension",
+        "path": "Invoice.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "max": "100"
+      },
+      {
+        "id": "Invoice.extension:irrlaeufer",
+        "path": "Invoice.extension",
+        "sliceName": "irrlaeufer",
+        "short": "Kennzeichen für Irrläuferrezepte",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Irrlaeufer"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.extension:zusatzdatenHerstellung",
+        "path": "Invoice.extension",
+        "sliceName": "zusatzdatenHerstellung",
+        "max": "99",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_ZusatzdatenHerstellung"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.extension:zusatzdatenHerstellung.extension:einheit",
+        "path": "Invoice.extension.extension",
+        "sliceName": "einheit"
+      },
+      {
+        "id": "Invoice.extension:zusatzdatenHerstellung.extension:einheit.extension:abrechnungsposition",
+        "path": "Invoice.extension.extension.extension",
+        "sliceName": "abrechnungsposition"
+      },
+      {
+        "id": "Invoice.extension:zusatzdatenHerstellung.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten",
+        "path": "Invoice.extension.extension.extension.extension",
+        "sliceName": "zuAbschlaegeZusatzdaten"
+      },
+      {
+        "id": "Invoice.extension:zusatzdatenHerstellung.extension:einheit.extension:abrechnungsposition.extension:zuAbschlaegeZusatzdaten.extension",
+        "path": "Invoice.extension.extension.extension.extension.extension",
+        "max": "3"
+      },
+      {
+        "id": "Invoice.identifier",
+        "path": "Invoice.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 2,
+        "max": "2"
+      },
+      {
+        "id": "Invoice.identifier:rezeptID",
+        "path": "Invoice.identifier",
+        "sliceName": "rezeptID",
+        "short": "Rezept-ID",
+        "definition": "Eindeutige Identifikation der Verordnung (Dokumenten-ID), auf die sich die Abrechnungsdaten beziehen.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Invoice.identifier:rezeptID.use",
+        "path": "Invoice.identifier.use",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:rezeptID.type",
+        "path": "Invoice.identifier.type",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:rezeptID.system",
+        "path": "Invoice.identifier.system",
+        "short": "Rezept-Id",
+        "min": 1,
+        "fixedUri": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"
+      },
+      {
+        "id": "Invoice.identifier:rezeptID.value",
+        "path": "Invoice.identifier.value",
+        "min": 1,
+        "constraint": [
+          {
+            "key": "Rezept-ID-length",
+            "severity": "error",
+            "human": "Die Rezept-ID muss 22 Zeichen lang sein.",
+            "expression": "length()=22"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.identifier:rezeptID.period",
+        "path": "Invoice.identifier.period",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:rezeptID.assigner",
+        "path": "Invoice.identifier.assigner",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:belegnummer",
+        "path": "Invoice.identifier",
+        "sliceName": "belegnummer",
+        "short": "Eindeutige Belegnummer",
+        "definition": "Belegnummer mit Aufbau entsprechend der Technischen Anlage 1 zzgl. vorangestelltes Jahrzehnt (2-stelliges Jahr, 2-stelliger Monat, 8-stellige Zählnummer und IK ohne die ersten beiden Stellen oder dreistelliges Identifikationsmerkmal.",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Invoice.identifier:belegnummer.use",
+        "path": "Invoice.identifier.use",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:belegnummer.type",
+        "path": "Invoice.identifier.type",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:belegnummer.system",
+        "path": "Invoice.identifier.system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/NamingSystem/GKVSV_NS_Belegnummer"
+      },
+      {
+        "id": "Invoice.identifier:belegnummer.value",
+        "path": "Invoice.identifier.value",
+        "short": "Eindeutige Belegnummer",
+        "definition": "Belegnummer mit Aufbau entsprechend der Technischen Anlage 1 zzgl. vorangestelltes Jahrzehnt (2-stelliges Jahr, 2-stelliger Monat, 8-stellige Zählnummer und IK ohne die ersten beiden Stellen oder dreistelliges Identifikationsmerkmal.",
+        "min": 1,
+        "constraint": [
+          {
+            "key": "Belegnummer-length",
+            "severity": "error",
+            "human": "Die eindeutige Belegnummer muss numerisch und 19 Zeichen lang sein.",
+            "expression": "toString().matches('^\\\\d{19}$')"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.identifier:belegnummer.period",
+        "path": "Invoice.identifier.period",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.identifier:belegnummer.assigner",
+        "path": "Invoice.identifier.assigner",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.status",
+        "path": "Invoice.status",
+        "fixedCode": "issued"
+      },
+      {
+        "id": "Invoice.cancelledReason",
+        "path": "Invoice.cancelledReason",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.type",
+        "path": "Invoice.type",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.subject",
+        "path": "Invoice.subject",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.recipient",
+        "path": "Invoice.recipient",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.date",
+        "path": "Invoice.date",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.participant",
+        "path": "Invoice.participant",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer",
+        "path": "Invoice.issuer",
+        "short": "Leistungserbringertyp und Apotheken-IK",
+        "definition": "Leistungserbringertyp und IK der abrechnenden Apotheke",
+        "min": 1
+      },
+      {
+        "id": "Invoice.issuer.extension",
+        "path": "Invoice.issuer.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Invoice.issuer.extension:sitzLE",
+        "path": "Invoice.issuer.extension",
+        "sliceName": "sitzLE",
+        "definition": "Leistungserbringer Sitz im Inland / Ausland",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_LE_Sitz"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.issuer.reference",
+        "path": "Invoice.issuer.reference",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.type",
+        "path": "Invoice.issuer.type",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.identifier",
+        "path": "Invoice.issuer.identifier",
+        "short": "Leistungserbringertyp und Apotheken-IK",
+        "definition": "Leistungserbringertyp und IK der abrechnenden Apotheke",
+        "min": 1
+      },
+      {
+        "id": "Invoice.issuer.identifier.use",
+        "path": "Invoice.issuer.identifier.use",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.identifier.type",
+        "path": "Invoice.issuer.identifier.type",
+        "min": 1,
+        "binding": {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName",
+              "valueString": "IdentifierType"
+            },
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/elementdefinition-isCommonBinding",
+              "valueBoolean": true
+            }
+          ],
+          "strength": "required",
+          "description": "Der Leistungserbringertyp muss aus dem Value Set 'https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringertyp' gewählt werden.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringertyp"
+        }
+      },
+      {
+        "id": "Invoice.issuer.identifier.type.coding",
+        "path": "Invoice.issuer.identifier.type.coding",
+        "min": 1,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "description": "Der Leistungserbringertyp muss aus dem Value Set 'https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringertyp' gewählt werden.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringertyp"
+        }
+      },
+      {
+        "id": "Invoice.issuer.identifier.type.coding.system",
+        "path": "Invoice.issuer.identifier.type.coding.system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Leistungserbringertyp"
+      },
+      {
+        "id": "Invoice.issuer.identifier.type.coding.version",
+        "path": "Invoice.issuer.identifier.type.coding.version",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.identifier.type.coding.code",
+        "path": "Invoice.issuer.identifier.type.coding.code",
+        "short": "A | K | S",
+        "definition": "A = Öffentliche Apotheken; \r\nK = Krankenhausapotheken; \r\nS = Sonstige Leistungserbringer",
+        "min": 1
+      },
+      {
+        "id": "Invoice.issuer.identifier.type.coding.userSelected",
+        "path": "Invoice.issuer.identifier.type.coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.identifier.type.text",
+        "path": "Invoice.issuer.identifier.type.text",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.identifier.system",
+        "path": "Invoice.issuer.identifier.system",
+        "min": 1,
+        "fixedUri": "http://fhir.de/sid/arge-ik/iknr"
+      },
+      {
+        "id": "Invoice.issuer.identifier.value",
+        "path": "Invoice.issuer.identifier.value",
+        "short": "Apotheken-IK",
+        "definition": "IK der abrechnenden Apotheke",
+        "min": 1,
+        "constraint": [
+          {
+            "key": "ApothekeIK-length",
+            "severity": "error",
+            "human": "Die IK der abrechnenden Apotheke muss 9 Zeichen lang und numerisch sein.",
+            "expression": "toString().matches('^\\\\d{9}$')"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.issuer.identifier.period",
+        "path": "Invoice.issuer.identifier.period",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.identifier.assigner",
+        "path": "Invoice.issuer.identifier.assigner",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.issuer.display",
+        "path": "Invoice.issuer.display",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.account",
+        "path": "Invoice.account",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem",
+        "path": "Invoice.lineItem",
+        "label": "Line Data",
+        "short": "Abrechnungszeile",
+        "min": 1,
+        "constraint": [
+          {
+            "key": "lineItemImportPZN-1",
+            "severity": "error",
+            "human": "Die PZN des Originals für Importe muss angegeben werden, wenn das Kennzeichen zum Import den Wert „1“ oder „2“ hat.",
+            "expression": "(extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import').exists() and ((extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import').value as CodeableConcept).coding.code = '1' or (extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import').value as CodeableConcept).coding.code = '2')) implies extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import_PZN').exists()"
+          },
+          {
+            "key": "lineItemImportPZN-2",
+            "severity": "error",
+            "human": "Die PZN des Originals für Importe darf nur angegeben werden, wenn das Kennzeichen zum Import den Wert „1“ oder „2“ hat.",
+            "expression": "extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import_PZN').exists() implies (extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import').exists() and ((extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import').value as CodeableConcept).coding.code = '1' or (extension('https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import').value as CodeableConcept).coding.code = '2'))"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.extension",
+        "path": "Invoice.lineItem.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "rules": "closed"
+        },
+        "min": 2,
+        "max": "4"
+      },
+      {
+        "id": "Invoice.lineItem.extension:positionstyp",
+        "path": "Invoice.lineItem.extension",
+        "sliceName": "positionstyp",
+        "short": "Kennzeichen Positionstyp",
+        "definition": "0 = Nullposition\r\n1 = übrige Position",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Positionstyp"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.extension:import",
+        "path": "Invoice.lineItem.extension",
+        "sliceName": "import",
+        "definition": "Schlüssel: \r\n0 = kein Import \r\n1 = Import mit gesetzlichem Preisabstand zum Bezugsarzneimittel (Original) im Sinne des Rahmenvertrages zu § 129 SGB V \r\n2 = Import unterhalb des gesetzlichen Preisabstandes zum Bezugsarzneimittel (Original) im Sinne des Rahmenvertrages zu § 129 SGB V \r\n3 = Import, zu dem kein Bezugsarzneimittel (Original) existiert Das Feld muss gefüllt werden, wenn das Feld „Kennzeichen nach § 4“ eine PZN eines Fertigarzneimittels beinhaltet.",
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.extension:import_pzn",
+        "path": "Invoice.lineItem.extension",
+        "sliceName": "import_pzn",
+        "definition": "Das Feld muss gefüllt werden, wenn das Feld „Import“ den Wert „1“ oder „2“ beinhaltet. Anzugeben ist die PZN des Bezugsarzneimittels (Original). Es sind nur die Ziffern 0 bis 9 zulässig. \r\nHinweis: Die in der 8-stelligen Pharmazentralnummer enthaltene Prüfziffer muss mit dem Modulo11-Verfahren konform sein",
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Import_PZN"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.extension:vatValue",
+        "path": "Invoice.lineItem.extension",
+        "sliceName": "vatValue",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_VAT_VALUE"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.sequence",
+        "path": "Invoice.lineItem.sequence",
+        "short": "Zähler Abrechnungszeile",
+        "definition": "unique link to eAbgabedatensatz",
+        "min": 1
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x]",
+        "path": "Invoice.lineItem.chargeItem[x]",
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].coding",
+        "path": "Invoice.lineItem.chargeItem[x].coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].coding.system",
+        "path": "Invoice.lineItem.chargeItem[x].coding.system",
+        "min": 1,
+        "fixedUri": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor"
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].coding.version",
+        "path": "Invoice.lineItem.chargeItem[x].coding.version",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].coding.code",
+        "path": "Invoice.lineItem.chargeItem[x].coding.code",
+        "short": "un-encoded",
+        "min": 1,
+        "fixedCode": "UNC"
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].coding.display",
+        "path": "Invoice.lineItem.chargeItem[x].coding.display",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].coding.userSelected",
+        "path": "Invoice.lineItem.chargeItem[x].coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.chargeItem[x].text",
+        "path": "Invoice.lineItem.chargeItem[x].text",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent",
+        "path": "Invoice.lineItem.priceComponent",
+        "short": "Zu- und Abschläge"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.type",
+        "path": "Invoice.lineItem.priceComponent.type",
+        "short": "surcharge | deduction",
+        "definition": "Kennzeichen Zu- oder Abschlag.\r\n\r\nsurcharge  = Zuschlag;\r\ndeduction = Abschlag\r\n\r\nDas Kennzeichen Zu- oder Abschlag dient als zusätzliche Information zum Betrag, der ein negatives Vorzeichen (Abschlag) haben kann.",
+        "constraint": [
+          {
+            "key": "surchargeOrDeduction",
+            "severity": "error",
+            "human": "Es sind nur die Kennzeichen \"surcharge\" (Zuschlag) oder \"deduction\" (Abschlag) zulässig.",
+            "expression": "matches('^surcharge$') or matches('^deduction$')"
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.code",
+        "path": "Invoice.lineItem.priceComponent.code",
+        "short": "Zu-/Abschlag",
+        "definition": "R001 = Apothekenabschlag nach § 130 SGB V; \r\nR003 = Sonstiger Abschlag/Rabatt; \r\nR004 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 1 und Absatz 1a SGB V; \r\nR005 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 3a SGB V; \r\nR006 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 3b SGB V; \r\nR007 = Rabattangabe der vom Kostenträger aufgrund von Verträgen nach § 130a Abs. 8 i.V.m. § 31 Abs. 2 SGB V zusätzlich übernommenen Mehrkosten; \r\nR008 = Rabattangabe aufgrund von Verträgen nach § 130a Abs. 8 SGB V ohne Berücksichtigung der Rabattangaben nach Schlüssel R007; \r\nR009 = Gesetzlicher Herstellerabschlag nach § 130a Abs. 2 SGB V",
+        "min": 1,
+        "binding": {
+          "strength": "required",
+          "description": "Der Zu-/Abschlag-Code muss aus dem ValueSet 'GKVSV_VS_ERP_ZuAbschlagKey' gewählt werden.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_ZuAbschlagKey"
+        }
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.code.coding",
+        "path": "Invoice.lineItem.priceComponent.code.coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.code.coding.system",
+        "path": "Invoice.lineItem.priceComponent.code.coding.system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_ZuAbschlagKey"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.code.coding.code",
+        "path": "Invoice.lineItem.priceComponent.code.coding.code",
+        "short": "Zu-/Abschlag",
+        "definition": "R001 = Apothekenabschlag nach § 130 SGB V; \r\nR003 = Sonstiger Abschlag/Rabatt; \r\nR004 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 1 und Absatz 1a SGB V; \r\nR005 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 3a SGB V; \r\nR006 = Gesetzlicher Herstellerabschlag nach § 130a Absatz 3b SGB V; \r\nR007 = Rabattangabe der vom Kostenträger aufgrund von Verträgen nach § 130a Abs. 8 i.V.m. § 31 Abs. 2 SGB V zusätzlich übernommenen Mehrkosten; \r\nR008 = Rabattangabe aufgrund von Verträgen nach § 130a Abs. 8 SGB V ohne Berücksichtigung der Rabattangaben nach Schlüssel R007; \r\nR009 = Gesetzlicher Herstellerabschlag nach § 130a Abs. 2 SGB V",
+        "min": 1
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.code.coding.userSelected",
+        "path": "Invoice.lineItem.priceComponent.code.coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.code.text",
+        "path": "Invoice.lineItem.priceComponent.code.text",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.factor",
+        "path": "Invoice.lineItem.priceComponent.factor",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.amount",
+        "path": "Invoice.lineItem.priceComponent.amount",
+        "short": "Betrag Zu-/Abschlag",
+        "min": 1,
+        "type": [
+          {
+            "code": "Money",
+            "profile": [
+              "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-ERP-PreisangabeEUR"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Invoice.lineItem.priceComponent.amount.value",
+        "path": "Invoice.lineItem.priceComponent.amount.value",
+        "short": "Betrag Zu-/Abschlag"
+      },
+      {
+        "id": "Invoice.totalPriceComponent",
+        "path": "Invoice.totalPriceComponent",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.totalNet",
+        "path": "Invoice.totalNet",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.totalGross",
+        "path": "Invoice.totalGross",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.paymentTerms",
+        "path": "Invoice.paymentTerms",
+        "max": "0"
+      },
+      {
+        "id": "Invoice.note",
+        "path": "Invoice.note",
+        "max": "0"
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-EX-ERP-EmergencyServicesFee" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee" />
+  <version value="1.4.0" />
+  <name value="KBV_EX_ERP_EmergencyServicesFee" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="complex-type" />
+  <abstract value="false" />
+  <context>
+    <type value="element" />
+    <expression value="MedicationRequest" />
+  </context>
+  <type value="Extension" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Extension">
+      <path value="Extension" />
+      <short value="Kennzeichen Noctu" />
+      <definition value="Ärztliche Kennzeichnung, ob diese Verordnung auch während der allgemeinen Ladenschlusszeiten beliefert werden soll, verbunden mit der Erhebung der Noctu-Gebühr zu Lasten der Krankenkasse gemäß Arzneimittelpreisverordnung." />
+    </element>
+    <element id="Extension.url">
+      <path value="Extension.url" />
+      <fixedUri value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee" />
+    </element>
+    <element id="Extension.value[x]">
+      <path value="Extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.value[x]:valueBoolean">
+      <path value="Extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <short value="Noctu" />
+      <definition value="Ärztliche Kennzeichnung, ob diese Verordnung auch während der allgemeinen Ladenschlusszeitetruen beliefert werden soll, verbunden mit der Erhebung der Noctu-Gebühr zu Lasten der Krankenkasse gemäß Arzneimittelpreisverordnung.&#xD;&#xA;&#xD;&#xA;false - Noctu Gebühr ist vom Versicherten zu zahlen (Standardwert)&#xD;&#xA;true - Noctu Gebühr ist nicht vom Versicherten sondern vom Kostenträger zu zahlen" />
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>

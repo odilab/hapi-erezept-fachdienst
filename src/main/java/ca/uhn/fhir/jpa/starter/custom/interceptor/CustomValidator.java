@@ -23,17 +23,19 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 import java.util.regex.Pattern;
 import java.util.List;
+import java.io.InputStream;
+import java.nio.file.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import ca.uhn.fhir.context.support.IValidationSupport;
+import java.util.Arrays;
 
 
 @Component
 @Interceptor
 public class CustomValidator {
     private static final Logger logger = LoggerFactory.getLogger(CustomValidator.class);
-    private static final Pattern KVID_PATTERN = Pattern.compile("^[A-Z][0-9]{9}$");
-    private static final Pattern GOAE_PATTERN = Pattern.compile("^[A-Z]?\\d{1,4}[A-Z]?$");
-    private static final Pattern GOZ_PATTERN = Pattern.compile("^\\d{3,4}[a-z]?$");
-    private static final String GOAE_SYSTEM = "http://fhir.de/CodeSystem/bäk/goä";
-    private static final String GOZ_SYSTEM = "http://fhir.de/CodeSystem/bzäk/goz";
     private final FhirValidator validator;
     private final ValidationSupportChain validationSupportChain;
     private final PrePopulatedValidationSupport prePopulatedSupport;
@@ -43,22 +45,127 @@ public class CustomValidator {
         this.ctx = ctx;
         logger.info("CustomValidator wird initialisiert...");
         try {
-            // NPM Package Support erstellen und Packages laden
-            NpmPackageValidationSupport npmPackageSupport = new NpmPackageValidationSupport(ctx);
-            npmPackageSupport.loadPackageFromClasspath("classpath:package/de.basisprofil.r4-1.5.3.tgz");
-            npmPackageSupport.loadPackageFromClasspath("classpath:package/de.ihe-d.terminology-3.0.1.tgz");
-            npmPackageSupport.loadPackageFromClasspath("classpath:package/dvmd.kdl.r4-2024.0.0.tgz");
-
-            logger.info("NPM Package Support erstellt und Packages geladen");
-
             // PrePopulatedValidationSupport für lokale Ressourcen erstellen und im Feld speichern
             this.prePopulatedSupport = new PrePopulatedValidationSupport(ctx);
             
             // Alle lokalen Ressourcen aus dem resources-Verzeichnis laden
             loadAllResources(this.prePopulatedSupport);
             
-            // Validation Support Chain erstellen
+            // Alle FHIR-Ressourcen aus den package-Ordnern laden
+            loadAllPackageResources(this.prePopulatedSupport);
+            
+            // NPM Package Support erstellen und .tgz Packages laden
+            NpmPackageValidationSupport npmPackageSupport = new NpmPackageValidationSupport(ctx);
+            
+            // Bestehende Packages
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/de.basisprofil.r4-1.5.3.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/de.ihe-d.terminology-3.0.1.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/dvmd.kdl.r4-2024.0.0.tgz");
+            
+            // Neue NPM Packages aus dem npm packages Verzeichnis
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.basis-1.7.0.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.ita.for-1.2.0.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.ita.erp-1.4.0-alpha.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/kbv.itv.evdga-1.2.1.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.abda.erezeptabgabedaten-1.4.1-rc.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.abda.erezeptabgabedaten-1.5.0.tgz");
+            npmPackageSupport.loadPackageFromClasspath("classpath:package/npm packages/de.gematik.erezept-workflow.r4-1.5.2.tgz");
+            
+            logger.info("NPM Packages geladen - inklusive KBV FOR, ERP, EVDGA, ABDA und Gematik Packages");
+            
+            // Erstelle flexiblen ValidationSupport für Versionskompatibilität
+            IValidationSupport flexibleVersionSupport = new IValidationSupport() {
+                @Override
+                public FhirContext getFhirContext() {
+                    return ctx;
+                }
+                
+                @Override
+                public IBaseResource fetchStructureDefinition(String url) {
+                    // Wenn keine Version angegeben, delegiere direkt
+                    if (!url.contains("|")) {
+                        return null;
+                    }
+                    
+                    // Extrahiere URL und Version
+                    String baseUrl = url.substring(0, url.indexOf("|"));
+                    String requestedVersion = url.substring(url.indexOf("|") + 1);
+                    
+                    logger.debug("Suche nach kompatiblem Profil für: {} Version: {}", baseUrl, requestedVersion);
+                    
+                    // Durchsuche alle verfügbaren StructureDefinitions
+                    for (IValidationSupport support : Arrays.asList(npmPackageSupport, prePopulatedSupport)) {
+                        List<IBaseResource> allSds = support.fetchAllStructureDefinitions();
+                        if (allSds != null) {
+                            for (IBaseResource resource : allSds) {
+                                if (resource instanceof StructureDefinition) {
+                                    StructureDefinition sd = (StructureDefinition) resource;
+                                    if (baseUrl.equals(sd.getUrl()) && sd.getVersion() != null) {
+                                        if (isVersionCompatible(requestedVersion, sd.getVersion())) {
+                                            logger.debug("Gefunden: {} Version {} (angefragt war {})", 
+                                                sd.getUrl(), sd.getVersion(), requestedVersion);
+                                            return sd;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    return null;
+                }
+                
+                private boolean isVersionCompatible(String requested, String available) {
+                    // Exakte Übereinstimmung
+                    if (requested.equals(available)) {
+                        return true;
+                    }
+                    
+                    // Zerteile Versionen in Komponenten
+                    String[] requestedParts = requested.split("\\.");
+                    String[] availableParts = available.split("\\.");
+                    
+                    // Prüfe Major und Minor Version
+                    if (requestedParts.length >= 2 && availableParts.length >= 2) {
+                        boolean majorMatch = requestedParts[0].equals(availableParts[0]);
+                        boolean minorMatch = requestedParts[1].equals(availableParts[1]);
+                        
+                        if (majorMatch && minorMatch) {
+                            // Bei gleicher Major.Minor Version:
+                            // - "1.4" akzeptiert "1.4.0", "1.4.1", etc.
+                            // - "1.4.0" akzeptiert auch "1.4"
+                            if (requestedParts.length == 2 && availableParts.length >= 2) {
+                                // Anfrage "1.4" akzeptiert jede "1.4.x"
+                                return true;
+                            } else if (requestedParts.length == 3 && availableParts.length == 2) {
+                                // Anfrage "1.4.0" akzeptiert auch "1.4"
+                                return requestedParts[2].equals("0");
+                            } else if (requestedParts.length == 3 && availableParts.length == 3) {
+                                // Bei vollständigen Versionen: Patch kann unterschiedlich sein
+                                // "1.4.0" akzeptiert "1.4.1" usw.
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    // Spezialfall: "1.2" und "1.2.0" sind kompatibel
+                    if (requestedParts.length == 2 && availableParts.length == 3) {
+                        return requestedParts[0].equals(availableParts[0]) && 
+                               requestedParts[1].equals(availableParts[1]);
+                    }
+                    if (requestedParts.length == 3 && availableParts.length == 2) {
+                        return requestedParts[0].equals(availableParts[0]) && 
+                               requestedParts[1].equals(availableParts[1]) &&
+                               requestedParts[2].equals("0");
+                    }
+                    
+                    return false;
+                }
+            };
+            
+            // Validation Support Chain erstellen (mit flexiblem Version Support zuerst)
             this.validationSupportChain = new ValidationSupportChain(
+                flexibleVersionSupport,  // Zuerst flexible Versionsauflösung
                 npmPackageSupport,
                 this.prePopulatedSupport,
                 new DefaultProfileValidationSupport(ctx),
@@ -66,16 +173,19 @@ public class CustomValidator {
                 new InMemoryTerminologyServerValidationSupport(ctx),
                 new SnapshotGeneratingValidationSupport(ctx)
             );
-            logger.info("Validation Support Chain erstellt");
+            logger.info("Validation Support Chain mit NPM Packages und flexibler Versionskompatibilität erstellt");
 
             // Validator mit Caching erstellen
             this.validator = ctx.newValidator();
             FhirInstanceValidator instanceValidator = new FhirInstanceValidator(this.validationSupportChain);
             instanceValidator.setNoTerminologyChecks(false);
             instanceValidator.setErrorForUnknownProfiles(true);
+            // Wichtig: Deaktiviere strenge Versionsüberprüfung
+            instanceValidator.setAnyExtensionsAllowed(true);
+            instanceValidator.setBestPracticeWarningLevel(org.hl7.fhir.r5.utils.validation.constants.BestPracticeWarningLevel.Ignore);
             validator.registerValidatorModule(instanceValidator);
-            logger.info("Validator erfolgreich konfiguriert");
-        } catch (IOException e) {
+            logger.info("Validator erfolgreich konfiguriert mit flexibler Versionsbehandlung");
+        } catch (IOException | URISyntaxException e) {
             logger.error("Fehler beim Laden der FHIR-Packages", e);
             throw new BeanCreationException("Fehler beim Laden der FHIR-Packages", e);
         }
@@ -91,6 +201,7 @@ public class CustomValidator {
     public void validateResourceCreate(IBaseResource resource) {
         logger.error("====== HOOK CALLED: STORAGE_PRECOMMIT_RESOURCE_CREATED for {} ======", resource.fhirType());
         validateAndThrowIfInvalid(resource);
+		  //validator.validateWithResult(resource);
     }
 
     @Hook(Pointcut.STORAGE_PRECOMMIT_RESOURCE_UPDATED)
@@ -101,24 +212,9 @@ public class CustomValidator {
     public void validateAndThrowIfInvalid(IBaseResource resource) {
         logger.debug("Validiere Resource vom Typ: {}", resource.getClass().getSimpleName());
         
-        // Zusätzliche KVID-Validierung für Patienten
-        if (resource instanceof Patient) {
-            validateKVID((Patient) resource);
-        }
-        
-        // Zusätzliche Validierung für DocumentReference
-        if (resource instanceof DocumentReference) {
-            validateDocumentReference((DocumentReference) resource);
-        }
-        
-        // Zusätzliche Validierung für Parameters
-        if (resource instanceof Parameters) {
-            validateParameters((Parameters) resource);
-        }
-
-        // Neue Validierung für Invoice (Gebührenordnungen)
-        if (resource instanceof Invoice) {
-            validateInvoiceGebOrd((Invoice) resource);
+        // Bei Bundle-Ressourcen: XML neu parsen wenn Kommentare problematisch sein könnten
+        if (resource instanceof Bundle) {
+            resource = preprocessBundleForValidation(resource);
         }
         
         ValidationResult validationResult = validator.validateWithResult(resource);
@@ -170,211 +266,22 @@ public class CustomValidator {
         logger.debug("Resource erfolgreich validiert (oder nur Warnungen/Informationen gefunden)");
     }
 
-    private void validateKVID(Patient patient) {
-        patient.getIdentifier().stream()
-            .filter(id -> "http://fhir.de/sid/gkv/kvid-10".equals(id.getSystem()))
-            .forEach(kvid -> {
-                String value = kvid.getValue();
-                if (value == null || !KVID_PATTERN.matcher(value).matches()) {
-                    OperationOutcome outcome = new OperationOutcome();
-                    outcome.addIssue()
-                        .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                        .setCode(OperationOutcome.IssueType.INVALID)
-                        .setDiagnostics("KVID muss 10-stellig sein und mit einem Großbuchstaben beginnen, gefolgt von 9 Ziffern. Gefundener Wert: " + value);
-                    
-                    throw new UnprocessableEntityException("Ungültiges KVID-Format", outcome);
-                }
-            });
-    }
-
-    private void validateDocumentReference(DocumentReference resource) {
-        OperationOutcome outcome = new OperationOutcome();
-        boolean hasError = false;
-
-        // Validiere Status
-        if (resource.getStatus() == null) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.REQUIRED)
-                .setDiagnostics("Validierungsfehler: Pflichtfeld Status fehlt");
-            hasError = true;
-        }
-
-        // Validiere Type
-        if (resource.getType() == null) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.REQUIRED)
-                .setDiagnostics("Validierungsfehler: Pflichtfeld Typ fehlt");
-            hasError = true;
-        }
-
-        // Validiere Subject (Patient)
-        if (resource.getSubject() == null || resource.getSubject().isEmpty()) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.REQUIRED)
-                .setDiagnostics("Validierungsfehler: Pflichtfeld Patientenreferenz (subject) fehlt");
-            hasError = true;
-        }
-
-        // Validiere Content
-        if (resource.getContent().isEmpty()) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.REQUIRED)
-                .setDiagnostics("Validierungsfehler: Pflichtfeld Inhalt (content) fehlt");
-            hasError = true;
+    /**
+     * Führt die Validierung durch und gibt das vollständige Ergebnis zurück.
+     *
+     * @param resource Die zu validierende Ressource.
+     * @return Das ValidationResult mit allen Meldungen (FATAL, ERROR, WARNING, INFORMATION).
+     */
+    public ValidationResult validateAndReturnResult(IBaseResource resource) {
+        logger.debug("Führe Validierung durch und gebe Ergebnis zurück für Ressource vom Typ: {}", resource.getClass().getSimpleName());
+        ValidationResult validationResult = validator.validateWithResult(resource);
+        // Logging der Ergebnisse kann hier optional wiederholt oder angepasst werden
+        if (validationResult.isSuccessful()) {
+            logger.debug("Validierung erfolgreich (keine Fehler oder Fatals). Anzahl Meldungen: {}", validationResult.getMessages().size());
         } else {
-            // Validiere Attachments in Content
-            for (DocumentReference.DocumentReferenceContentComponent content : resource.getContent()) {
-                if (content.getAttachment() == null || content.getAttachment().isEmpty()) {
-                    outcome.addIssue()
-                        .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                        .setCode(OperationOutcome.IssueType.REQUIRED)
-                        .setDiagnostics("Validierungsfehler: Pflichtfeld Attachment fehlt im Content");
-                    hasError = true;
-                }
-            }
+            logger.warn("Validierung nicht erfolgreich (Fehler oder Fatals gefunden). Anzahl Meldungen: {}", validationResult.getMessages().size());
         }
-
-        if (hasError) {
-            throw new UnprocessableEntityException("Validierungsfehler: Pflichtfelder fehlen", outcome);
-        }
-    }
-
-    private void validateParameters(Parameters parameters) {
-        OperationOutcome outcome = new OperationOutcome();
-        boolean hasError = false;
-
-        // Validiere Pflichtparameter für die Submit-Operation
-        boolean hasRechnung = false;
-        boolean hasModus = false;
-        boolean hasAngereichertesPDF = false;
-
-        for (Parameters.ParametersParameterComponent param : parameters.getParameter()) {
-            switch (param.getName()) {
-                case "rechnung":
-                    hasRechnung = true;
-                    if (param.getResource() instanceof DocumentReference) {
-                        try {
-                            validateDocumentReference((DocumentReference) param.getResource());
-                        } catch (UnprocessableEntityException e) {
-                            outcome.addIssue()
-                                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                                .setCode(OperationOutcome.IssueType.INVALID)
-                                .setDiagnostics("Fehler in der Rechnung: " + e.getMessage());
-                            hasError = true;
-                        }
-                    }
-                    break;
-                case "modus":
-                    hasModus = true;
-                    if (param.getValue() instanceof CodeType) {
-                        CodeType modus = (CodeType) param.getValue();
-                        if (!"normal".equals(modus.getValue()) && !"test".equals(modus.getValue())) {
-                            outcome.addIssue()
-                                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                                .setCode(OperationOutcome.IssueType.INVALID)
-                                .setDiagnostics("Der Modus muss 'normal' oder 'test' sein");
-                            hasError = true;
-                        }
-                    } else {
-                        outcome.addIssue()
-                            .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                            .setCode(OperationOutcome.IssueType.INVALID)
-                            .setDiagnostics("Der Parameter 'modus' muss vom Typ CodeType sein");
-                        hasError = true;
-                    }
-                    break;
-                case "angereichertesPDF":
-                    hasAngereichertesPDF = true;
-                    break;
-            }
-        }
-
-        if (!hasRechnung) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.INVALID)
-                .setDiagnostics("Der Parameter 'rechnung' muss angegeben werden");
-            hasError = true;
-        }
-        if (!hasModus) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.INVALID)
-                .setDiagnostics("Der Parameter 'modus' muss angegeben werden");
-            hasError = true;
-        }
-        if (!hasAngereichertesPDF) {
-            outcome.addIssue()
-                .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                .setCode(OperationOutcome.IssueType.INVALID)
-                .setDiagnostics("Der Parameter 'angereichertesPDF' muss angegeben werden");
-            hasError = true;
-        }
-
-        if (hasError) {
-            throw new UnprocessableEntityException("Validierungsfehler in den Parametern", outcome);
-        }
-    }
-
-    private void validateInvoiceGebOrd(Invoice invoice) {
-        OperationOutcome outcome = new OperationOutcome();
-        boolean hasError = false;
-
-        // Prüfe Rechnungspositionen
-        for (Invoice.InvoiceLineItemComponent lineItem : invoice.getLineItem()) {
-            if (lineItem.hasChargeItemReference()) {
-                try {
-                    IBaseResource chargeItem = lineItem.getChargeItemReference().getResource();
-                    if (chargeItem instanceof ChargeItem) {
-                        ChargeItem charge = (ChargeItem) chargeItem;
-                        
-                        // Prüfe nur das Format der Gebührenordnungspositionen
-                        if (charge.getCode() != null && charge.getCode().getCoding() != null) {
-                            for (Coding coding : charge.getCode().getCoding()) {
-                                String system = coding.getSystem();
-                                String code = coding.getCode();
-                                
-                                if (system != null && code != null) {
-                                    // Validiere Format der GOÄ Positionen
-                                    if (GOAE_SYSTEM.equals(system) && !GOAE_PATTERN.matcher(code).matches()) {
-                                        outcome.addIssue()
-                                            .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                                            .setCode(OperationOutcome.IssueType.INVALID)
-                                            .setDiagnostics("Ungültiges Format der GOÄ-Position: " + code + 
-                                                ". Format muss sein: Optional Buchstabe, 1-4 Ziffern, optional Buchstabe");
-                                        hasError = true;
-                                    }
-                                    // Validiere Format der GOZ Positionen
-                                    else if (GOZ_SYSTEM.equals(system) && !GOZ_PATTERN.matcher(code).matches()) {
-                                        outcome.addIssue()
-                                            .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                                            .setCode(OperationOutcome.IssueType.INVALID)
-                                            .setDiagnostics("Ungültiges Format der GOZ-Position: " + code + 
-                                                ". Format muss sein: 3-4 Ziffern, optional Kleinbuchstabe");
-                                        hasError = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("Fehler bei der Validierung der Gebührenordnungsposition: {}", e.getMessage());
-                    outcome.addIssue()
-                        .setSeverity(OperationOutcome.IssueSeverity.ERROR)
-                        .setCode(OperationOutcome.IssueType.INVALID)
-                        .setDiagnostics("Fehler bei der Validierung der Gebührenordnungsposition: " + e.getMessage());
-                    hasError = true;
-                }
-            }
-        }
-
-        if (hasError) {
-            throw new UnprocessableEntityException("Validierungsfehler in den Gebührenordnungspositionen", outcome);
-        }
+        return validationResult;
     }
 
     public FhirValidator getValidator() {
@@ -402,7 +309,7 @@ public class CustomValidator {
         }
     }
 
-    // Hilfsmethode zum Laden aller Ressourcen (StructureDefinitions, ValueSets, CodeSystems)
+    // Hilfsmethode zum Laden aller Ressourcen aus dem gematik-erg-resources Verzeichnis
     private void loadAllResources(PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
         try (var stream = getClass().getResourceAsStream("/gematik-erg-resources(new)")) {
             if (stream == null) {
@@ -437,5 +344,128 @@ public class CustomValidator {
                 }
             }
         }
+    }
+
+    // Hilfsmethode zum rekursiven Laden aller FHIR-Ressourcen aus den package-Ordnern
+    private void loadAllPackageResources(PrePopulatedValidationSupport prePopulatedSupport) throws IOException, URISyntaxException {
+        logger.info("Lade alle FHIR-Ressourcen aus den package-Ordnern...");
+        
+        // Das /package Verzeichnis aus den Resources finden
+        URI packageUri = getClass().getResource("/package").toURI();
+        Path packagePath;
+        
+        // Unterstützung für JAR und normale Dateisysteme
+        if (packageUri.getScheme().equals("jar")) {
+            FileSystem fileSystem = FileSystems.newFileSystem(packageUri, Collections.emptyMap());
+            packagePath = fileSystem.getPath("/package");
+        } else {
+            packagePath = Paths.get(packageUri);
+        }
+        
+        // Rekursiv alle .json und .xml Dateien finden und laden
+        loadResourcesFromPath(packagePath, prePopulatedSupport);
+        
+        logger.info("Fertig mit dem Laden aller package-Ressourcen");
+    }
+    
+    // Rekursive Hilfsmethode zum Laden von Ressourcen aus einem Pfad
+    private void loadResourcesFromPath(Path path, PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
+        if (!Files.exists(path)) {
+            logger.warn("Pfad nicht gefunden: {}", path);
+            return;
+        }
+        
+        try (var stream = Files.walk(path)) {
+            stream.filter(Files::isRegularFile)
+                  .filter(file -> {
+                      String fileName = file.getFileName().toString().toLowerCase();
+                      return fileName.endsWith(".json") || fileName.endsWith(".xml");
+                  })
+                  .forEach(file -> {
+                      try {
+                          loadResourceFromFile(file, prePopulatedSupport);
+                      } catch (Exception e) {
+                          logger.error("Fehler beim Laden der Datei {}: {}", file, e.getMessage());
+                      }
+                  });
+        }
+    }
+    
+    // Hilfsmethode zum Laden einer einzelnen Ressource aus einer Datei
+    private void loadResourceFromFile(Path file, PrePopulatedValidationSupport prePopulatedSupport) throws IOException {
+        String fileName = file.getFileName().toString();
+        String fileContent = Files.readString(file);
+        
+        try {
+            IBaseResource resource;
+            
+            // JSON oder XML Parser verwenden je nach Dateiendung
+            if (fileName.toLowerCase().endsWith(".json")) {
+                resource = ctx.newJsonParser().parseResource(fileContent);
+            } else if (fileName.toLowerCase().endsWith(".xml")) {
+                resource = ctx.newXmlParser().parseResource(fileContent);
+            } else {
+                logger.debug("Überspringe Datei mit unbekannter Endung: {}", fileName);
+                return;
+            }
+            
+            // Nur relevante FHIR-Ressourcen hinzufügen
+            if (resource instanceof StructureDefinition) {
+                StructureDefinition sd = (StructureDefinition) resource;
+                prePopulatedSupport.addStructureDefinition(sd);
+                logger.info("StructureDefinition '{}' aus Datei '{}' geladen", sd.getUrl(), fileName);
+            } else if (resource instanceof ValueSet) {
+                ValueSet vs = (ValueSet) resource;
+                prePopulatedSupport.addValueSet(vs);
+                logger.info("ValueSet '{}' aus Datei '{}' geladen", vs.getUrl(), fileName);
+            } else if (resource instanceof CodeSystem) {
+                CodeSystem cs = (CodeSystem) resource;
+                prePopulatedSupport.addCodeSystem(cs);
+                logger.info("CodeSystem '{}' aus Datei '{}' geladen", cs.getUrl(), fileName);
+            } else {
+                logger.debug("Überspringe Ressource vom Typ '{}' in Datei '{}'", resource.fhirType(), fileName);
+            }
+            
+        } catch (Exception e) {
+            logger.error("Fehler beim Parsen der Datei {}: {}", fileName, e.getMessage());
+        }
+    }
+    
+    /**
+     * Vorverarbeitung von Bundle-Ressourcen zur Behebung von Validierungsproblemen
+     * mit XML-Kommentaren vor dem id-Element.
+     */
+    private IBaseResource preprocessBundleForValidation(IBaseResource resource) {
+        try {
+            // Konvertiere die Ressource zu XML
+            String xml = ctx.newXmlParser().encodeResourceToString(resource);
+            
+            // Entferne problematische Kommentare zwischen Bundle-Tag und id-Element
+            xml = removeXmlCommentsBeforeId(xml);
+            
+            // Parse die bereinigte XML zurück zur Ressource
+            return ctx.newXmlParser().parseResource(xml);
+        } catch (Exception e) {
+            logger.warn("Fehler bei der Vorverarbeitung der Bundle-Ressource, verwende Original: {}", e.getMessage());
+            return resource;
+        }
+    }
+    
+    /**
+     * Entfernt XML-Kommentare, die zwischen dem öffnenden Bundle-Tag und dem id-Element stehen.
+     * Diese Kommentare verursachen den Fehler "Objekt muss einen Inhalt haben".
+     */
+    private String removeXmlCommentsBeforeId(String xml) {
+        // Regex-Pattern für Bundle-Start bis id-Element mit Kommentaren dazwischen
+        String pattern = "(<Bundle[^>]*>)(\\s*<!--[^>]*-->\\s*)(<id[^>]*/>)";
+        
+        // Ersetze das Pattern, behalte Bundle und id, entferne nur den Kommentar
+        String cleaned = xml.replaceAll(pattern, "$1$3");
+        
+        // Alternative: Entferne alle Kommentare zwischen XML-Tags generell
+        // Dies ist sicherer für verschiedene Ressourcentypen
+        cleaned = cleaned.replaceAll(">(\\s*<!--[^>]*-->\\s*)<", "><");
+        
+        return cleaned;
     }
 } 

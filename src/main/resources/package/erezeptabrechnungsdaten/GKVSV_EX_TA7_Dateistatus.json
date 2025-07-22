@@ -1,0 +1,63 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-EX-TA7-Dateistatus",
+  "url": "https://fhir.gevko.de/StructureDefinition/GKVSV_EX_TA7_Dateistatus",
+  "version": "1.5.1",
+  "name": "GKVSV_EX_TA7_Dateistatus",
+  "title": "GKVSV_EX_TA7_Dateistatus",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Status der beschriebenen Datei.",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "List.entry.item"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.gevko.de/StructureDefinition/GKVSV_EX_TA7_Dateistatus"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Dateistatus",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ]
+      },
+      {
+        "id": "Extension.value[x].system",
+        "path": "Extension.value[x].system",
+        "min": 1
+      },
+      {
+        "id": "Extension.value[x].version",
+        "path": "Extension.value[x].version",
+        "max": "0"
+      },
+      {
+        "id": "Extension.value[x].code",
+        "path": "Extension.value[x].code",
+        "min": 1
+      },
+      {
+        "id": "Extension.value[x].userSelected",
+        "path": "Extension.value[x].userSelected",
+        "max": "0"
+      }
+    ]
+  }
+}

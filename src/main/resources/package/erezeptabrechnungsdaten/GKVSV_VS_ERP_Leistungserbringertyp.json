@@ -1,0 +1,30 @@
+{
+  "resourceType": "ValueSet",
+  "id": "GKVSV-VS-ERP-Leistungserbringertyp",
+  "url": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringertyp",
+  "version": "1.5.1",
+  "name": "GKVSV_VS_ERP_Leistungserbringertyp",
+  "title": "GKVSV_VS_ERP_Leistungserbringertyp",
+  "status": "active",
+  "date": "2025-03-31",
+  "publisher": "GKV-Spitzenverband",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gkv-spitzenverband.de/"
+        }
+      ]
+    }
+  ],
+  "description": "Eindeutiges Merkmal zur Identifizierung des Leistungserbringertyps für interne Zwecke der Krankenkassen",
+  "copyright": "GKV-Spitzenverband",
+  "compose": {
+    "include": [
+      {
+        "system": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Leistungserbringertyp"
+      }
+    ]
+  }
+}

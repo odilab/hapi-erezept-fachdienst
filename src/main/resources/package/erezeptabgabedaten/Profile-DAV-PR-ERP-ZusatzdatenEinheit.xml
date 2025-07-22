@@ -1,0 +1,101 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="DAV-PR-ERP-ZusatzdatenEinheit" />
+  <url value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-ERP-ZusatzdatenEinheit" />
+  <version value="1.5.0" />
+  <name value="DAV_PR_ERP_ZusatzdatenEinheit" />
+  <title value="DAV_PR_ERP_ZusatzdatenEinheit" />
+  <status value="active" />
+  <date value="2025-03-31" />
+  <publisher value="Deutscher Apothekerverband e.V. (DAV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="resource" />
+  <abstract value="false" />
+  <type value="Invoice" />
+  <baseDefinition value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-Base-ZusatzdatenEinheit" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Invoice.meta">
+      <path value="Invoice.meta" />
+    </element>
+    <element id="Invoice.meta.profile:erpProfile">
+      <path value="Invoice.meta.profile" />
+      <sliceName value="erpProfile" />
+      <min value="1" />
+      <max value="1" />
+      <fixedCanonical value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-ERP-ZusatzdatenEinheit|1.5" />
+    </element>
+    <element id="Invoice.lineItem.extension">
+      <path value="Invoice.lineItem.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+    </element>
+    <element id="Invoice.lineItem.extension:Chargenbezeichnung">
+      <path value="Invoice.lineItem.extension" />
+      <sliceName value="Chargenbezeichnung" />
+      <short value="Chargenbezeichnung" />
+      <definition value="Die Chargenbezeichnung ist anzugeben, wenn dies gesetzlich oder vertraglich gefordert ist." />
+      <type>
+        <code value="Extension" />
+        <profile value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-Chargenbezeichnung" />
+      </type>
+      <mustSupport value="true" />
+    </element>
+    <element id="Invoice.lineItem.chargeItem[x].coding:Sonderkennzeichen-TA1">
+      <path value="Invoice.lineItem.chargeItem[x].coding" />
+      <sliceName value="Sonderkennzeichen-TA1" />
+      <definition value="8-stelliges Sonderkennzeichen aus der Technischen Anlage 1 zur Arzneimittelabrechnungsvereinbarung gemäß § 300 Absatz 3 SGB V oder aus einer anderen vertraglichen Vereinbarung. Das Sonderkennzeichen muss mit einer Preisangabe verknüpft sein." />
+    </element>
+    <element id="Invoice.lineItem.chargeItem[x].coding:keineAngabe">
+      <path value="Invoice.lineItem.chargeItem[x].coding" />
+      <sliceName value="keineAngabe" />
+      <max value="0" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension">
+      <path value="Invoice.lineItem.priceComponent.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="2" />
+      <max value="2" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Faktorkennzeichen">
+      <path value="Invoice.lineItem.priceComponent.extension" />
+      <sliceName value="Faktorkennzeichen" />
+      <min value="1" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Faktorkennzeichen.value[x]">
+      <path value="Invoice.lineItem.priceComponent.extension.value[x]" />
+      <definition value="Eindeutiges Merkmal zur Identifizierung der in der Datenlieferung nach Abschnitt 4.14 der Technischen Anlage 1 übermittelten Faktoren." />
+      <binding>
+        <strength value="required" />
+        <valueSet value="http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-ZusatzdatenEinheitFaktorkennzeichen" />
+      </binding>
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Preiskennzeichen">
+      <path value="Invoice.lineItem.priceComponent.extension" />
+      <sliceName value="Preiskennzeichen" />
+      <min value="1" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Preiskennzeichen.value[x]">
+      <path value="Invoice.lineItem.priceComponent.extension.value[x]" />
+      <definition value="Eindeutiges Merkmal zur Identifizierung der in der Datenlieferung nach Abschnitt 4.14.2 der Technischen Anlage 1 übermittelten Preise." />
+      <binding>
+        <strength value="required" />
+        <valueSet value="http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-VS-ERP-ZusatzdatenEinheitPreiskennzeichen" />
+      </binding>
+    </element>
+    <element id="Invoice.lineItem.priceComponent.factor">
+      <path value="Invoice.lineItem.priceComponent.factor" />
+      <min value="1" />
+    </element>
+  </differential>
+</StructureDefinition>

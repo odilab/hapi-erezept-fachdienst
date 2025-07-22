@@ -1,0 +1,59 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "GKVSV-CS-ERP-Rechnungsart",
+  "url": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Rechnungsart",
+  "version": "1.5.1",
+  "name": "GKVSV_CS_ERP_Rechnungsart",
+  "status": "active",
+  "experimental": false,
+  "date": "2025-03-31",
+  "publisher": "GKV-Spitzenverband",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gkv-spitzenverband.de/"
+        }
+      ]
+    }
+  ],
+  "description": "Kennzeichnung der Art der Abrechnung",
+  "copyright": "GKV-Spitzenverband",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "1",
+      "display": "Abrechnung der Apotheke und Zahlung über IK der Apotheke durch Krankenkasse"
+    },
+    {
+      "code": "2",
+      "display": "Abrechnung über Abrechnungszentrum der Apotheke und Zahlung über IK der Apotheke durch Krankenkasse"
+    },
+    {
+      "code": "3",
+      "display": "Abrechnung über Abrechnungszentrum der Apotheke und Zahlung über IK des Abrechnungszentrums durch Krankenkasse"
+    },
+    {
+      "code": "4",
+      "display": "Abrechnung der Apotheke  und Zahlung über IK der Apotheke durch Abrechnungszentrum der Krankenkasse"
+    },
+    {
+      "code": "5",
+      "display": "Abrechnung des Abrechnungszentrums der Apotheken und Zahlung über IK  der Apotheke durch Abrechnungszentrum der Krankenkasse"
+    },
+    {
+      "code": "6",
+      "display": "Abrechnung des Abrechnungszentrums der Apotheken und Zahlung über IK des Abrechnungszentrums der Apotheken durch Abrechnungszentrum der Krankenkasse"
+    },
+    {
+      "code": "7",
+      "display": "Einzelrechnung \"Krankenkasse\" einer Sammelabrechnung"
+    },
+    {
+      "code": "8",
+      "display": "Einzelrechnung \"Apotheke\" einer Sammelabrechnung"
+    }
+  ]
+}

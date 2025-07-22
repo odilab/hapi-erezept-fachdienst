@@ -1,0 +1,99 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="DAV-PKV-PR-ERP-ZusatzdatenEinheit" />
+  <url value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-ZusatzdatenEinheit" />
+  <version value="1.4.0" />
+  <name value="DAV_PKV_PR_ERP_ZusatzdatenEinheit" />
+  <title value="DAV_PKV_PR_ERP_ZusatzdatenEinheit" />
+  <status value="active" />
+  <date value="2025-03-31" />
+  <publisher value="Deutscher Apothekerverband e.V. (DAV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="resource" />
+  <abstract value="false" />
+  <type value="Invoice" />
+  <baseDefinition value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-Base-ZusatzdatenEinheit" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Invoice.meta">
+      <path value="Invoice.meta" />
+    </element>
+    <element id="Invoice.meta.profile:pkvProfile">
+      <path value="Invoice.meta.profile" />
+      <sliceName value="pkvProfile" />
+      <min value="1" />
+      <max value="1" />
+      <fixedCanonical value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-ZusatzdatenEinheit|1.4" />
+    </element>
+    <element id="Invoice.extension">
+      <path value="Invoice.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+    </element>
+    <element id="Invoice.extension:ZaehlerEinheit">
+      <path value="Invoice.extension" />
+      <sliceName value="ZaehlerEinheit" />
+      <definition value="Bei parenteralen Zubereitungen ist jede innerhalb eines Herstellungsvorgangs hergestellte Einheit beginnend mit &quot;1&quot; lückenlos fortlaufend zu nummerieren. Bei sonstigen Rezepturen und der Abgabe von Teilmengen ist der Wert &quot;1&quot; anzugeben." />
+      <min value="1" />
+    </element>
+    <element id="Invoice.lineItem">
+      <path value="Invoice.lineItem" />
+      <constraint>
+        <key value="Faktor-4-PZN-SOK" />
+        <severity value="error" />
+        <human value="Angabe Faktor bei PZN oder SOK Pflicht." />
+        <expression value="(chargeItemCodeableConcept.coding.system = 'http://fhir.de/CodeSystem/ifa/pzn' or chargeItemCodeableConcept.coding.system = 'http://TA1.abda.de') implies priceComponent.factor.exists()" />
+        <source value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-ZusatzdatenEinheit" />
+      </constraint>
+    </element>
+    <element id="Invoice.lineItem.chargeItem[x]">
+      <path value="Invoice.lineItem.chargeItem[x]" />
+      <short value="Angabe eines Codes (Pharmazentralnummer (PZN) oder Sonderkennzeichen aus der technischen Anlage." />
+      <definition value="Sofern die Code-Angabe optional ist, kann auf die Angabe der PZN bzw. des Sonderkennzeichens verzichtet werden und alternativ „keineAngabe“ ausgewählt werden. &#xD;&#xA;Parenterale Zubereitungen: Die Angabe eines Codes ist bei Fertigarzneimittel-Bestandteilen verpflichtend, bei anderen Bestandteilen optional.&#xD;&#xA;Abgabe von Teilmengen: Die Angabe eines Codes ist verpflichtend. &#xD;&#xA;Sonstige Rezepturen: Die Angabe eines Codes ist optional. Wenn das Feld PZN_Sonderkennzeichen mit einem Code gefüllt wird, ist immer auch der Faktor im gleichnamigen Feld anzugeben." />
+    </element>
+    <element id="Invoice.lineItem.chargeItem[x].coding:keineAngabe">
+      <path value="Invoice.lineItem.chargeItem[x].coding" />
+      <sliceName value="keineAngabe" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension">
+      <path value="Invoice.lineItem.priceComponent.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <max value="1" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Faktorkennzeichen">
+      <path value="Invoice.lineItem.priceComponent.extension" />
+      <sliceName value="Faktorkennzeichen" />
+      <mustSupport value="true" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Faktorkennzeichen.value[x]">
+      <path value="Invoice.lineItem.priceComponent.extension.value[x]" />
+      <definition value="Eindeutiges Merkmal zur Identifizierung des übermittelten Faktors.&#xD;&#xA;Pflichtfeld bei Fertigarzneimittel-Bestandteilen in parenteralen Zubereitungen, optional bei anderen Bestandteilen. &#xD;&#xA;Wenn das Feld Faktorkennzeichen verwendet wird, ist immer auch das Feld PZN_Sonderkennzeichen mit einem Code zu füllen und der Faktor ist anzugeben. Keine Angabe des Faktorkennzeichens erfolgt bei sonstigen Rezepturen und der Abgabe von Teilmengen." />
+      <binding>
+        <strength value="required" />
+        <valueSet value="http://fhir.abda.de/eRezeptAbgabedaten/ValueSet/DAV-PKV-VS-ERP-ZusatzdatenEinheitFaktorkennzeichen" />
+      </binding>
+    </element>
+    <element id="Invoice.lineItem.priceComponent.extension:Preiskennzeichen">
+      <path value="Invoice.lineItem.priceComponent.extension" />
+      <sliceName value="Preiskennzeichen" />
+      <max value="0" />
+    </element>
+    <element id="Invoice.lineItem.priceComponent.factor">
+      <path value="Invoice.lineItem.priceComponent.factor" />
+      <definition value="Anteil der Packung oder des Zuschlags; Angabe als Promilleanteil (bis zu 6 Vor- und bis zu 6-Nachkommastellen mit Dezimaltrennzeichen)&#xD;&#xA;Pflichtfeld bei Fertigarzneimittel-Bestandteilen in parenteralen Zubereitungen, optional bei anderen Bestandteilen.&#xD;&#xA;Pflichtfeld bei der Abgabe von Teilmengen, optional bei sonstigen Rezepturen. Wenn das Feld Faktor verwendet wird, ist immer auch ein Code im Feld PZN_Sonderkennzeichen anzugeben." />
+      <mustSupport value="true" />
+    </element>
+  </differential>
+</StructureDefinition>

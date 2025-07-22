@@ -1,0 +1,76 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-EX-ERP-LE-Sitz",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_LE_Sitz",
+  "version": "1.5.1",
+  "name": "GKVSV_EX_ERP_LE_Sitz",
+  "title": "GKVSV_EX_ERP_LE_Sitz",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Leistungserbringer mit Sitz im Inland bzw. Ausland",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Invoice.issuer"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Leistungserbringer Sitz",
+        "definition": "Leistungserbringer Sitz im Inland / Ausland."
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_LE_Sitz"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "description": "Der Code für den Sitz des Leistungserbringers muss aus dem Value Set 'https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringer_Sitz' gewählt werden.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Leistungserbringer_Sitz"
+        }
+      },
+      {
+        "id": "Extension.value[x].system",
+        "path": "Extension.value[x].system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Leistungserbringer_Sitz"
+      },
+      {
+        "id": "Extension.value[x].version",
+        "path": "Extension.value[x].version",
+        "max": "0"
+      },
+      {
+        "id": "Extension.value[x].code",
+        "path": "Extension.value[x].code",
+        "short": "1 | 2",
+        "definition": "1 = Leistungserbringer mit Sitz im Inland; \r\n2 = Leistungserbringer mit Sitz im Ausland",
+        "min": 1
+      },
+      {
+        "id": "Extension.value[x].userSelected",
+        "path": "Extension.value[x].userSelected",
+        "max": "0"
+      }
+    ]
+  }
+}

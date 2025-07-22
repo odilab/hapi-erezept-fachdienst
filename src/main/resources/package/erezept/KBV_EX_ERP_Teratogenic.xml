@@ -1,0 +1,260 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-EX-ERP-Teratogenic" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Teratogenic" />
+  <version value="1.4.0" />
+  <name value="KBV_EX_ERP_Teratogenic" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <fhirVersion value="4.0.1" />
+  <mapping>
+    <identity value="rim" />
+    <uri value="http://hl7.org/v3" />
+    <name value="RIM Mapping" />
+  </mapping>
+  <kind value="complex-type" />
+  <abstract value="false" />
+  <context>
+    <type value="element" />
+    <expression value="MedicationRequest" />
+  </context>
+  <type value="Extension" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Extension">
+      <path value="Extension" />
+      <short value="Teratogene Arzneimittel" />
+      <definition value="Abbildung der Angaben zur Verordnung eines teratogenen Arzneimittels" />
+    </element>
+    <element id="Extension.extension">
+      <path value="Extension.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="5" />
+      <max value="5" />
+    </element>
+    <element id="Extension.extension:Off-Label">
+      <path value="Extension.extension" />
+      <sliceName value="Off-Label" />
+      <min value="1" />
+      <max value="1" />
+    </element>
+    <element id="Extension.extension:Off-Label.extension">
+      <path value="Extension.extension.extension" />
+      <max value="0" />
+    </element>
+    <element id="Extension.extension:Off-Label.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="Off-Label" />
+    </element>
+    <element id="Extension.extension:Off-Label.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:Off-Label.value[x]:valueBoolean">
+      <path value="Extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <short value="Off-Label" />
+      <definition value="Dieses Feld enthält eine Angabe, ob eine Behandlung außerhalb der jeweils zugelassenen Anwendungsgebiete („Off-Label“) erfolgt." />
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:GebaerfaehigeFrau">
+      <path value="Extension.extension" />
+      <sliceName value="GebaerfaehigeFrau" />
+      <min value="1" />
+      <max value="1" />
+      <mustSupport value="false" />
+    </element>
+    <element id="Extension.extension:GebaerfaehigeFrau.extension">
+      <path value="Extension.extension.extension" />
+      <max value="0" />
+    </element>
+    <element id="Extension.extension:GebaerfaehigeFrau.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="GebaerfaehigeFrau" />
+    </element>
+    <element id="Extension.extension:GebaerfaehigeFrau.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:GebaerfaehigeFrau.value[x]:valueBoolean">
+      <path value="Extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <short value="Gebärfähige Frau" />
+      <definition value="Dieses Feld enthält die Angabe, ob es sich um eine Verschreibung für eine gebärfähige Frau handelt." />
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:EinhaltungSicherheitsmassnahmen">
+      <path value="Extension.extension" />
+      <sliceName value="EinhaltungSicherheitsmassnahmen" />
+      <min value="1" />
+      <max value="1" />
+      <constraint>
+        <key value="-erp-angabeT-RezeptEinhaltungSicherheitsmassnahmenTrue" />
+        <severity value="error" />
+        <human value="Bei einem T-Rezept muss die Einhaltung der Sicherheitsmaßnahmen mit true bestätigt werden." />
+        <expression value="($this.value as boolean)=true" />
+      </constraint>
+    </element>
+    <element id="Extension.extension:EinhaltungSicherheitsmassnahmen.extension">
+      <path value="Extension.extension.extension" />
+      <max value="0" />
+    </element>
+    <element id="Extension.extension:EinhaltungSicherheitsmassnahmen.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="EinhaltungSicherheitsmassnahmen" />
+    </element>
+    <element id="Extension.extension:EinhaltungSicherheitsmassnahmen.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:EinhaltungSicherheitsmassnahmen.value[x]:valueBoolean">
+      <path value="Extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <short value="Einhaltung Sicherheitsmaßnahmen" />
+      <definition value="Dieses Feld enthält eine Angabe, ob die Sicherheitsmaßnahmen gemäß der aktuellen Fachinformation eines entsprechenden Fertigarzneimittels eingehalten werden, insbesondere, dass erforderlichenfalls ein Schwangerschafts-Präventionsprogramm durchgeführt wird." />
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:AushaendigungInformationsmaterialien">
+      <path value="Extension.extension" />
+      <sliceName value="AushaendigungInformationsmaterialien" />
+      <min value="1" />
+      <max value="1" />
+      <constraint>
+        <key value="-erp-angabeT-RezeptAushaendigungInformationsmaterialienTrue" />
+        <severity value="error" />
+        <human value="Bei einem T-Rezept muss die Aushändigung der Informationsmaterialien mit true bestätigt werden." />
+        <expression value="($this.value as boolean)=true" />
+      </constraint>
+    </element>
+    <element id="Extension.extension:AushaendigungInformationsmaterialien.extension">
+      <path value="Extension.extension.extension" />
+      <max value="0" />
+    </element>
+    <element id="Extension.extension:AushaendigungInformationsmaterialien.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="AushaendigungInformationsmaterialien" />
+    </element>
+    <element id="Extension.extension:AushaendigungInformationsmaterialien.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:AushaendigungInformationsmaterialien.value[x]:valueBoolean">
+      <path value="Extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <short value="Aushändigung Informationsmaterialien" />
+      <definition value="Dieses Feld enthält eine Angabe, ob der Patientin oder dem Patienten vor Beginn der medikamentösen Behandlung geeignete medizinische Informationsmaterialien ausgehändigt wurden." />
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:ErklaerungSachkenntnis">
+      <path value="Extension.extension" />
+      <sliceName value="ErklaerungSachkenntnis" />
+      <min value="1" />
+      <max value="1" />
+      <constraint>
+        <key value="-erp-angabeT-RezeptErklaerungSachkenntnisTrue" />
+        <severity value="error" />
+        <human value="Bei einem T-Rezept muss die Erklärung der Sachkenntnis mit true bestätigt werden." />
+        <expression value="($this.value as boolean)=true" />
+      </constraint>
+    </element>
+    <element id="Extension.extension:ErklaerungSachkenntnis.extension">
+      <path value="Extension.extension.extension" />
+      <max value="0" />
+    </element>
+    <element id="Extension.extension:ErklaerungSachkenntnis.url">
+      <path value="Extension.extension.url" />
+      <fixedUri value="ErklaerungSachkenntnis" />
+    </element>
+    <element id="Extension.extension:ErklaerungSachkenntnis.value[x]">
+      <path value="Extension.extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="closed" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.extension:ErklaerungSachkenntnis.value[x]:valueBoolean">
+      <path value="Extension.extension.value[x]" />
+      <sliceName value="valueBoolean" />
+      <short value="Erklärung Sachkenntnis" />
+      <definition value="Dieses Feld enthält die Erklärung, ob die verschreibende Person über ausreichende Sachkenntnisse zur Verschreibung von Arzneimitteln mit Lenalidomid, Pomalidomid oder Thalidomid verfügt." />
+      <min value="1" />
+      <type>
+        <code value="boolean" />
+      </type>
+    </element>
+    <element id="Extension.url">
+      <path value="Extension.url" />
+      <fixedUri value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Teratogenic" />
+    </element>
+    <element id="Extension.value[x]">
+      <path value="Extension.value[x]" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

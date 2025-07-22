@@ -1,0 +1,35 @@
+{
+  "resourceType": "CodeSystem",
+  "id": "GKVSV-CS-ERP-Leistungserbringer-Sitz",
+  "url": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Leistungserbringer_Sitz",
+  "version": "1.5.1",
+  "name": "GKVSV_CS_ERP_Leistungserbringer_Sitz",
+  "status": "active",
+  "experimental": false,
+  "date": "2025-03-31",
+  "publisher": "GKV-Spitzenverband",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gkv-spitzenverband.de/"
+        }
+      ]
+    }
+  ],
+  "description": "Leistungserbringer mit Sitz im Inland oder Ausland",
+  "copyright": "GKV-Spitzenverband",
+  "caseSensitive": true,
+  "content": "complete",
+  "concept": [
+    {
+      "code": "1",
+      "display": "Leistungserbringer mit Sitz im Inland"
+    },
+    {
+      "code": "2",
+      "display": "Leistungserbringer mit Sitz im Ausland"
+    }
+  ]
+}

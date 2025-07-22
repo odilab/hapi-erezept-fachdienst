@@ -1,0 +1,73 @@
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="KBV-EX-ERP-DosageCategory" />
+  <url value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageCategory" />
+  <version value="1.4.0" />
+  <name value="KBV_EX_ERP_DosageCategory" />
+  <status value="draft" />
+  <date value="2025-06-17" />
+  <publisher value="Kassenärztliche Bundesvereinigung (KBV)" />
+  <fhirVersion value="4.0.1" />
+  <kind value="complex-type" />
+  <abstract value="false" />
+  <context>
+    <type value="element" />
+    <expression value="Dosage" />
+  </context>
+  <type value="Extension" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="Extension.extension">
+      <path value="Extension.extension" />
+      <max value="0" />
+    </element>
+    <element id="Extension.url">
+      <path value="Extension.url" />
+      <fixedUri value="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageCategory" />
+    </element>
+    <element id="Extension.value[x]">
+      <path value="Extension.value[x]" />
+      <slicing>
+        <discriminator>
+          <type value="type" />
+          <path value="$this" />
+        </discriminator>
+        <rules value="open" />
+      </slicing>
+      <min value="1" />
+      <type>
+        <code value="Coding" />
+      </type>
+    </element>
+    <element id="Extension.value[x]:valueCoding">
+      <path value="Extension.value[x]" />
+      <sliceName value="valueCoding" />
+      <min value="1" />
+      <type>
+        <code value="Coding" />
+      </type>
+    </element>
+    <element id="Extension.value[x]:valueCoding.system">
+      <path value="Extension.value[x].system" />
+      <min value="1" />
+      <fixedUri value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Dosage_Category" />
+    </element>
+    <element id="Extension.value[x]:valueCoding.version">
+      <path value="Extension.value[x].version" />
+      <max value="0" />
+    </element>
+    <element id="Extension.value[x]:valueCoding.code">
+      <path value="Extension.value[x].code" />
+      <short value="Dosieranweisung / Gebrauchsanweisung Kategorie" />
+      <min value="1" />
+    </element>
+    <element id="Extension.value[x]:valueCoding.display">
+      <path value="Extension.value[x].display" />
+      <max value="0" />
+    </element>
+    <element id="Extension.value[x]:valueCoding.userSelected">
+      <path value="Extension.value[x].userSelected" />
+      <max value="0" />
+    </element>
+  </differential>
+</StructureDefinition>

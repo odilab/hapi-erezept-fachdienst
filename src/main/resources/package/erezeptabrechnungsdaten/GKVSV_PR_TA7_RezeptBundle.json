@@ -1,0 +1,370 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-PR-TA7-RezeptBundle",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_TA7_RezeptBundle",
+  "version": "1.5.1",
+  "name": "GKVSV_PR_TA7_RezeptBundle",
+  "title": "GKVSV_PR_TA7_RezeptBundle",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Dieses Bundle verbindet die eRezept Verordnungsdaten, Quittungsdaten, Abgabedaten und Abrechnungsdaten",
+  "fhirVersion": "4.0.1",
+  "kind": "resource",
+  "abstract": false,
+  "type": "Bundle",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Bundle",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Bundle.id",
+        "path": "Bundle.id",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.meta",
+        "path": "Bundle.meta",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.meta.profile",
+        "path": "Bundle.meta.profile",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "$this"
+            }
+          ],
+          "rules": "open"
+        },
+        "min": 1
+      },
+      {
+        "id": "Bundle.meta.profile:erpProfile",
+        "path": "Bundle.meta.profile",
+        "sliceName": "erpProfile",
+        "min": 1,
+        "max": "1",
+        "fixedCanonical": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_TA7_RezeptBundle|1.5",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.implicitRules",
+        "path": "Bundle.implicitRules",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.language",
+        "path": "Bundle.language",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.identifier",
+        "path": "Bundle.identifier",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.type",
+        "path": "Bundle.type",
+        "fixedCode": "collection",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.timestamp",
+        "path": "Bundle.timestamp",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.total",
+        "path": "Bundle.total",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.link",
+        "path": "Bundle.link",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry",
+        "path": "Bundle.entry",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "link.url"
+            }
+          ],
+          "ordered": true,
+          "rules": "closed"
+        },
+        "min": 4,
+        "max": "4",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten",
+        "path": "Bundle.entry",
+        "sliceName": "Verordnungsdaten",
+        "short": "Verordnungsdatensatz",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.link",
+        "path": "Bundle.entry.link",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.link.relation",
+        "path": "Bundle.entry.link.relation",
+        "fixedString": "item",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.link.url",
+        "path": "Bundle.entry.link.url",
+        "fixedUri": "https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.fullUrl",
+        "path": "Bundle.entry.fullUrl",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.resource",
+        "path": "Bundle.entry.resource",
+        "short": "Verordnungsdatensatz",
+        "definition": "Der Verordnungsdatensatz (https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle) soll als base64Binary im Profil GKVSV_PR_Binary enthalten sein.",
+        "min": 1,
+        "type": [
+          {
+            "code": "Resource",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_Binary"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.search",
+        "path": "Bundle.entry.search",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.request",
+        "path": "Bundle.entry.request",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Verordnungsdaten.response",
+        "path": "Bundle.entry.response",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten",
+        "path": "Bundle.entry",
+        "sliceName": "Quittungsdaten",
+        "short": "Quittungsdatensatz",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.link",
+        "path": "Bundle.entry.link",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.link.relation",
+        "path": "Bundle.entry.link.relation",
+        "fixedString": "item",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.link.url",
+        "path": "Bundle.entry.link.url",
+        "fixedUri": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.fullUrl",
+        "path": "Bundle.entry.fullUrl",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.resource",
+        "path": "Bundle.entry.resource",
+        "short": "Quittungsdatensatz",
+        "min": 1,
+        "type": [
+          {
+            "code": "Resource",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_Binary"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.search",
+        "path": "Bundle.entry.search",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.request",
+        "path": "Bundle.entry.request",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Quittungsdaten.response",
+        "path": "Bundle.entry.response",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten",
+        "path": "Bundle.entry",
+        "sliceName": "Abgabedaten",
+        "short": "Abgabedatensatz",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.link",
+        "path": "Bundle.entry.link",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.link.relation",
+        "path": "Bundle.entry.link.relation",
+        "fixedString": "item",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.link.url",
+        "path": "Bundle.entry.link.url",
+        "fixedUri": "http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PR-ERP-AbgabedatenBundle"
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.fullUrl",
+        "path": "Bundle.entry.fullUrl",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.resource",
+        "path": "Bundle.entry.resource",
+        "short": "Abgabedatensatz",
+        "definition": "Der Abgabedatensatz (http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/PR-eRezeptAbgabedatenBundle) soll als base64Binary im Profil GKVSV_PR_Binary enthalten sein.",
+        "min": 1,
+        "type": [
+          {
+            "code": "Resource",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_Binary"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.search",
+        "path": "Bundle.entry.search",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.request",
+        "path": "Bundle.entry.request",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Abgabedaten.response",
+        "path": "Bundle.entry.response",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten",
+        "path": "Bundle.entry",
+        "sliceName": "Abrechnungsdaten",
+        "short": "Abrechnungsdatensatz",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.link",
+        "path": "Bundle.entry.link",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.link.relation",
+        "path": "Bundle.entry.link.relation",
+        "fixedString": "item",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.link.url",
+        "path": "Bundle.entry.link.url",
+        "fixedUri": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_ERP_eAbrechnungsdaten",
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.fullUrl",
+        "path": "Bundle.entry.fullUrl",
+        "min": 1,
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.resource",
+        "path": "Bundle.entry.resource",
+        "short": "Abrechnungsdatensatz",
+        "min": 1,
+        "type": [
+          {
+            "code": "Resource",
+            "profile": [
+              "https://fhir.gkvsv.de/StructureDefinition/GKVSV_PR_ERP_eAbrechnungsdaten"
+            ]
+          }
+        ],
+        "mustSupport": true
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.search",
+        "path": "Bundle.entry.search",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.request",
+        "path": "Bundle.entry.request",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.entry:Abrechnungsdaten.response",
+        "path": "Bundle.entry.response",
+        "max": "0"
+      },
+      {
+        "id": "Bundle.signature",
+        "path": "Bundle.signature",
+        "max": "0"
+      }
+    ]
+  }
+}

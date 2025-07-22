@@ -1,0 +1,60 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-EX-ERP-TA7-Dateinummer",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_TA7_Dateinummer",
+  "version": "1.5.1",
+  "name": "GKVSV_EX_ERP_TA7_Dateinummer",
+  "title": "GKVSV_EX_ERP_TA7_Dateinummer",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "TA7 Dateinummer",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Bundle.identifier"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_TA7_Dateinummer"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "short": "Dateinummer",
+        "definition": "Fortlaufende Nummer innerhalb eines Jahres, beginnend mit 00001.",
+        "min": 1,
+        "type": [
+          {
+            "code": "string"
+          }
+        ],
+        "constraint": [
+          {
+            "key": "Dateinummer-length",
+            "severity": "error",
+            "human": "Die Dateinummer muss 5 Zeichen lang sein (beginnend mit 00001).",
+            "expression": "toString().matches('^\\\\d{5}$')",
+            "source": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_TA7_Dateinummer"
+          },
+          {
+            "key": "Dateinummer-zero",
+            "severity": "error",
+            "human": "Die Dateinummer darf nicht kleiner als 00001 sein.",
+            "expression": "toInteger() >= 1",
+            "source": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_TA7_Dateinummer"
+          }
+        ]
+      }
+    ]
+  }
+}

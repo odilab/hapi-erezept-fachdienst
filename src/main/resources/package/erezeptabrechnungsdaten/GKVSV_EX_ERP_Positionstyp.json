@@ -1,0 +1,87 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "GKVSV-EX-ERP-Positionstyp",
+  "url": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Positionstyp",
+  "version": "1.5.1",
+  "name": "GKVSV_EX_ERP_Positionstyp",
+  "title": "GKVSV_EX_ERP_Positionstyp",
+  "status": "active",
+  "date": "2025-03-31",
+  "description": "Kennzeichen Positionstyp",
+  "fhirVersion": "4.0.1",
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Invoice.lineItem"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Kennzeichen Nullposition",
+        "definition": "0 = Nullposition \r\n1 = übrige Position"
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.gkvsv.de/StructureDefinition/GKVSV_EX_ERP_Positionstyp"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "min": 1,
+        "type": [
+          {
+            "code": "CodeableConcept"
+          }
+        ],
+        "binding": {
+          "strength": "required",
+          "description": "Der Positionstyp muss vom Typ 'Nullposition' oder 'übrige Position' sein.",
+          "valueSet": "https://fhir.gkvsv.de/ValueSet/GKVSV_VS_ERP_Positionstyp"
+        }
+      },
+      {
+        "id": "Extension.value[x].coding",
+        "path": "Extension.value[x].coding",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Extension.value[x].coding.system",
+        "path": "Extension.value[x].coding.system",
+        "min": 1,
+        "fixedUri": "https://fhir.gkvsv.de/CodeSystem/GKVSV_CS_ERP_Positionstyp"
+      },
+      {
+        "id": "Extension.value[x].coding.version",
+        "path": "Extension.value[x].coding.version",
+        "max": "0"
+      },
+      {
+        "id": "Extension.value[x].coding.code",
+        "path": "Extension.value[x].coding.code",
+        "short": "0 | 1",
+        "definition": "0 = Nullposition\r\n1 = übrige Position",
+        "min": 1
+      },
+      {
+        "id": "Extension.value[x].coding.userSelected",
+        "path": "Extension.value[x].coding.userSelected",
+        "max": "0"
+      },
+      {
+        "id": "Extension.value[x].text",
+        "path": "Extension.value[x].text",
+        "max": "0"
+      }
+    ]
+  }
+}
