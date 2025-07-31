@@ -47,6 +47,7 @@ public class TestcontainersConfig {
                     .withNetworkAliases("erp-service")
                     .withEnv("SPRING_PROFILES_ACTIVE", "ssl")
                     .withEnv("default.string.idp.urlHttps", "https://idp-server:10000")
+                    //.withEnv("default.string.fd.urlFachdienst", "https://localhost:8080")
                     .withCreateContainerCmdModifier(cmd ->
                             cmd.withEntrypoint(
                                     "java",

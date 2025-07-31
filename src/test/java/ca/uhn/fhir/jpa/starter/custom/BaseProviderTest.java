@@ -46,9 +46,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {
     Application.class, 
 }, properties = {
-    "hapi.fhir.custom-bean-packages=ca.uhn.fhir.jpa.starter.custom.interceptor",
+    "hapi.fhir.custom-bean-packages=ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.operation",
     "hapi.fhir.custom-interceptor-classes=ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor",
-    //"hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.SubmitOperationProvider,ca.uhn.fhir.jpa.starter.custom.RetrieveOperationProvider,ca.uhn.fhir.jpa.starter.custom.ProcessFlagOperationProvider,ca.uhn.fhir.jpa.starter.custom.EraseOperationProvider,ca.uhn.fhir.jpa.starter.custom.ChangeStatusOperationProvider",
+    "hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider",
     "spring.datasource.url=jdbc:h2:mem:dbr4",
     "hapi.fhir.cr_enabled=false",
     "hapi.fhir.fhir_version=r4",
@@ -146,6 +146,18 @@ public abstract class BaseProviderTest {
                     TestcontainersConfig.startErpServiceContainer().getMappedPort(3001),
                     healthCardType));
             conn = (HttpURLConnection) url.openConnection();
+            
+            // SSL-Validierung für Testcontainer deaktivieren
+            if (conn instanceof javax.net.ssl.HttpsURLConnection) {
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, new TrustManager[] { new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                }}, new SecureRandom());
+                ((javax.net.ssl.HttpsURLConnection) conn).setSSLSocketFactory(sc.getSocketFactory());
+                ((javax.net.ssl.HttpsURLConnection) conn).setHostnameVerifier((hostname, session) -> true);
+            }
             conn.setRequestMethod("GET");
             conn.setRequestProperty("accept", "application/json");
             
