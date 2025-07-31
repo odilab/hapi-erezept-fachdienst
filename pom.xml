@@ -447,6 +447,57 @@
             <version>20231013</version>
         </dependency>
 
+        <!-- Gematik Reference Validator - Local JARs -->
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>commons</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/commons-2.12.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>referencevalidator-lib</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/referencevalidator-lib-2.12.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>valmodule-base</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/valmodule-base-2.12.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>valmodule-core</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/valmodule-core-2.12.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>valmodule-erp</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/valmodule-erp-2.12.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>valmodule-eau</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/valmodule-eau-2.12.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.refv</groupId>
+            <artifactId>valmodule-erpta7</artifactId>
+            <version>2.12.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/valmodule-erpta7-2.12.0.jar</systemPath>
+        </dependency>
+
     </dependencies>
 
     <build>
