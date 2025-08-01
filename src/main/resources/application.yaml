@@ -308,7 +308,7 @@ hapi:
     inline_resource_storage_below_size: 4000
     custom-bean-packages: ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth
     custom-interceptor-classes: ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor
-    custom-provider-classes:
+    custom-provider-classes: ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider
 #    bulk_export_enabled: true
 #    subscription:
 #      resthook_enabled: true

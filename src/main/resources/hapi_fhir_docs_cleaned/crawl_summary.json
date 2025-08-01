@@ -1,0 +1,836 @@
+{
+  "base_url": "https://hapifhir.io/hapi-fhir/docs/",
+  "crawl_date": "2025-08-01T14:15:21.573072",
+  "total_pages_crawled": 138,
+  "pages_in_queue": 0,
+  "results": [
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/",
+      "filename": "index.md",
+      "content_length": 30624,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/android",
+      "filename": "android.md",
+      "content_length": 20670,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/android/client.html",
+      "filename": "android_client.md",
+      "content_length": 20754,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/annotation_client.html",
+      "filename": "annotation_client.md",
+      "content_length": 77,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/appendix/faq.html",
+      "filename": "appendix_faq.md",
+      "content_length": 20851,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/appendix/javadocs.html",
+      "filename": "appendix_javadocs.md",
+      "content_length": 18451,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/appendix/logging.html",
+      "filename": "appendix_logging.md",
+      "content_length": 25130,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client",
+      "filename": "client.md",
+      "content_length": 19845,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client/annotation_client.html",
+      "filename": "client_annotation_client.md",
+      "content_length": 26872,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client/client_configuration.html",
+      "filename": "client_client_configuration.md",
+      "content_length": 24732,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client/examples.html",
+      "filename": "client_examples.md",
+      "content_length": 27792,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client/generic_client.html",
+      "filename": "client_generic_client.md",
+      "content_length": 49921,
+      "links_found": 137
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client/get_started.html",
+      "filename": "client_get_started.md",
+      "content_length": 18200,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/client/introduction.html",
+      "filename": "client_introduction.md",
+      "content_length": 19949,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/activity_definitions.html",
+      "filename": "clinical_reasoning_activity_definitions.md",
+      "content_length": 24490,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/caregaps.html",
+      "filename": "clinical_reasoning_caregaps.md",
+      "content_length": 25166,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/cql.html",
+      "filename": "clinical_reasoning_cql.md",
+      "content_length": 19627,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/measures.html",
+      "filename": "clinical_reasoning_measures.md",
+      "content_length": 40134,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/overview.html",
+      "filename": "clinical_reasoning_overview.md",
+      "content_length": 20390,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/plan_definitions.html",
+      "filename": "clinical_reasoning_plan_definitions.md",
+      "content_length": 35890,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/clinical_reasoning/questionnaires.html",
+      "filename": "clinical_reasoning_questionnaires.md",
+      "content_length": 46930,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/contributing/hacking_guide.html",
+      "filename": "contributing_hacking_guide.md",
+      "content_length": 23788,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/generic_client.html",
+      "filename": "generic_client.md",
+      "content_length": 74,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/getting_started/downloading_and_importing.html",
+      "filename": "getting_started_downloading_and_importing.md",
+      "content_length": 24970,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/getting_started/introduction.html",
+      "filename": "getting_started_introduction.md",
+      "content_length": 25355,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/getting_started/modules.html",
+      "filename": "getting_started_modules.md",
+      "content_length": 21840,
+      "links_found": 138
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/getting_started/r4b.html",
+      "filename": "getting_started_r4b.md",
+      "content_length": 18189,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/getting_started/versions.html",
+      "filename": "getting_started_versions.md",
+      "content_length": 20284,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/hfql/hfql.html",
+      "filename": "hfql_hfql.md",
+      "content_length": 19169,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-create-1.svg",
+      "filename": "images_empi-create-1.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-create-2.svg",
+      "filename": "images_empi-create-2.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-create-3.svg",
+      "filename": "images_empi-create-3.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-create-4.svg",
+      "filename": "images_empi-create-4.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-create-5.svg",
+      "filename": "images_empi-create-5.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-update-1.svg",
+      "filename": "images_empi-update-1.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-update-2.svg",
+      "filename": "images_empi-update-2.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-update-3.svg",
+      "filename": "images_empi-update-3.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-update-4.svg",
+      "filename": "images_empi-update-4.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-update-5.svg",
+      "filename": "images_empi-update-5.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/empi-update-6.svg",
+      "filename": "images_empi-update-6.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/interceptors-client-pipeline.svg",
+      "filename": "images_interceptors-client-pipeline.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/images/validation-support-chain.svg",
+      "filename": "images_validation-support-chain.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/instance_validator.html",
+      "filename": "instance_validator.md",
+      "content_length": 78,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors",
+      "filename": "interceptors.md",
+      "content_length": 24245,
+      "links_found": 136
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/built_in_client_interceptors.html",
+      "filename": "interceptors_built_in_client_interceptors.md",
+      "content_length": 32805,
+      "links_found": 141
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/built_in_server_interceptors.html",
+      "filename": "interceptors_built_in_server_interceptors.md",
+      "content_length": 62223,
+      "links_found": 152
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/client_interceptors.html",
+      "filename": "interceptors_client_interceptors.md",
+      "content_length": 19819,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/client_pointcuts.html",
+      "filename": "interceptors_client_pointcuts.md",
+      "content_length": 19379,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/filter_hook_interceptors.html",
+      "filename": "interceptors_filter_hook_interceptors.md",
+      "content_length": 20540,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/interceptors.html",
+      "filename": "interceptors_interceptors.md",
+      "content_length": 24353,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/jakarta_upgrade.html",
+      "filename": "interceptors_jakarta_upgrade.md",
+      "content_length": 21543,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/server_interceptors.html",
+      "filename": "interceptors_server_interceptors.md",
+      "content_length": 20787,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/server_pointcuts.html",
+      "filename": "interceptors_server_pointcuts.md",
+      "content_length": 19878,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/server_pointcuts/interceptors-server-jpa-pipeline.svg",
+      "filename": "interceptors_server_pointcuts_interceptors-server-jpa-pipeline.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/interceptors/server_pointcuts/interceptors-server-pipeline.svg",
+      "filename": "interceptors_server_pointcuts_interceptors-server-pipeline.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction.html",
+      "filename": "introduction.md",
+      "content_length": 72,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog.html",
+      "filename": "introduction_changelog.md",
+      "content_length": 115161,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2014.html",
+      "filename": "introduction_changelog_2014.md",
+      "content_length": 49298,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2015.html",
+      "filename": "introduction_changelog_2015.md",
+      "content_length": 61223,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2016.html",
+      "filename": "introduction_changelog_2016.md",
+      "content_length": 89753,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2017.html",
+      "filename": "introduction_changelog_2017.md",
+      "content_length": 72884,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2018.html",
+      "filename": "introduction_changelog_2018.md",
+      "content_length": 73059,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2019.html",
+      "filename": "introduction_changelog_2019.md",
+      "content_length": 91578,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2020.html",
+      "filename": "introduction_changelog_2020.md",
+      "content_length": 79461,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2021.html",
+      "filename": "introduction_changelog_2021.md",
+      "content_length": 94656,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2022.html",
+      "filename": "introduction_changelog_2022.md",
+      "content_length": 178170,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2023.html",
+      "filename": "introduction_changelog_2023.md",
+      "content_length": 124416,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/changelog_2024.html",
+      "filename": "introduction_changelog_2024.md",
+      "content_length": 129200,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/introduction/table_of_contents.html",
+      "filename": "introduction_table_of_contents.md",
+      "content_length": 30764,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/bundle_builder.html",
+      "filename": "model_bundle_builder.md",
+      "content_length": 24463,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/converter.html",
+      "filename": "model_converter.md",
+      "content_length": 20459,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/custom_structures.html",
+      "filename": "model_custom_structures.md",
+      "content_length": 37408,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/narrative_generation.html",
+      "filename": "model_narrative_generation.md",
+      "content_length": 28468,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/parsers.html",
+      "filename": "model_parsers.md",
+      "content_length": 25993,
+      "links_found": 136
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html",
+      "filename": "model_profiles_and_extensions.md",
+      "content_length": 25095,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/references.html",
+      "filename": "model_references.md",
+      "content_length": 30484,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/model/working_with_resources.html",
+      "filename": "model_working_with_resources.md",
+      "content_length": 24299,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/parser_error_handler.html",
+      "filename": "parser_error_handler.md",
+      "content_length": 80,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/schema_validator.html",
+      "filename": "schema_validator.md",
+      "content_length": 76,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/authorization_interceptor.html",
+      "filename": "security_authorization_interceptor.md",
+      "content_length": 33195,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/balp_interceptor.html",
+      "filename": "security_balp_interceptor.md",
+      "content_length": 29676,
+      "links_found": 138
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/binary_security_interceptor.html",
+      "filename": "security_binary_security_interceptor.md",
+      "content_length": 22693,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/consent_interceptor.html",
+      "filename": "security_consent_interceptor.md",
+      "content_length": 24121,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/cors.html",
+      "filename": "security_cors.md",
+      "content_length": 24862,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/introduction.html",
+      "filename": "security_introduction.md",
+      "content_length": 22785,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/security/search_narrowing_interceptor.html",
+      "filename": "security_search_narrowing_interceptor.md",
+      "content_length": 27833,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa",
+      "filename": "server_jpa.md",
+      "content_length": 19762,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/architecture.html",
+      "filename": "server_jpa_architecture.md",
+      "content_length": 21788,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/configuration.html",
+      "filename": "server_jpa_configuration.md",
+      "content_length": 30760,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/database_support.html",
+      "filename": "server_jpa_database_support.md",
+      "content_length": 21402,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/diff.html",
+      "filename": "server_jpa_diff.md",
+      "content_length": 22542,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/elastic.html",
+      "filename": "server_jpa_elastic.md",
+      "content_length": 37968,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/get_started.html",
+      "filename": "server_jpa_get_started.md",
+      "content_length": 19971,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/introduction.html",
+      "filename": "server_jpa_introduction.md",
+      "content_length": 19834,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/ips.html",
+      "filename": "server_jpa_ips.md",
+      "content_length": 25004,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/ips/overview.svg",
+      "filename": "server_jpa_ips_overview.svg.md",
+      "content_length": 1,
+      "links_found": 0
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/lastn.html",
+      "filename": "server_jpa_lastn.md",
+      "content_length": 22987,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/performance.html",
+      "filename": "server_jpa_performance.md",
+      "content_length": 27083,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/schema.html",
+      "filename": "server_jpa_schema.md",
+      "content_length": 49327,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/search.html",
+      "filename": "server_jpa_search.md",
+      "content_length": 33288,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/terminology.html",
+      "filename": "server_jpa_terminology.md",
+      "content_length": 26519,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa/upgrading.html",
+      "filename": "server_jpa_upgrading.md",
+      "content_length": 27341,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_batch/introduction.html",
+      "filename": "server_jpa_batch_introduction.md",
+      "content_length": 22601,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm.html",
+      "filename": "server_jpa_mdm_mdm.md",
+      "content_length": 22452,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm_customizations.html",
+      "filename": "server_jpa_mdm_mdm_customizations.md",
+      "content_length": 22950,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm_details.html",
+      "filename": "server_jpa_mdm_mdm_details.md",
+      "content_length": 26424,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm_eid.html",
+      "filename": "server_jpa_mdm_mdm_eid.md",
+      "content_length": 21681,
+      "links_found": 144
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm_expansion.html",
+      "filename": "server_jpa_mdm_mdm_expansion.md",
+      "content_length": 20635,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm_operations.html",
+      "filename": "server_jpa_mdm_mdm_operations.md",
+      "content_length": 43437,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm_rules.html",
+      "filename": "server_jpa_mdm_mdm_rules.md",
+      "content_length": 37280,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_partitioning/db_partition_mode.html",
+      "filename": "server_jpa_partitioning_db_partition_mode.md",
+      "content_length": 23374,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_partitioning/enabling_in_hapi_fhir.html",
+      "filename": "server_jpa_partitioning_enabling_in_hapi_fhir.md",
+      "content_length": 20814,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_partitioning/partition_interceptor_examples.html",
+      "filename": "server_jpa_partitioning_partition_interceptor_examples.md",
+      "content_length": 25378,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_partitioning/partitioning.html",
+      "filename": "server_jpa_partitioning_partitioning.md",
+      "content_length": 33561,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_jpa_partitioning/partitioning_management_operations.html",
+      "filename": "server_jpa_partitioning_partitioning_management_operations.md",
+      "content_length": 26009,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain",
+      "filename": "server_plain.md",
+      "content_length": 22527,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/customizing_the_capabilitystatement.html",
+      "filename": "server_plain_customizing_the_capabilitystatement.md",
+      "content_length": 21557,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/get_started.html",
+      "filename": "server_plain_get_started.md",
+      "content_length": 20647,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/introduction.html",
+      "filename": "server_plain_introduction.md",
+      "content_length": 30678,
+      "links_found": 137
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/jax_rs.html",
+      "filename": "server_plain_jax_rs.md",
+      "content_length": 26842,
+      "links_found": 141
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/multitenancy.html",
+      "filename": "server_plain_multitenancy.md",
+      "content_length": 21648,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/openapi.html",
+      "filename": "server_plain_openapi.md",
+      "content_length": 21980,
+      "links_found": 133
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/paging.html",
+      "filename": "server_plain_paging.md",
+      "content_length": 27353,
+      "links_found": 135
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/resource_providers.html",
+      "filename": "server_plain_resource_providers.md",
+      "content_length": 35253,
+      "links_found": 139
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations.html",
+      "filename": "server_plain_rest_operations.md",
+      "content_length": 64982,
+      "links_found": 155
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations_operations.html",
+      "filename": "server_plain_rest_operations_operations.md",
+      "content_length": 32982,
+      "links_found": 139
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/rest_operations_search.html",
+      "filename": "server_plain_rest_operations_search.md",
+      "content_length": 61380,
+      "links_found": 151
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/server_types.html",
+      "filename": "server_plain_server_types.md",
+      "content_length": 22666,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/server_plain/web_testpage_overlay.html",
+      "filename": "server_plain_web_testpage_overlay.md",
+      "content_length": 28391,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/tools/hapi_fhir_cli.html",
+      "filename": "tools_hapi_fhir_cli.md",
+      "content_length": 24272,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation",
+      "filename": "validation.md",
+      "content_length": 19887,
+      "links_found": 136
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/examples.html",
+      "filename": "validation_examples.md",
+      "content_length": 20331,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/instance_validator.html",
+      "filename": "validation_instance_validator.md",
+      "content_length": 31993,
+      "links_found": 137
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/introduction.html",
+      "filename": "validation_introduction.md",
+      "content_length": 19992,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/parser_error_handler.html",
+      "filename": "validation_parser_error_handler.md",
+      "content_length": 21122,
+      "links_found": 137
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/repository_validating_interceptor.html",
+      "filename": "validation_repository_validating_interceptor.md",
+      "content_length": 30327,
+      "links_found": 134
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/schema_validator.html",
+      "filename": "validation_schema_validator.md",
+      "content_length": 22846,
+      "links_found": 132
+    },
+    {
+      "url": "https://hapifhir.io/hapi-fhir/docs/validation/validation_support_modules.html",
+      "filename": "validation_validation_support_modules.md",
+      "content_length": 38743,
+      "links_found": 145
+    }
+  ]
+}

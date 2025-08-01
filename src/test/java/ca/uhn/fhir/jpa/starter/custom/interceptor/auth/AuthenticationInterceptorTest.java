@@ -50,8 +50,8 @@ class AuthenticationInterceptorTest extends BaseProviderTest {
         assertNotNull(storedToken, "Token sollte im RequestDetails gespeichert sein");
         assertEquals("https://idp.zentral.idp.splitdns.ti-dienste.de", storedToken.getIss());
         assertEquals("https://erp-test.zentral.erp.splitdns.ti-dienste.de/", storedToken.getAud());
-        assertEquals("Krankenhaus St. KilianTEST-ONLY", storedToken.getOrganizationName());
-        assertEquals("5-SMC-B-Testkarte-883110000129072", storedToken.getIdNumber());
+        assertEquals("Tolles kleines Krankenhaus, am ruhigen,erholsamen Park TEST-ONLY", storedToken.getOrganizationName());
+        assertEquals("5-2-KHAUS-KOMMA-20230327", storedToken.getIdNumber());
     }
 
     @Test
