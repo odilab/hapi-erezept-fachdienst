@@ -4,6 +4,7 @@ import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AccessToken;
+import ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator;
 import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +40,14 @@ public class CreateTaskService {
     }
 
     private final DaoRegistry daoRegistry;
+    private final CustomValidator customValidator;
     private final SecureRandom secureRandom;
     private long prescriptionIdCounter = 0; // In Produktion sollte dies persistent gespeichert werden
 
     @Autowired
-    public CreateTaskService(DaoRegistry daoRegistry) {
+    public CreateTaskService(DaoRegistry daoRegistry, CustomValidator customValidator) {
         this.daoRegistry = daoRegistry;
+        this.customValidator = customValidator;
         this.secureRandom = new SecureRandom();
     }
 
@@ -105,7 +108,10 @@ public class CreateTaskService {
         meta.setLastUpdated(now);
         task.setMeta(meta);
         
-        // 8. Speichere den Task
+        // 8. Validiere den Task vor dem Speichern (CustomValidator wird automatisch beim Speichern aufgerufen)
+        LOGGER.debug("Task wird validiert und gespeichert...");
+        
+        // 9. Speichere den Task
         IFhirResourceDao<Task> taskDao = daoRegistry.getResourceDao(Task.class);
         DaoMethodOutcome outcome = taskDao.create(task);
         Task savedTask = (Task) outcome.getResource();

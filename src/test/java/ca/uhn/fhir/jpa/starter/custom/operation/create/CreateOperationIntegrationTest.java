@@ -1,6 +1,7 @@
 package ca.uhn.fhir.jpa.starter.custom.operation.create;
 
 import ca.uhn.fhir.jpa.starter.custom.BaseProviderTest;
+import org.junit.jupiter.api.Disabled;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
@@ -47,27 +48,33 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
             LOGGER.info("Access Token erfolgreich erhalten");
 
             // Act
-            Task result = client
+            Parameters result = client
                 .operation()
                 .onType(Task.class)
                 .named("$create")
                 .withParameters(inParams)
                 .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                .returnResourceType(Task.class)
+                .returnResourceType(Parameters.class)
                 .execute();
 
             // Assert
             assertNotNull(result);
-            assertNotNull(result.getIdElement().getIdPart());
-            assertEquals(Task.TaskStatus.DRAFT, result.getStatus());
-            assertEquals(Task.TaskIntent.ORDER, result.getIntent());
+            assertEquals(1, result.getParameter().size());
+            assertEquals("return", result.getParameter().get(0).getName());
+            
+            // Extrahiere den Task aus den Parameters
+            Task createdTask = (Task) result.getParameter().get(0).getResource();
+            assertNotNull(createdTask);
+            assertNotNull(createdTask.getIdElement().getIdPart());
+            assertEquals(Task.TaskStatus.DRAFT, createdTask.getStatus());
+            assertEquals(Task.TaskIntent.ORDER, createdTask.getIntent());
             
             // Prüfe Prescription ID
-            boolean hasPrescriptionId = result.getIdentifier().stream()
+            boolean hasPrescriptionId = createdTask.getIdentifier().stream()
                 .anyMatch(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId".equals(id.getSystem()));
             assertTrue(hasPrescriptionId, "Task sollte eine Prescription ID haben");
             
-            String prescriptionId = result.getIdentifier().stream()
+            String prescriptionId = createdTask.getIdentifier().stream()
                 .filter(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId".equals(id.getSystem()))
                 .findFirst()
                 .map(Identifier::getValue)
@@ -75,11 +82,11 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
             assertTrue(prescriptionId.startsWith("160."), "Prescription ID sollte mit '160.' beginnen");
             
             // Prüfe Access Code
-            boolean hasAccessCode = result.getIdentifier().stream()
+            boolean hasAccessCode = createdTask.getIdentifier().stream()
                 .anyMatch(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode".equals(id.getSystem()));
             assertTrue(hasAccessCode, "Task sollte einen Access Code haben");
             
-            String accessCode = result.getIdentifier().stream()
+            String accessCode = createdTask.getIdentifier().stream()
                 .filter(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode".equals(id.getSystem()))
                 .findFirst()
                 .map(Identifier::getValue)
@@ -87,16 +94,21 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
             assertEquals(64, accessCode.length(), "Access Code sollte 64 Zeichen lang sein (256 Bit hex)");
             
             // Prüfe FlowType Extension
-            boolean hasFlowType = result.getExtension().stream()
+            boolean hasFlowType = createdTask.getExtension().stream()
                 .anyMatch(ext -> "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_FlowType".equals(ext.getUrl()));
             assertTrue(hasFlowType, "Task sollte FlowType Extension haben");
             
             // Prüfe PerformerType
-            assertEquals(1, result.getPerformerType().size());
-            assertTrue(result.getPerformerType().get(0).getCoding().stream()
+            assertEquals(1, createdTask.getPerformerType().size());
+            assertTrue(createdTask.getPerformerType().get(0).getCoding().stream()
                 .anyMatch(coding -> "urn:oid:1.2.276.0.76.4.54".equals(coding.getCode())));
             
-            LOGGER.info("Task erfolgreich erstellt mit ID: {}", result.getIdElement().getIdPart());
+            // Prüfe Output-Parameters Meta-Profile
+            assertNotNull(result.getMeta());
+            assertTrue(result.getMeta().getProfile().stream()
+                .anyMatch(profile -> profile.getValue().startsWith("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CreateOperation_Output")));
+            
+            LOGGER.info("Task erfolgreich erstellt mit ID: {}", createdTask.getIdElement().getIdPart());
             
         } catch (Exception e) {
             LOGGER.error("Fehler im Test: ", e);
@@ -121,19 +133,21 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
                         .setSystem("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType")
                         .setCode(flowType));
                 
-                Task result = client
+                Parameters result = client
                     .operation()
                     .onType(Task.class)
                     .named("$create")
                     .withParameters(inParams)
                     .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                    .returnResourceType(Task.class)
+                    .returnResourceType(Parameters.class)
                     .execute();
                 
                 assertNotNull(result);
-                assertEquals(Task.TaskStatus.DRAFT, result.getStatus());
+                Task createdTask = (Task) result.getParameter().get(0).getResource();
+                assertNotNull(createdTask);
+                assertEquals(Task.TaskStatus.DRAFT, createdTask.getStatus());
                 
-                String prescriptionId = getPrescriptionId(result);
+                String prescriptionId = getPrescriptionId(createdTask);
                 assertTrue(prescriptionId.startsWith(flowType + "."), 
                           "Prescription ID sollte mit '" + flowType + ".' beginnen");
                 
@@ -167,7 +181,7 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
                     .named("$create")
                     .withParameters(inParams)
                     .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                    .returnResourceType(Task.class)
+                    .returnResourceType(Parameters.class)
                     .execute();
             });
             
@@ -195,7 +209,7 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
                     .named("$create")
                     .withParameters(inParams)
                     .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                    .returnResourceType(Task.class)
+                    .returnResourceType(Parameters.class)
                     .execute();
             });
             
@@ -247,32 +261,35 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
                     .setCode("160"));
 
             // Act - Erstelle 3 Tasks
-            Task task1 = client
+            Parameters result1 = client
                 .operation()
                 .onType(Task.class)
                 .named("$create")
                 .withParameters(inParams)
                 .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                .returnResourceType(Task.class)
+                .returnResourceType(Parameters.class)
                 .execute();
+            Task task1 = (Task) result1.getParameter().get(0).getResource();
 
-            Task task2 = client
+            Parameters result2 = client
                 .operation()
                 .onType(Task.class)
                 .named("$create")
                 .withParameters(inParams)
                 .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                .returnResourceType(Task.class)
+                .returnResourceType(Parameters.class)
                 .execute();
+            Task task2 = (Task) result2.getParameter().get(0).getResource();
 
-            Task task3 = client
+            Parameters result3 = client
                 .operation()
                 .onType(Task.class)
                 .named("$create")
                 .withParameters(inParams)
                 .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                .returnResourceType(Task.class)
+                .returnResourceType(Parameters.class)
                 .execute();
+            Task task3 = (Task) result3.getParameter().get(0).getResource();
 
             // Assert - Alle IDs sollten unterschiedlich sein
             assertNotEquals(task1.getIdElement().getIdPart(), task2.getIdElement().getIdPart());
@@ -322,14 +339,15 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
                     .setDisplay("Muster 16 (Apothekenpflichtige Arzneimittel)"));
             
             // Act - Task erstellen
-            Task createdTask = client
+            Parameters result = client
                 .operation()
                 .onType(Task.class)
                 .named("$create")
                 .withParameters(inParams)
                 .withAdditionalHeader("Authorization", "Bearer " + accessToken)
-                .returnResourceType(Task.class)
+                .returnResourceType(Parameters.class)
                 .execute();
+            Task createdTask = (Task) result.getParameter().get(0).getResource();
             
             // Assert - Task wurde erstellt
             assertNotNull(createdTask);
@@ -384,6 +402,76 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
             LOGGER.info("Task Metadaten - Version: {}, LastUpdated: {}", 
                 retrievedTask.getMeta().getVersionId(), 
                 retrievedTask.getMeta().getLastUpdated());
+            
+        } catch (Exception e) {
+            LOGGER.error("Fehler im Test: ", e);
+            fail("Test fehlgeschlagen: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreateTask_ShowCompleteResponse() {
+        LOGGER.info("Starte Test: testCreateTask_ShowCompleteResponse");
+        
+        try {
+            String accessToken = getValidAccessToken("SMCB_KRANKENHAUS");
+            LOGGER.info("Access Token erfolgreich erhalten");
+            
+            // Arrange
+            Parameters inParams = new Parameters();
+            inParams.addParameter()
+                .setName("workflowType")
+                .setValue(new Coding()
+                    .setSystem("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType")
+                    .setCode("160")
+                    .setDisplay("Muster 16 (Apothekenpflichtige Arzneimittel)"));
+            
+            // Act
+            Parameters result = client
+                .operation()
+                .onType(Task.class)
+                .named("$create")
+                .withParameters(inParams)
+                .withAdditionalHeader("Authorization", "Bearer " + accessToken)
+                .returnResourceType(Parameters.class)
+                .execute();
+            
+            // Extrahiere den Task aus den Parameters
+            Task createdTask = (Task) result.getParameter().get(0).getResource();
+            
+            // Ausgabe der kompletten Response als XML
+            String xmlOutput = ctx.newXmlParser().setPrettyPrint(true).encodeResourceToString(createdTask);
+            
+            System.out.println("\n============================================");
+            System.out.println("KOMPLETTE TASK RESPONSE ALS XML:");
+            System.out.println("============================================");
+            System.out.println(xmlOutput);
+            System.out.println("============================================\n");
+            
+            // Zusätzlich in eine Datei schreiben für bessere Sichtbarkeit
+            try {
+                java.nio.file.Files.write(
+                    java.nio.file.Paths.get("task-response.xml"), 
+                    xmlOutput.getBytes(java.nio.charset.StandardCharsets.UTF_8)
+                );
+                LOGGER.info("Task Response wurde in task-response.xml geschrieben");
+            } catch (java.io.IOException e) {
+                LOGGER.error("Konnte Response nicht in Datei schreiben: {}", e.getMessage());
+            }
+            
+            // Zusätzliche Details ausgeben
+            LOGGER.info("Task ID: {}", createdTask.getIdElement().getIdPart());
+            LOGGER.info("Prescription ID: {}", getPrescriptionId(createdTask));
+            LOGGER.info("Access Code: {}", getAccessCode(createdTask));
+            LOGGER.info("Status: {}", createdTask.getStatus());
+            LOGGER.info("Intent: {}", createdTask.getIntent());
+            LOGGER.info("AuthoredOn: {}", createdTask.getAuthoredOn());
+            LOGGER.info("LastModified: {}", createdTask.getLastModified());
+            
+            // Assertions
+            assertNotNull(createdTask);
+            assertNotNull(createdTask.getIdElement().getIdPart());
+            assertEquals(Task.TaskStatus.DRAFT, createdTask.getStatus());
             
         } catch (Exception e) {
             LOGGER.error("Fehler im Test: ", e);

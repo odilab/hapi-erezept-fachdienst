@@ -77,10 +77,10 @@ public class CreateOperationProvider implements IResourceProvider {
      * 
      * @param workflowType Der Workflow-Typ (z.B. "160" für Muster 16, "200" für PKV)
      * @param theRequestDetails Request-Details mit Authorization-Header
-     * @return Task-Ressource mit generierter ID und AccessCode
+     * @return Parameters-Ressource mit dem erstellten Task gemäß GEM_ERP_PR_PAR_CreateOperation_Output
      */
     @Operation(name = "$create", idempotent = false, type = Task.class)
-    public Task createTaskOperation(
+    public Parameters createTaskOperation(
             @OperationParam(name = "workflowType", min = 1) Coding workflowType,
             RequestDetails theRequestDetails) {
         
@@ -99,13 +99,14 @@ public class CreateOperationProvider implements IResourceProvider {
             // 4. Erstelle neuen Task mit Status "draft"
             Task createdTask = createTaskService.createTask(workflowType, accessToken);
 
-            // 5. Location-Header wird von HAPI FHIR automatisch gesetzt
+            // 5. Erstelle Output-Parameters gemäß GEM_ERP_PR_PAR_CreateOperation_Output
+            Parameters outputParameters = createOutputParameters(createdTask);
 
             // 6. Audit-Logging
             logCreateOperation(createdTask, accessToken);
 
             LOGGER.info("Task erfolgreich erstellt mit ID: {}", createdTask.getIdElement().getIdPart());
-            return createdTask;
+            return outputParameters;
 
         } catch (Exception e) {
             LOGGER.error("Fehler bei der $create Operation: {}", e.getMessage(), e);
@@ -169,6 +170,25 @@ public class CreateOperationProvider implements IResourceProvider {
             default:
                 return profession.name().toLowerCase();
         }
+    }
+
+    /**
+     * Erstellt die Output-Parameters gemäß GEM_ERP_PR_PAR_CreateOperation_Output.
+     */
+    private Parameters createOutputParameters(Task task) {
+        Parameters parameters = new Parameters();
+        
+        // Setze Meta-Profile
+        Meta meta = new Meta();
+        meta.addProfile("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CreateOperation_Output|1.5");
+        parameters.setMeta(meta);
+        
+        // Füge den Task als "return" Parameter hinzu
+        Parameters.ParametersParameterComponent returnParam = parameters.addParameter();
+        returnParam.setName("return");
+        returnParam.setResource(task);
+        
+        return parameters;
     }
 
     /**
