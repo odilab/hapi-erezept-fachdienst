@@ -1,0 +1,2 @@
+- Bnetzavl_konn.xml stamm aus dem Konnektor und wurde mit dem Zertifikat für den fachdienst-tool-webservice ergänzt. Weitere QES Zertifikate dort eintragen bei bedarf
+- tsl_konn.xml sollte in die TSL_idp.xml zusammengeführt werden. Neuen Hash in die *.sha2 datei nicht vergessen einzutragen

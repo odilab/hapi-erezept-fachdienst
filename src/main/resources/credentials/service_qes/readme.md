@@ -1,0 +1,1 @@
+als volume in den /credentials ordner des fachdienst-tool-webservice mounten bitte

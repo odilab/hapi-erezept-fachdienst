@@ -14,6 +14,7 @@ public class TestcontainersConfig {
     private static final Logger logger = LoggerFactory.getLogger(TestcontainersConfig.class);
     private static GenericContainer<?> idpContainer;
     private static GenericContainer<?> erpServiceContainer;
+    private static GenericContainer<?> fachdienstToolContainer;
     private static final Network network = Network.newNetwork();
 
     public static GenericContainer<?> startIdpContainer() {
@@ -37,21 +38,23 @@ public class TestcontainersConfig {
 
     public static GenericContainer<?> startErpServiceContainer() {
         if (erpServiceContainer == null || !erpServiceContainer.isRunning()) {
-            // Stelle sicher, dass IDP Container läuft
+            // Ensure IDP and Fachdienst-Tool containers are running
             startIdpContainer();
+            startFachdienstToolContainer();
 
             erpServiceContainer = new GenericContainer<>(
                     DockerImageName.parse("ghcr.io/odilab/spring-erp-services/erp-service:latest"))
                     .withExposedPorts(3001)
                     .withNetwork(network)
                     .withNetworkAliases("erp-service")
-                    .withEnv("SPRING_PROFILES_ACTIVE", "ssl")
+                    .withEnv("SPRING_PROFILES_ACTIVE", "ssl,test")
                     .withEnv("default.string.idp.urlHttps", "https://idp-server:10000")
-                    //.withEnv("default.string.fd.urlFachdienst", "https://localhost:8080")
+                    .withEnv("default.string.fd.urlFachdienstTools", "http://fachdienst-tool:8080")
                     .withCreateContainerCmdModifier(cmd ->
                             cmd.withEntrypoint(
                                     "java",
-                                    "-Dspring.profiles.active=ssl",
+                                    "-Dspring.profiles.active=ssl,test",
+                                    "-Ddefault.string.fd.urlFachdienstTools=http://fachdienst-tool:8080",
                                     "-jar",
                                     "/app/app.jar"
                             ))
@@ -59,8 +62,30 @@ public class TestcontainersConfig {
 
             erpServiceContainer.start();
             logger.info("ERP-Service Container gestartet auf Port: {}", erpServiceContainer.getMappedPort(3001));
+            logger.info("Container Env: {}", erpServiceContainer.getEnvMap());
         }
         return erpServiceContainer;
+    }
+
+    public static GenericContainer<?> startFachdienstToolContainer() {
+        if (fachdienstToolContainer == null || !fachdienstToolContainer.isRunning()) {
+            fachdienstToolContainer = new GenericContainer<>(
+                    DockerImageName.parse("ghcr.io/odilab/fachdienst-tool-webservice/fachdienst_tool_webservice:latest"))
+                    .withExposedPorts(8080)
+                    .withNetwork(network)
+                    .withNetworkAliases("fachdienst-tool")
+                    .withStartupTimeout(java.time.Duration.ofSeconds(120))
+                    .withFileSystemBind(
+                            System.getProperty("user.dir") + "/src/main/resources/credentials/service_qes",
+                            "/app/credentials",
+                            org.testcontainers.containers.BindMode.READ_ONLY
+                    )
+                    .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forHttp("/").forPort(8080).forStatusCode(404));
+
+            fachdienstToolContainer.start();
+            logger.info("Fachdienst-Tool Container gestartet auf Port: {}", fachdienstToolContainer.getMappedPort(8080));
+        }
+        return fachdienstToolContainer;
     }
 
     public static class IdpInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
