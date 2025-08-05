@@ -44,6 +44,9 @@ public class PukTokenManager {
     
     @PostConstruct
     public void init() {
+        // SSL-Validierung für Initialisierung konfigurieren
+        configureSslContext();
+        
         try {
             updatePublicKey();
             logger.info("PukTokenManager wurde automatisch initialisiert und Public Key erfolgreich geladen.");
@@ -179,6 +182,16 @@ public class PukTokenManager {
     }
     
     public PublicKey getCurrentPublicKey() {
+        // Wenn kein Public Key vorhanden ist, versuche ihn zu laden
+        if (currentPublicKey == null) {
+            try {
+                logger.info("Public Key nicht vorhanden, versuche nachzuladen...");
+                updatePublicKey();
+                logger.info("Public Key erfolgreich nachgeladen");
+            } catch (Exception e) {
+                logger.error("Fehler beim Nachladen des Public Keys: {}", e.getMessage());
+            }
+        }
         return currentPublicKey;
     }
 } 

@@ -82,8 +82,9 @@ spring:
 hapi:
   fhir:
     auth:
-      discovery_url: https://localhost:10000/.well-known/openid-configuration
+      discovery_url: https://idp-fachdienst-ref.gematik.erppre.de/auth/realms/erp-fachdienst/.well-known/openid-configuration
       update_interval_seconds: 43200
+      skip_tsl_time_validation: true
     custom-bean-packages: ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth
     custom-interceptor-classes: ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator
     custom-provider-classes: ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider

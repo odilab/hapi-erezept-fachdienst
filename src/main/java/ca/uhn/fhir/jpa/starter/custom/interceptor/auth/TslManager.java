@@ -17,11 +17,15 @@ import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.time.ZonedDateTime;
 import java.util.*;
+import org.springframework.beans.factory.annotation.Value;
 
 @Component
 public class TslManager {
     
     private static final Logger logger = LoggerFactory.getLogger(TslManager.class);
+    
+    @Value("${hapi.fhir.auth.skip_tsl_time_validation:false}")
+    private boolean skipTimeValidation;
     private static final String TSL_NAMESPACE = "http://uri.etsi.org/02231/v2#";
     private static final String PKC_SERVICE_TYPE = "http://uri.etsi.org/TrstSvc/Svctype/CA/PKC";
     private static final String SERVICE_STATUS_ACTIVE = "http://uri.etsi.org/TrstSvc/Svcstatus/inaccord";
@@ -200,8 +204,12 @@ public class TslManager {
             // Zeitvalidierung
             ValidationResult timeValidation = validateTime(cert, validationTime);
             if (!timeValidation.isValid()) {
-                logger.error("Zeitvalidierung fehlgeschlagen: {}", timeValidation.getMessage());
-                return false;
+                if (skipTimeValidation) {
+                    logger.warn("Zeitvalidierung fehlgeschlagen, wird aber übersprungen: {}", timeValidation.getMessage());
+                } else {
+                    logger.error("Zeitvalidierung fehlgeschlagen: {}", timeValidation.getMessage());
+                    return false;
+                }
             }
             
             // Konvertiere das zu validierende Zertifikat zu BC
@@ -214,8 +222,12 @@ public class TslManager {
                 // Prüfe auch die Gültigkeit des Aussteller-Zertifikats
                 ValidationResult issuerTimeValidation = validateTime(issuerCert, validationTime);
                 if (!issuerTimeValidation.isValid()) {
-                    logger.info("Aussteller-Zertifikat nicht gültig: {}", issuerTimeValidation.getMessage());
-                    continue;
+                    if (skipTimeValidation) {
+                        logger.warn("Aussteller-Zertifikat Zeitvalidierung fehlgeschlagen, wird aber übersprungen: {}", issuerTimeValidation.getMessage());
+                    } else {
+                        logger.info("Aussteller-Zertifikat nicht gültig: {}", issuerTimeValidation.getMessage());
+                        continue;
+                    }
                 }
                 
                 // Prüfe Basic Constraints
