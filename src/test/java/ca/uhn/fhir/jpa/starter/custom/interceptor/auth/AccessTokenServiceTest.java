@@ -25,8 +25,8 @@ class AccessTokenServiceTest extends BaseProviderTest {
         assertEquals("https://idp.zentral.idp.splitdns.ti-dienste.de", decodedToken.getIss());
         assertEquals("https://erp-test.zentral.erp.splitdns.ti-dienste.de/", decodedToken.getAud());
         assertEquals(Profession.ARZT_KRANKENHAUS, decodedToken.getProfession());
-        assertEquals("5-SMC-B-Testkarte-883110000129072", decodedToken.getIdNumber());
-        assertEquals("Krankenhaus St. KilianTEST-ONLY", decodedToken.getOrganizationName());
+        assertEquals("5-2-KHAUS-KOMMA-20230327", decodedToken.getIdNumber());
+        assertEquals("Tolles kleines Krankenhaus, am ruhigen,erholsamen Park TEST-ONLY", decodedToken.getOrganizationName());
         assertEquals("eRezeptApp", decodedToken.getClientId(), "Client-ID sollte korrekt extrahiert werden");
         assertEquals("openid e-rezept", decodedToken.getScope(), "Scope sollte korrekt extrahiert werden");
         logger.info("Token erfolgreich validiert und decodiert");
