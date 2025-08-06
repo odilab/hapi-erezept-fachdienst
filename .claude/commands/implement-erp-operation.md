@@ -346,4 +346,182 @@ Erstelle einen detaillierten Implementierungsplan mit:
 6. **Offene Fragen**
    - Falls etwas unklar ist
 
+### SCHRITT 11: DOKUMENTATIONS-ORDNER ERSTELLEN
+
+**WICHTIG**: Nach der vollständigen Analyse aller Dateien, erstelle einen strukturierten Ordner mit ALLEN gesammelten Informationen:
+
+#### 11.1 Ordnerstruktur erstellen
+
+Erstelle folgende Verzeichnisstruktur:
+```
+/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/docs/operations/{operation}-implementation/
+├── README.md                          # Hauptdokumentation mit Verlinkungen
+├── specification/                      # Offizielle Spezifikationen
+│   ├── OperationDefinition.json       # Kopie der OperationDefinition
+│   ├── relevant-requirements.md       # Extrahierte Anforderungen aus XML
+│   └── workflow-diagrams/             # Diagramme aus ADOC
+├── examples/                          # Beispieldateien
+│   ├── request/                       # Beispiel-Requests
+│   │   ├── valid-request-1.json
+│   │   ├── valid-request-2.json
+│   │   └── edge-cases/
+│   ├── response/                      # Beispiel-Responses
+│   │   ├── success-response.json
+│   │   └── error-responses/
+│   └── test-data/                     # Testdaten aus C++
+│       ├── test-bundles/
+│       ├── test-tasks/
+│       └── test-certificates/
+├── reference-implementation/          # C++ Referenz
+│   ├── handler-analysis.md           # Analyse des C++ Handlers
+│   ├── validation-rules.md           # Alle ErpExpect Statements
+│   └── code-snippets/                # Wichtige Code-Ausschnitte
+├── java-implementation/              # Java Implementierung
+│   ├── provider-template.java        # Vollständiges Provider Template
+│   ├── service-template.java         # Service Template (falls nötig)
+│   ├── test-template.java            # Test Template mit allen Szenarien
+│   └── helper-methods.java           # Wiederverwendbare Hilfsmethoden
+├── tests/                            # Testszenarien
+│   ├── test-scenarios.md             # Alle Testfälle dokumentiert
+│   ├── success-cases.md              # Positive Tests
+│   ├── error-cases.md                # Negative Tests mit Fehlercodes
+│   └── dependencies.md               # Abhängigkeiten zu anderen Operationen
+└── implementation-guide.md           # Schritt-für-Schritt Anleitung
+
+```
+
+#### 11.2 Inhalte der Dateien
+
+**README.md** - Haupteinstiegspunkt mit:
+- Kurzbeschreibung der Operation
+- Verlinkungen zu allen wichtigen Dateien
+- Quick-Start Guide
+- Checkliste für Implementierung
+
+**specification/relevant-requirements.md** - Strukturiert nach:
+- Anforderungs-IDs (A_xxxxx, ERPF_xxxxx)
+- Berechtigungsmatrix
+- Status-Anforderungen
+- Validierungsregeln
+- Fehlerszenarien mit HTTP-Codes
+
+**examples/** - Vollständige Beispiele:
+- Mindestens 3 valide Request-Beispiele
+- Alle möglichen Error-Response Beispiele
+- Testdaten aus C++ Tests kopiert und angepasst
+- Edge-Cases dokumentiert
+
+**reference-implementation/validation-rules.md** - ALLE ErpExpect aus C++:
+```markdown
+## Validierungsregeln aus C++ Referenz
+
+### 1. Task Status Validierung
+- **Regel**: Task muss im Status "ready" sein
+- **C++ Code**: `ErpExpect(task.status() == Task::Status::ready, HttpStatus::Conflict, "Task must be in status ready")`
+- **Java Umsetzung**: `if (!task.getStatus().equals(Task.TaskStatus.READY)) { throw new InvalidRequestException("Task must be in status ready"); }`
+- **Fehlercode**: 409 Conflict
+
+### 2. AccessCode Validierung
+...
+```
+
+**java-implementation/provider-template.java** - Vollständiges Template mit:
+- Allen Imports
+- Korrekten Annotations
+- Vollständiger Methodensignatur
+- Kommentaren wo spezifische Logik eingefügt werden muss
+- Verweis auf relevante C++ Stellen
+
+**tests/test-scenarios.md** - Strukturierte Testfälle:
+```markdown
+## Testszenarien für {Operation}
+
+### Vorbedingungen
+- Task wurde mit CREATE erstellt (siehe `CreateOperationIntegrationTest`)
+- Task ist im Status X
+- Gültiges Access Token mit Profession OID Y
+
+### Success Cases
+1. **Standard {Operation}**
+   - Input: [Verweis auf examples/request/valid-request-1.json]
+   - Expected: Task Status wird zu Z
+   - Assertions: Status, AuditLog, Output Parameter
+
+### Error Cases
+1. **Falscher Task Status**
+   - Input: Task im Status "draft"
+   - Expected: 409 Conflict
+   - Message: "Task must be in status ready"
+```
+
+**implementation-guide.md** - Detaillierte Schritt-für-Schritt Anleitung:
+```markdown
+# Implementierungsleitfaden für {Operation}
+
+## Übersicht
+Diese Operation [Beschreibung] ...
+
+## Voraussetzungen
+- [ ] CreateOperation ist implementiert (benötigt für Tests)
+- [ ] Verstehen der Task-Workflow States
+- [ ] Zugriff auf Testcontainer-Setup
+
+## Schritt 1: Provider erstellen
+1. Kopiere `java-implementation/provider-template.java` nach:
+   `/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/main/java/ca/uhn/fhir/jpa/starter/custom/operation/{operation}/{OperationName}OperationProvider.java`
+
+2. Passe die TODOs im Template an:
+   - Zeile 45: Füge ALLOWED_PROFESSION_OIDS ein (siehe `specification/relevant-requirements.md#berechtigungsmatrix`)
+   - Zeile 67: Implementiere Validierung 1 (siehe `reference-implementation/validation-rules.md#1`)
+
+## Schritt 2: Tests implementieren
+1. Verwende `java-implementation/test-template.java`
+2. Testdaten findest du in `examples/test-data/`
+3. Für Signatur-Tests siehe `examples/test-data/test-certificates/`
+
+## Schritt 3: application.yaml anpassen
+Füge in Zeile X hinzu:
+```yaml
+custom-provider-classes: ...,ca.uhn.fhir.jpa.starter.custom.operation.{operation}.{OperationName}OperationProvider
+```
+
+## Verifikation
+- [ ] Alle Tests aus `tests/test-scenarios.md` sind grün
+- [ ] Code Coverage > 80%
+- [ ] Audit-Logs werden korrekt geschrieben
+```
+
+#### 11.3 Automatisches Befüllen
+
+Der Befehl soll:
+1. Alle relevanten Dateien analysieren
+2. Automatisch Beispiele extrahieren
+3. Code-Snippets mit Kontext speichern
+4. Querverweise zwischen Dateien erstellen
+5. TODOs an Stellen einfügen wo manuelle Anpassung nötig ist
+
+### SCHRITT 12: FINALE AUSGABE
+
+Nach Abschluss aller Analysen und Erstellung des Dokumentationsordners:
+
+1. **Zusammenfassung erstellen**
+   - Kurze Übersicht was analysiert wurde
+   - Pfad zum erstellten Dokumentationsordner
+   - Wichtigste Erkenntnisse
+
+2. **Nächste Schritte**
+   - Verweis auf `implementation-guide.md` für die Umsetzung
+   - Hinweis auf kritische Punkte die Aufmerksamkeit benötigen
+   - Empfehlung welche Dateien zuerst gelesen werden sollten
+
+3. **Verifikation**
+   - Bestätige dass alle Dateien erstellt wurden
+   - Prüfe dass alle Beispiele vollständig sind
+   - Stelle sicher dass alle Querverweise funktionieren
+
 **REMEMBER**: Das Ziel ist eine VOLLSTÄNDIGE Implementierung. Jedes Detail muss erfasst werden!
+
+*** CRITICAL AFTER YOU ARE DONE RESEARCHING AND EXPLORING THE CODEBASE BEFORE YOU START WRITING THE IMPLEMENTIERUNGSLEITFADEN ***
+
+*** ULTRATHINK ABOUT THE IMPLEMENTIERUNGSLEITFADEN AND PLAN YOUR APPROACH THEN START WRITING THE IMPLEMENTIERUNGSLEITFADEN ***
+

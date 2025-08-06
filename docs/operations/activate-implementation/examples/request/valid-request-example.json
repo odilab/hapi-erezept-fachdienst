@@ -1,0 +1,9 @@
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "ePrescription",
+      "resource": {
+        "resourceType": "Binary",
+        "contentType": "application/pkcs7-mime",
+        "data": "MIIUvwYJKoZIhvcNAQcCoIIUsDCCFKwCAQUxDTALBglghkgBZQMEAgEwggmPBgkqhkiG9w0BBwGgggmABIIJfDxCdW5kbGUgeG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZGVudGlmaWVyPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9OYW1pbmdTeXN0ZW0vR0VNX0VSUF9OU19QcmVzY3JpcHRpb25JZCIvPjx2YWx1ZSB2YWx1ZT0iMTYwLjAwMC4wMDAuMDAwLjAwMC4wMSIvPjwvaWRlbnRpZmllcj48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9Imh0dHA6Ly9leGFtcGxlLm9yZy9maGly
