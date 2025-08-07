@@ -267,7 +267,8 @@ public class ActivateOperationIntegrationTest extends BaseProviderTest {
         
         // Arrange - Erstelle Task
         Task draftTask = createTaskForTest("160");
-        String prescriptionId = draftTask.getIdentifierFirstRep().getValue();
+        // Seit der Änderung ist Task-ID = Prescription-ID
+        String prescriptionId = draftTask.getIdElement().getIdPart();
         String accessCode = draftTask.getIdentifier().stream()
             .filter(id -> id.getSystem().contains("AccessCode"))
             .findFirst()
@@ -339,7 +340,8 @@ public class ActivateOperationIntegrationTest extends BaseProviderTest {
         
         // Arrange
         Task draftTask = createTaskForTest("160");
-        String prescriptionId = draftTask.getIdentifierFirstRep().getValue();
+        // Seit der Änderung ist Task-ID = Prescription-ID
+        String prescriptionId = draftTask.getIdElement().getIdPart();
         String signedBundle = createSignedBundleForTest(prescriptionId, "S040464113");
         
         Binary ePrescription = new Binary();
@@ -381,7 +383,8 @@ public class ActivateOperationIntegrationTest extends BaseProviderTest {
         
         // Arrange - Erstelle und aktiviere Task
         Task draftTask = createTaskForTest("160");
-        String prescriptionId = draftTask.getIdentifierFirstRep().getValue();
+        // Seit der Änderung ist Task-ID = Prescription-ID
+        String prescriptionId = draftTask.getIdElement().getIdPart();
         String accessCode = draftTask.getIdentifier().stream()
             .filter(id -> id.getSystem().contains("AccessCode"))
             .findFirst()
@@ -438,7 +441,8 @@ public class ActivateOperationIntegrationTest extends BaseProviderTest {
         
         // Arrange
         Task draftTask = createTaskForTest("160");
-        String prescriptionId = draftTask.getIdentifierFirstRep().getValue();
+        // Seit der Änderung ist Task-ID = Prescription-ID
+        String prescriptionId = draftTask.getIdElement().getIdPart();
         String accessCode = draftTask.getIdentifier().stream()
             .filter(id -> id.getSystem().contains("AccessCode"))
             .findFirst()
@@ -488,7 +492,8 @@ public class ActivateOperationIntegrationTest extends BaseProviderTest {
         
         // Arrange
         Task draftTask = createTaskForTest("160");
-        String prescriptionId = draftTask.getIdentifierFirstRep().getValue();
+        // Seit der Änderung ist Task-ID = Prescription-ID
+        String prescriptionId = draftTask.getIdElement().getIdPart();
         String accessCode = draftTask.getIdentifier().stream()
             .filter(id -> id.getSystem().contains("AccessCode"))
             .findFirst()

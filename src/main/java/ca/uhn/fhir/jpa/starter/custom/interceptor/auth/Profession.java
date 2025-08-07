@@ -8,8 +8,8 @@ public enum Profession {
     ZAHNARZT_PRAXIS("1.2.276.0.76.4.30"),
     PRAXIS_PSYCHOTHERAPEUT("1.2.276.0.76.4.30"),
     KRANKENHAUS("1.2.276.0.76.4.30"),
-    OEFFENTLICHE_APOTHEKE("1.2.276.0.76.4.30"),
-    KRANKENHAUS_APOTHEKE("1.2.276.0.76.4.30"),
+    OEFFENTLICHE_APOTHEKE("1.2.276.0.76.4.54"),  // Korrekte OID für öffentliche Apotheken
+    KRANKENHAUS_APOTHEKE("1.2.276.0.76.4.59"),   // Korrekte OID für Krankenhausapotheken
     ARZT_KRANKENHAUS("1.2.276.0.76.4.53");
     
     private final String oid;

@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 }, properties = {
     "hapi.fhir.custom-bean-packages=ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.operation",
     "hapi.fhir.custom-interceptor-classes=ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor",
-    "hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider",
+    "hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider",
     "spring.datasource.url=jdbc:h2:mem:dbr4",
     "hapi.fhir.cr_enabled=false",
     "hapi.fhir.fhir_version=r4",
@@ -90,9 +90,10 @@ public abstract class BaseProviderTest {
         // SSL-Validierung für Tests deaktivieren
         disableSSLValidation();
         
-        // Nur Zeitvalidierung deaktivieren, Signaturvalidierung aktivieren
-        accessTokenService.setSkipTimeValidation(false);
-        accessTokenService.setSkipSignatureValidation(false);
+        // Für Tests: Zeit- und Signaturvalidierung deaktivieren
+        // Die Test-Tokens kommen vom Testcontainer und haben keine gültigen Signaturen
+        accessTokenService.setSkipTimeValidation(true);
+        accessTokenService.setSkipSignatureValidation(true);
 
         // Extrahiere die KVNR aus dem EGK1-Token
         versichertenKvnr = extractKvnrFromEgk1Token();

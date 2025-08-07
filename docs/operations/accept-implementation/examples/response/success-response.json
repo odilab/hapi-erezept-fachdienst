@@ -1,0 +1,99 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "meta": {
+    "profile": [
+      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_AcceptOperation_Output|1.5"
+    ]
+  },
+  "link": [
+    {
+      "relation": "self",
+      "url": "/Task/160.000.033.491.280.78/$accept/"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "/Task/160.000.033.491.280.78",
+      "resource": {
+        "resourceType": "Task",
+        "id": "160.000.033.491.280.78",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task|1.5"
+          ],
+          "lastUpdated": "2024-01-15T14:30:00.000+01:00"
+        },
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "160.000.033.491.280.78"
+          },
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode",
+            "value": "af3e8f9c2b4d6a1e7f5c9b3a8d2e1f4c6b9a3e7d5f2c8a1b4e6d9f3c7a2e5b8d1f"
+          },
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_Secret",
+            "value": "d7f2e9a4c6b8e1f3a5c7b9d2e4f6a8c1b3d5e7f9a2c4e6b8d1f3a5c7e9b2d4f6a8"
+          }
+        ],
+        "status": "in-progress",
+        "intent": "order",
+        "for": {
+          "identifier": {
+            "system": "http://fhir.de/NamingSystem/gkv/kvid-10",
+            "value": "X234567890"
+          }
+        },
+        "authoredOn": "2024-01-15T10:00:00.000+01:00",
+        "lastModified": "2024-01-15T14:30:00.000+01:00",
+        "owner": {
+          "display": "3-SMC-B-Testkarte-883110000116873"
+        },
+        "performerType": [
+          {
+            "coding": [
+              {
+                "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_OrganizationType",
+                "code": "urn:oid:1.2.276.0.76.4.54",
+                "display": "Öffentliche Apotheke"
+              }
+            ]
+          }
+        ],
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_FlowType",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType",
+              "code": "160",
+              "display": "Muster 16 (Apothekenpflichtige Arzneimittel)"
+            }
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate",
+            "valueDateTime": "2024-04-15"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate",
+            "valueDateTime": "2024-01-15"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:281a985c-f25b-4aae-91a6-41ad744080b0",
+      "resource": {
+        "resourceType": "Binary",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary|1.5"
+          ]
+        },
+        "contentType": "application/pkcs7-mime",
+        "data": "MIIUvAYJKoZIhvcNAQcCoIIUrTCCFKkCAQExDTALBglghkgBZQMEAgEwgg..."
+      }
+    }
+  ]
+}

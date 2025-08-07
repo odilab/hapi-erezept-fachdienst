@@ -108,12 +108,16 @@ public class CreateTaskService {
         meta.setLastUpdated(now);
         task.setMeta(meta);
         
-        // 8. Validiere den Task vor dem Speichern (CustomValidator wird automatisch beim Speichern aufgerufen)
-        LOGGER.debug("Task wird validiert und gespeichert...");
+        // 8. WICHTIG: Setze die Task-ID gleich der Prescription-ID
+        // Dies ermöglicht eine konsistente ID-Verwaltung im System
+        task.setId(prescriptionId);
         
-        // 9. Speichere den Task
+        // 9. Validiere den Task vor dem Speichern (CustomValidator wird automatisch beim Speichern aufgerufen)
+        LOGGER.debug("Task wird validiert und gespeichert mit ID: {}", prescriptionId);
+        
+        // 10. Speichere den Task mit update() statt create(), um die selbst gesetzte ID zu verwenden
         IFhirResourceDao<Task> taskDao = daoRegistry.getResourceDao(Task.class);
-        DaoMethodOutcome outcome = taskDao.create(task);
+        DaoMethodOutcome outcome = taskDao.update(task, (ca.uhn.fhir.rest.api.server.RequestDetails) null);
         Task savedTask = (Task) outcome.getResource();
         
         LOGGER.info("Task erfolgreich erstellt - ID: {}, PrescriptionID: {}", 

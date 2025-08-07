@@ -126,9 +126,9 @@ public class ActivateTaskService {
             healthCarePrescriptionBinary.setContentType("application/pkcs7-mime");
             healthCarePrescriptionBinary.setData(signedBundleBase64.getBytes());
             
-            // Speichere Binary
+            // Speichere Binary mit update() statt create(), um die selbst gesetzte ID zu verwenden
             IFhirResourceDao<Binary> binaryDao = daoRegistry.getResourceDao(Binary.class);
-            binaryDao.create(healthCarePrescriptionBinary);
+            binaryDao.update(healthCarePrescriptionBinary, (ca.uhn.fhir.rest.api.server.RequestDetails) null);
             
             // 11. Speichere den aktualisierten Task
             IFhirResourceDao<Task> taskDao = daoRegistry.getResourceDao(Task.class);

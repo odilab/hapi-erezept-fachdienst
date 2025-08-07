@@ -1,0 +1,127 @@
+{
+  "403_wrong_access_code": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "text": "Access code does not match"
+        },
+        "diagnostics": "Der angegebene AccessCode stimmt nicht mit dem Task überein"
+      }
+    ]
+  },
+  
+  "409_wrong_status_draft": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "conflict",
+        "details": {
+          "text": "Task has invalid status draft"
+        },
+        "diagnostics": "Task befindet sich im Status draft und kann nicht akzeptiert werden"
+      }
+    ]
+  },
+  
+  "409_already_in_progress": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "conflict",
+        "details": {
+          "text": "Task has invalid status in-progress"
+        },
+        "diagnostics": "Task wird bereits von einer anderen Apotheke bearbeitet"
+      }
+    ]
+  },
+  
+  "409_in_progress_same_pharmacy": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "conflict",
+        "details": {
+          "text": "Task has invalid status in-progress. Task is processed by requesting institution"
+        },
+        "diagnostics": "Task wird bereits von Ihrer Apotheke bearbeitet"
+      }
+    ]
+  },
+  
+  "410_task_deleted": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "gone",
+        "details": {
+          "text": "Task meanwhile deleted for prescription id"
+        },
+        "diagnostics": "Der Task wurde zwischenzeitlich gelöscht"
+      }
+    ]
+  },
+  
+  "403_expired": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "text": "Verordnung bis 14.01.2024 einlösbar."
+        },
+        "diagnostics": "Die Einlösefrist für diese Verordnung ist abgelaufen"
+      }
+    ]
+  },
+  
+  "403_mvo_not_yet_valid": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "text": "Teilverordnung zur Mehrfachverordnung MVO.160.000.033.491.280.01 ist ab 01.02.2024 einlösbar."
+        },
+        "diagnostics": "Die Einlösefrist für diese Teilverordnung hat noch nicht begonnen"
+      }
+    ]
+  },
+  
+  "403_wrong_profession": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "forbidden",
+        "details": {
+          "text": "Die Operation $accept ist nur für Apotheken erlaubt"
+        },
+        "diagnostics": "Ihre Rolle ist nicht berechtigt, diese Operation auszuführen"
+      }
+    ]
+  },
+  
+  "404_not_found": {
+    "resourceType": "OperationOutcome",
+    "issue": [
+      {
+        "severity": "error",
+        "code": "not-found",
+        "details": {
+          "text": "Task not found for prescription id"
+        },
+        "diagnostics": "Es wurde kein Task mit der angegebenen ID gefunden"
+      }
+    ]
+  }
+}
