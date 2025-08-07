@@ -78,6 +78,7 @@ Suche nach ALLEN Erwähnungen der Operation (z.B. "$activate", "activate", "Akti
 Lies die ergänzende Dokumentation:
 ```
 /Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/main/resources/E-Rezept docs/erp_bereitstellen.adoc
+/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/main/resources/E-Rezept docs/erp_abrufen.adoc
 ```
 
 Suche nach:

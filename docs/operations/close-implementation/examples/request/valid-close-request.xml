@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Parameters xmlns="http://hl7.org/fhir">
+  <meta>
+    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_CloseOperation_Input|1.5"/>
+  </meta>
+  <parameter>
+    <name value="rxDispensation"/>
+    <part>
+      <name value="medicationDispense"/>
+      <resource>
+        <MedicationDispense>
+          <meta>
+            <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.5"/>
+          </meta>
+          <identifier>
+            <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_MedicationDispenseId"/>
+            <value value="160.000.000.000.000.01-1"/>
+          </identifier>
+          <status value="completed"/>
+          <medicationReference>
+            <reference value="Medication/1"/>
+          </medicationReference>
+          <subject>
+            <identifier>
+              <system value="http://fhir.de/sid/gkv/kvid-10"/>
+              <value value="X123456789"/>
+            </identifier>
+          </subject>
+          <performer>
+            <actor>
+              <identifier>
+                <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                <value value="3-SMC-B-Testkarte-883110000095957"/>
+              </identifier>
+            </actor>
+          </performer>
+          <authorizingPrescription>
+            <reference value="Task/160.000.000.000.000.01"/>
+          </authorizingPrescription>
+          <quantity>
+            <value value="1"/>
+            <unit value="Packung"/>
+            <system value="http://unitsofmeasure.org"/>
+            <code value="{Packung}"/>
+          </quantity>
+          <whenHandedOver value="2025-01-08T10:30:00+01:00"/>
+          <dosageInstruction>
+            <text value="1-0-0-0"/>
+          </dosageInstruction>
+        </MedicationDispense>
+      </resource>
+    </part>
+    <part>
+      <name value="medication"/>
+      <resource>
+        <Medication>
+          <meta>
+            <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication|1.5"/>
+          </meta>
+          <code>
+            <coding>
+              <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+              <code value="06313728"/>
+              <display value="Sumatriptan-1A Pharma 100 mg Tabletten"/>
+            </coding>
+            <text value="Sumatriptan-1A Pharma 100 mg Tabletten"/>
+          </code>
+          <form>
+            <coding>
+              <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM"/>
+              <code value="TAB"/>
+              <display value="Tabletten"/>
+            </coding>
+          </form>
+          <amount>
+            <numerator>
+              <value value="12"/>
+              <unit value="Stück"/>
+              <system value="http://unitsofmeasure.org"/>
+              <code value="{St}"/>
+            </numerator>
+            <denominator>
+              <value value="1"/>
+              <unit value="Packung"/>
+              <system value="http://unitsofmeasure.org"/>
+              <code value="{Packung}"/>
+            </denominator>
+          </amount>
+        </Medication>
+      </resource>
+    </part>
+  </parameter>
+</Parameters>
