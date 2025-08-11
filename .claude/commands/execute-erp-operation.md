@@ -216,3 +216,147 @@ Nach erfolgreicher Implementierung:
 - Folge EXAKT dem strukturierten Dokumentationsordner
 - Jeder TODO im Template hat einen Verweis auf die entsprechende Dokumentation
 - Bei Unklarheiten sind alle Informationen im Dokumentationsordner zu finden
+
+## WICHTIGE ERKENNTNISSE AUS DER IMPLEMENTIERUNG
+
+### KRITISCHE PUNKTE FÜR TESTS
+
+#### 1. Access Token Typ
+**Problem**: Falscher Token-Typ führt zu HTTP 400 Fehler
+```java
+// FALSCH - dieser Token-Typ existiert nicht im Test-Container:
+String accessToken = getValidAccessToken("SMCB_OEFFENTLICHE_APOTHEKE");
+
+// RICHTIG - verfügbare Token-Typen:
+String accessToken = getValidAccessToken("SMCB_APOTHEKE");      // für Apotheken
+String accessToken = getValidAccessToken("SMCB_KRANKENHAUS");    // für Ärzte/Krankenhäuser
+```
+
+#### 2. AuthoredOn-Datum im Test-Bundle
+**Problem**: Altes Datum im Test-Bundle führt zu Validierungsfehler bei Activate
+```java
+// In loadAndAdaptKbvBundleXml() IMMER das heutige Datum setzen:
+String today = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new Date());
+bundleXml = bundleXml.replaceAll("<authoredOn value=\"[^\"]+\"", "<authoredOn value=\"" + today + "\"");
+```
+
+#### 3. Query-Parameter bei Operations
+**Problem**: Secret oder andere Query-Parameter müssen korrekt übergeben werden
+```java
+// FALSCH - withSearchParameter existiert nicht für Operations:
+.withSearchParameter("secret", secret)
+
+// FALSCH - Header ist nicht korrekt für Query-Parameter:
+.withAdditionalHeader("secret", secret)
+
+// RICHTIG - Query-Parameter im Provider lesen:
+String[] secretParams = theRequestDetails.getParameters().get("secret");
+String secret = (secretParams != null && secretParams.length > 0) ? secretParams[0] : null;
+
+// RICHTIG - In Tests als URL-Parameter übergeben:
+String url = client.getServerBase() + "/Task/" + taskId + "/$close?secret=" + secret;
+client.operation().onUrl(url).withParameters(params)...
+```
+
+#### 4. MedicationDispense Referenzen
+**Problem**: HAPI erlaubt keine Task-Referenz in MedicationDispense.authorizingPrescription
+```java
+// FALSCH - führt zu HAPI-0931 Fehler:
+dispense.addAuthorizingPrescription(new Reference("Task/" + taskId));
+
+// RICHTIG - Referenz weglassen oder anderen Typ verwenden:
+// Keine authorizingPrescription setzen für Tests
+```
+
+#### 5. Import-Statements für Test-Utils
+**Problem**: Fehlende oder falsche Imports führen zu Kompilierungsfehlern
+```java
+// IMMER diese Imports hinzufügen für Tests mit signierten Bundles:
+import ca.uhn.fhir.jpa.starter.custom.config.TestcontainersConfig;
+import ca.uhn.fhir.jpa.starter.custom.util.TestSslUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+```
+
+#### 6. BaseProviderTest setUp() Methode
+**Problem**: Sichtbarkeit der setUp() Methode
+```java
+// In BaseProviderTest.java muss setUp() protected sein:
+@BeforeEach
+protected void setUp() throws Exception { ... }
+
+// In abgeleiteten Tests dann auch protected:
+@BeforeEach
+public void setupTask() throws Exception {
+    super.setUp();  // Wichtig!
+    // weitere Setup-Logik
+}
+```
+
+### PROVIDER-IMPLEMENTIERUNG HINWEISE
+
+#### 1. Query-Parameter vs Operation-Parameter
+- Query-Parameter (wie `secret`) NICHT als `@OperationParam` definieren
+- Stattdessen aus `RequestDetails.getParameters()` lesen
+- Dokumentation in JavaDoc anpassen
+
+#### 2. DAO-Methoden Deprecation
+- Viele DAO-Methoden sind deprecated (search, read, create, update, delete)
+- Funktionieren aber noch - für neue Implementierungen ggf. SystemRequestDetails verwenden
+
+#### 3. Profession OID Mapping
+- Test-Token verwenden andere OIDs als Produktion
+- Mapping-Logik flexibel gestalten oder für Tests anpassen
+
+### TEST-HELPER METHODEN
+
+Folgende Helper-Methoden sollten in alle Operation-Tests kopiert werden:
+
+```java
+private String createSignedBundleForTest(String prescriptionId, String kvnr) {
+    try {
+        String bundleXml = loadAndAdaptKbvBundleXml(prescriptionId);
+        java.nio.file.Path tempFile = java.nio.file.Files.createTempFile("test-bundle-", ".xml");
+        java.nio.file.Files.write(tempFile, bundleXml.getBytes(StandardCharsets.UTF_8));
+        
+        RestTemplate restTemplate = TestSslUtils.createTrustAllRestTemplate();
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("kbvBundleFromFile", new org.springframework.core.io.FileSystemResource(tempFile.toFile()));
+        body.add("kbvBundleAsString", "");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+        String signUrl = String.format("https://localhost:%d/signDocumentWithTool",
+            TestcontainersConfig.startErpServiceContainer().getMappedPort(3001));
+        
+        ResponseEntity<String> response = restTemplate.postForEntity(signUrl, request, String.class);
+        return response.getBody();
+        
+    } catch (Exception e) {
+        LOGGER.error("Fehler beim Erstellen des signierten Bundles: {}", e.getMessage());
+        fail("Konnte signiertes Bundle nicht erstellen: " + e.getMessage());
+        return null;
+    }
+}
+
+private String loadAndAdaptKbvBundleXml(String prescriptionId) throws IOException {
+    ClassPathResource resource = new ClassPathResource("e-rezept-bundles/valid/Beispiel_4.xml");
+    String bundleXml = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    
+    // PrescriptionID ersetzen
+    String oldPattern = "(<system value=\"https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId\"\\s*/>[\\s\\n\\r]*<value value=\")[^\"]+(\")";
+    String replacement = "$1" + prescriptionId + "$2";
+    bundleXml = bundleXml.replaceAll(oldPattern, replacement);
+    
+    // WICHTIG: AuthoredOn auf heute setzen!
+    String today = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new Date());
+    bundleXml = bundleXml.replaceAll("<authoredOn value=\"[^\"]+\"", "<authoredOn value=\"" + today + "\"");
+    
+    return bundleXml;
+}
+```
