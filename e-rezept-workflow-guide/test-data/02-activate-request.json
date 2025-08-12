@@ -1,0 +1,13 @@
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "ePrescription",
+      "resource": {
+        "resourceType": "Binary",
+        "contentType": "application/pkcs7-mime",
+        "data": "MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIAwggQ..."
+      }
+    }
+  ]
+}

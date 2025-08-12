@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="test-kbv-bundle"/>
+    <meta>
+        <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle|1.1.0"/>
+    </meta>
+    <identifier>
+        <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+        <value value="160.000.000.000.000.01"/>
+    </identifier>
+    <type value="document"/>
+    <timestamp value="2025-08-11T10:00:00.000+02:00"/>
+    
+    <!-- Composition -->
+    <entry>
+        <fullUrl value="http://example.org/Composition/1"/>
+        <resource>
+            <Composition>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Composition|1.1.0"/>
+                </meta>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_FORMULAR_ART"/>
+                        <code value="e16A"/>
+                        <display value="Muster 16 (Apothekenpflichtige Arzneimittel)"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="Patient/1"/>
+                </subject>
+                <date value="2025-08-11"/>
+                <author>
+                    <reference value="Practitioner/1"/>
+                </author>
+                <title value="elektronische Arzneimittelverordnung"/>
+                <section>
+                    <code>
+                        <coding>
+                            <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Section_Type"/>
+                            <code value="Prescription"/>
+                        </coding>
+                    </code>
+                    <entry>
+                        <reference value="MedicationRequest/1"/>
+                    </entry>
+                </section>
+                <section>
+                    <code>
+                        <coding>
+                            <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Section_Type"/>
+                            <code value="Coverage"/>
+                        </coding>
+                    </code>
+                    <entry>
+                        <reference value="Coverage/1"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    
+    <!-- Patient -->
+    <entry>
+        <fullUrl value="http://example.org/Patient/1"/>
+        <resource>
+            <Patient>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.1.0"/>
+                </meta>
+                <identifier>
+                    <type>
+                        <coding>
+                            <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                            <code value="GKV"/>
+                        </coding>
+                    </type>
+                    <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                    <value value="S040464113"/>
+                </identifier>
+                <name>
+                    <use value="official"/>
+                    <family value="Mustermann"/>
+                    <given value="Max"/>
+                </name>
+                <birthDate value="1985-01-15"/>
+                <address>
+                    <type value="both"/>
+                    <line value="Musterstraße 1"/>
+                    <city value="Berlin"/>
+                    <postalCode value="10117"/>
+                    <country value="D"/>
+                </address>
+            </Patient>
+        </resource>
+    </entry>
+    
+    <!-- Practitioner -->
+    <entry>
+        <fullUrl value="http://example.org/Practitioner/1"/>
+        <resource>
+            <Practitioner>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner|1.1.0"/>
+                </meta>
+                <identifier>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+                            <code value="LANR"/>
+                        </coding>
+                    </type>
+                    <system value="https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR"/>
+                    <value value="838382202"/>
+                </identifier>
+                <name>
+                    <use value="official"/>
+                    <family value="Müller"/>
+                    <given value="Dr. med."/>
+                    <given value="Hans"/>
+                    <prefix value="Dr. med."/>
+                </name>
+                <qualification>
+                    <code>
+                        <coding>
+                            <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Qualification_Type"/>
+                            <code value="00"/>
+                        </coding>
+                    </code>
+                </qualification>
+                <qualification>
+                    <code>
+                        <text value="Facharzt für Allgemeinmedizin"/>
+                    </code>
+                </qualification>
+            </Practitioner>
+        </resource>
+    </entry>
+    
+    <!-- Organization -->
+    <entry>
+        <fullUrl value="http://example.org/Organization/1"/>
+        <resource>
+            <Organization>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Organization|1.1.0"/>
+                </meta>
+                <identifier>
+                    <type>
+                        <coding>
+                            <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+                            <code value="BSNR"/>
+                        </coding>
+                    </type>
+                    <system value="https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR"/>
+                    <value value="031234567"/>
+                </identifier>
+                <name value="Praxis Dr. Müller"/>
+                <telecom>
+                    <system value="phone"/>
+                    <value value="030/1234567"/>
+                </telecom>
+                <address>
+                    <type value="both"/>
+                    <line value="Hauptstraße 1"/>
+                    <city value="Berlin"/>
+                    <postalCode value="10117"/>
+                    <country value="D"/>
+                </address>
+            </Organization>
+        </resource>
+    </entry>
+    
+    <!-- Coverage -->
+    <entry>
+        <fullUrl value="http://example.org/Coverage/1"/>
+        <resource>
+            <Coverage>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage|1.1.0"/>
+                </meta>
+                <status value="active"/>
+                <type>
+                    <coding>
+                        <system value="http://fhir.de/CodeSystem/versicherungsart-de-basis"/>
+                        <code value="GKV"/>
+                    </coding>
+                </type>
+                <beneficiary>
+                    <reference value="Patient/1"/>
+                </beneficiary>
+                <payor>
+                    <identifier>
+                        <system value="http://fhir.de/sid/arge-ik/iknr"/>
+                        <value value="104212059"/>
+                    </identifier>
+                    <display value="AOK Nordost"/>
+                </payor>
+            </Coverage>
+        </resource>
+    </entry>
+    
+    <!-- Medication -->
+    <entry>
+        <fullUrl value="http://example.org/Medication/1"/>
+        <resource>
+            <Medication>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.1.0"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <code value="06313728"/>
+                    </coding>
+                    <text value="Sumatriptan-1A Pharma 100 mg Tabletten"/>
+                </code>
+                <form>
+                    <coding>
+                        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM"/>
+                        <code value="TAB"/>
+                    </coding>
+                </form>
+            </Medication>
+        </resource>
+    </entry>
+    
+    <!-- MedicationRequest -->
+    <entry>
+        <fullUrl value="http://example.org/MedicationRequest/1"/>
+        <resource>
+            <MedicationRequest>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.1.0"/>
+                </meta>
+                <status value="active"/>
+                <intent value="order"/>
+                <medicationReference>
+                    <reference value="Medication/1"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/1"/>
+                </subject>
+                <authoredOn value="2025-08-11"/>
+                <requester>
+                    <reference value="Practitioner/1"/>
+                </requester>
+                <insurance>
+                    <reference value="Coverage/1"/>
+                </insurance>
+                <dosageInstruction>
+                    <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag">
+                        <valueBoolean value="true"/>
+                    </extension>
+                    <text value="1-0-0-0"/>
+                </dosageInstruction>
+                <dispenseRequest>
+                    <quantity>
+                        <value value="1"/>
+                        <unit value="Packung"/>
+                        <system value="http://unitsofmeasure.org"/>
+                        <code value="{Package}"/>
+                    </quantity>
+                </dispenseRequest>
+                <substitution>
+                    <allowedBoolean value="true"/>
+                </substitution>
+            </MedicationRequest>
+        </resource>
+    </entry>
+</Bundle>

@@ -1,0 +1,7 @@
+{
+  "comment": "Accept operation can be called with empty body.",
+  "comment2": "Access code is provided either as query parameter ?ac={accessCode}",
+  "comment3": "or as header X-AccessCode: {accessCode}",
+  "resourceType": "Parameters",
+  "parameter": []
+}

@@ -1,0 +1,311 @@
+{
+  "info": {
+    "name": "E-Rezept Workflow",
+    "description": "Vollständiger E-Rezept Workflow mit allen Operationen",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/fhir",
+      "type": "string"
+    },
+    {
+      "key": "access_token_arzt",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "access_token_apotheke",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "prescription_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "access_code",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "secret",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Create E-Rezept",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has Parameters\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.resourceType).to.eql(\"Parameters\");",
+              "});",
+              "",
+              "pm.test(\"Task created with status draft\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var task = jsonData.parameter[0].resource;",
+              "    pm.expect(task.status).to.eql(\"draft\");",
+              "    ",
+              "    // Save prescription ID and access code",
+              "    pm.collectionVariables.set(\"prescription_id\", task.id);",
+              "    ",
+              "    var identifiers = task.identifier;",
+              "    for (var i = 0; i < identifiers.length; i++) {",
+              "        if (identifiers[i].system.includes(\"AccessCode\")) {",
+              "            pm.collectionVariables.set(\"access_code\", identifiers[i].value);",
+              "            break;",
+              "        }",
+              "    }",
+              "});",
+              "",
+              "console.log(\"Prescription ID: \" + pm.collectionVariables.get(\"prescription_id\"));",
+              "console.log(\"Access Code: \" + pm.collectionVariables.get(\"access_code\"));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token_arzt}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    {\n      \"name\": \"workflowType\",\n      \"valueCoding\": {\n        \"system\": \"https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType\",\n        \"code\": \"160\",\n        \"display\": \"Muster 16 (Apothekenpflichtige Arzneimittel)\"\n      }\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/Task/$create",
+          "host": ["{{base_url}}"],
+          "path": ["Task", "$create"]
+        }
+      }
+    },
+    {
+      "name": "2. Activate E-Rezept",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Task status changed to ready\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var task = jsonData.parameter[0].resource;",
+              "    pm.expect(task.status).to.eql(\"ready\");",
+              "});",
+              "",
+              "pm.test(\"Task has patient KVNR\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var task = jsonData.parameter[0].resource;",
+              "    pm.expect(task.for).to.not.be.undefined;",
+              "    pm.expect(task.for.identifier).to.not.be.undefined;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token_arzt}}",
+            "type": "text"
+          },
+          {
+            "key": "X-AccessCode",
+            "value": "{{access_code}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    {\n      \"name\": \"ePrescription\",\n      \"resource\": {\n        \"resourceType\": \"Binary\",\n        \"contentType\": \"application/pkcs7-mime\",\n        \"data\": \"MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIAwggQ...\"\n      }\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/Task/{{prescription_id}}/$activate",
+          "host": ["{{base_url}}"],
+          "path": ["Task", "{{prescription_id}}", "$activate"]
+        }
+      }
+    },
+    {
+      "name": "3. Accept E-Rezept",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is Bundle\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.resourceType).to.eql(\"Bundle\");",
+              "    pm.expect(jsonData.type).to.eql(\"collection\");",
+              "});",
+              "",
+              "pm.test(\"Task status changed to in-progress\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var task = jsonData.entry[0].resource;",
+              "    pm.expect(task.status).to.eql(\"in-progress\");",
+              "    ",
+              "    // Save secret for close operation",
+              "    var identifiers = task.identifier;",
+              "    for (var i = 0; i < identifiers.length; i++) {",
+              "        if (identifiers[i].system.includes(\"Secret\")) {",
+              "            pm.collectionVariables.set(\"secret\", identifiers[i].value);",
+              "            break;",
+              "        }",
+              "    }",
+              "});",
+              "",
+              "console.log(\"Secret: \" + pm.collectionVariables.get(\"secret\"));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token_apotheke}}",
+            "type": "text"
+          },
+          {
+            "key": "X-AccessCode",
+            "value": "{{access_code}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/Task/{{prescription_id}}/$accept",
+          "host": ["{{base_url}}"],
+          "path": ["Task", "{{prescription_id}}", "$accept"]
+        }
+      }
+    },
+    {
+      "name": "4. Close E-Rezept",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is document Bundle\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.resourceType).to.eql(\"Bundle\");",
+              "    pm.expect(jsonData.type).to.eql(\"document\");",
+              "});",
+              "",
+              "pm.test(\"Composition status is final\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    var composition = jsonData.entry[0].resource;",
+              "    pm.expect(composition.resourceType).to.eql(\"Composition\");",
+              "    pm.expect(composition.status).to.eql(\"final\");",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token_apotheke}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/fhir+json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"resourceType\": \"Parameters\",\n  \"parameter\": [\n    {\n      \"name\": \"secret\",\n      \"valueString\": \"{{secret}}\"\n    },\n    {\n      \"name\": \"rxDispensation\",\n      \"resource\": {\n        \"resourceType\": \"Parameters\",\n        \"parameter\": [\n          {\n            \"name\": \"medicationDispense\",\n            \"resource\": {\n              \"resourceType\": \"MedicationDispense\",\n              \"meta\": {\n                \"profile\": [\n                  \"https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense\"\n                ]\n              },\n              \"status\": \"completed\",\n              \"subject\": {\n                \"identifier\": {\n                  \"system\": \"http://fhir.de/sid/gkv/kvid-10\",\n                  \"value\": \"S040464113\"\n                }\n              },\n              \"whenHandedOver\": \"2025-08-11T14:30:00+02:00\",\n              \"medicationCodeableConcept\": {\n                \"coding\": [\n                  {\n                    \"system\": \"http://fhir.de/CodeSystem/ifa/pzn\",\n                    \"code\": \"06313728\",\n                    \"display\": \"Sumatriptan-1A Pharma 100 mg Tabletten\"\n                  }\n                ]\n              },\n              \"quantity\": {\n                \"value\": 1,\n                \"unit\": \"St\",\n                \"system\": \"http://unitsofmeasure.org\",\n                \"code\": \"{tbl}\"\n              }\n            }\n          }\n        ]\n      }\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/Task/{{prescription_id}}/$close",
+          "host": ["{{base_url}}"],
+          "path": ["Task", "{{prescription_id}}", "$close"]
+        }
+      }
+    },
+    {
+      "name": "Get Task Status",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token_apotheke}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/Task/{{prescription_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["Task", "{{prescription_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Server Metadata",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/metadata",
+          "host": ["{{base_url}}"],
+          "path": ["metadata"]
+        }
+      }
+    }
+  ]
+}

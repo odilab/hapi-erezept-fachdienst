@@ -1,0 +1,51 @@
+{
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "secret",
+      "valueString": "fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
+    },
+    {
+      "name": "rxDispensation",
+      "resource": {
+        "resourceType": "Parameters",
+        "parameter": [
+          {
+            "name": "medicationDispense",
+            "resource": {
+              "resourceType": "MedicationDispense",
+              "meta": {
+                "profile": [
+                  "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense"
+                ]
+              },
+              "status": "completed",
+              "subject": {
+                "identifier": {
+                  "system": "http://fhir.de/sid/gkv/kvid-10",
+                  "value": "S040464113"
+                }
+              },
+              "whenHandedOver": "2025-08-11T14:30:00+02:00",
+              "medicationCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://fhir.de/CodeSystem/ifa/pzn",
+                    "code": "06313728",
+                    "display": "Sumatriptan-1A Pharma 100 mg Tabletten"
+                  }
+                ]
+              },
+              "quantity": {
+                "value": 1,
+                "unit": "St",
+                "system": "http://unitsofmeasure.org",
+                "code": "{tbl}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
