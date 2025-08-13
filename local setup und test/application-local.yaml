@@ -1,0 +1,95 @@
+# Lokale Konfiguration für E-Rezept FHIR Server
+# Nutzt Docker-Container für alle externen Services
+
+spring:
+  main:
+    allow-circular-references: true
+  flyway:
+    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hapi
+    username: admin
+    password: admin
+    driverClassName: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+        format_sql: false
+        show_sql: false
+        hbm2ddl.auto: update
+        jdbc.batch_size: 20
+        cache.use_query_cache: false
+        cache.use_second_level_cache: false
+        cache.use_structured_entries: false
+        cache.use_minimal_puts: false
+
+hapi:
+  fhir:
+    fhir_version: R4
+    # Custom Components
+    custom-bean-packages: ca.uhn.fhir.jpa.starter.custom
+    custom-interceptor-classes:
+      - ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor
+      - ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor
+      - ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator
+    custom-provider-classes:
+      - ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider
+      - ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider
+      - ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider
+      - ca.uhn.fhir.jpa.starter.custom.operation.close.CloseOperationProvider
+    
+    # Authentication Configuration
+    auth:
+      discovery_url: http://localhost:8084/.well-known/openid-configuration
+      idp_server_url: http://localhost:8084
+      update_interval_seconds: 43200
+      skip_tsl_time_validation: true
+      # JWT-Validierung MUSS aktiviert bleiben
+      skip_jwt_validation: false
+    
+    # ERP Service Configuration
+    erp:
+      service:
+        url: https://localhost:3001
+        fachdienst_tool_url: http://localhost:8083
+    
+    # Server Base Configuration
+    server_address: http://localhost:8080/fhir
+    reuse_cached_search_results_millis: 60000
+    tester:
+      home:
+        name: E-Rezept FHIR Server (Local)
+        server_address: http://localhost:8080/fhir
+        refuse_to_fetch_third_party_urls: false
+        fhir_version: R4
+    cors:
+      allow_Credentials: true
+      allowed_origin:
+        - '*'
+    
+    # Validation
+    validation:
+      requests_enabled: true
+      responses_enabled: false  # Deaktiviert für Operations, da sonst Parameters-Responses als OperationOutcome zurückgegeben werden
+    
+    # Search
+    default_page_size: 20
+    max_page_size: 200
+    
+    # Authorization
+    allow_multiple_delete: false
+    enforce_referential_integrity_on_delete: false
+    enforce_referential_integrity_on_write: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    ca.uhn.fhir.jpa.starter.custom: DEBUG
+    ca.uhn.fhir.jpa.starter.custom.interceptor.auth: DEBUG
+    ca.uhn.fhir.jpa.starter.custom.operation: DEBUG
+    org.springframework.security: DEBUG

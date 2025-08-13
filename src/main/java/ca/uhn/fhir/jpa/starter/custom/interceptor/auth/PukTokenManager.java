@@ -31,6 +31,7 @@ public class PukTokenManager {
     private final String discoveryUrl;
     private final long updateIntervalSeconds;
     private PublicKey currentPublicKey;
+    private String currentIssuer;
     
     @Autowired
     private TslManager tslManager;
@@ -76,16 +77,33 @@ public class PukTokenManager {
     
     private String fetchData(String urlString) {
         try {
-            URL url = new URL(urlString);
-            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json, */*;q=0.8");
-            conn.setRequestProperty("User-Agent", "PukTokenManager/1.0");
-            conn.setRequestProperty("Accept-Charset", "UTF-8");
-            conn.setDoInput(true);
-            conn.setUseCaches(false);
+            // Für lokale Entwicklung: Ersetze idp-server durch localhost:8084
+            // Dies ermöglicht lokales Testen ohne Docker-Netzwerk
+            if (urlString.contains("idp-server:8080")) {
+                String replacedUrl = urlString.replace("idp-server:8080", "localhost:8084");
+                logger.info("URL für lokale Entwicklung angepasst: {} -> {}", urlString, replacedUrl);
+                urlString = replacedUrl;
+            }
             
-            try (InputStream is = conn.getInputStream();
+            URL url = new URL(urlString);
+            // Unterstützung für HTTP und HTTPS
+            java.net.URLConnection connection = url.openConnection();
+            
+            if (connection instanceof HttpsURLConnection) {
+                HttpsURLConnection httpsConn = (HttpsURLConnection) connection;
+                httpsConn.setRequestMethod("GET");
+            } else if (connection instanceof java.net.HttpURLConnection) {
+                java.net.HttpURLConnection httpConn = (java.net.HttpURLConnection) connection;
+                httpConn.setRequestMethod("GET");
+            }
+            
+            connection.setRequestProperty("Accept", "application/json, */*;q=0.8");
+            connection.setRequestProperty("User-Agent", "PukTokenManager/1.0");
+            connection.setRequestProperty("Accept-Charset", "UTF-8");
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            
+            try (InputStream is = connection.getInputStream();
                 ByteArrayOutputStream result = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[1024];
                 int length;
@@ -118,6 +136,9 @@ public class PukTokenManager {
             String jwt = fetchData(discoveryUrl);
             X509Certificate discoveryDocCert = extractAndValidateCertFromJwt(jwt);
             logger.info("Discovery-Dokument Zertifikat validiert");
+            
+            // Issuer aus Discovery-Dokument extrahieren und speichern
+            extractAndStoreIssuer(jwt);
             
             // JWKS URL und Daten abrufen
             String jwksUrl = extractUriPukIdpSig(jwt);
@@ -193,5 +214,43 @@ public class PukTokenManager {
             }
         }
         return currentPublicKey;
+    }
+    
+    public String getCurrentIssuer() {
+        // Wenn kein Issuer vorhanden ist, versuche Discovery Document zu laden
+        if (currentIssuer == null) {
+            try {
+                logger.info("Issuer nicht vorhanden, versuche nachzuladen...");
+                updatePublicKey();
+                logger.info("Issuer erfolgreich nachgeladen: {}", currentIssuer);
+            } catch (Exception e) {
+                logger.error("Fehler beim Nachladen des Issuers: {}", e.getMessage());
+                // Fallback - muss mit Token-Issuer übereinstimmen
+                currentIssuer = "http://idp-server:8080";
+            }
+        }
+        return currentIssuer;
+    }
+    
+    private void extractAndStoreIssuer(String jwt) {
+        try {
+            String[] jwtParts = jwt.split("\\.");
+            String payload = new String(Base64.getUrlDecoder().decode(jwtParts[1]));
+            JSONObject payloadJson = new JSONObject(payload);
+            
+            // Issuer aus Discovery Document extrahieren
+            String issuer = payloadJson.getString("issuer");
+            
+            // WICHTIG: Issuer NICHT ersetzen! 
+            // Der Token kommt vom ERP-Service mit "http://idp-server:8080" als Issuer
+            // und genau das muss auch validiert werden
+            this.currentIssuer = issuer;
+            
+            logger.info("Issuer aus Discovery Document: {}", this.currentIssuer);
+        } catch (Exception e) {
+            logger.error("Fehler beim Extrahieren des Issuers aus Discovery Document", e);
+            // Fallback auf Standard-Issuer
+            this.currentIssuer = "http://idp-server:8080";
+        }
     }
 } 

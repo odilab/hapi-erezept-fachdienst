@@ -285,10 +285,10 @@ public class AcceptOperationProvider implements IResourceProvider {
      * Extrahiert das Ablaufdatum aus dem Task.
      */
     private Date extractExpiryDate(Task task) {
-        // ExpiryDate ist in Extension gespeichert
+        // ExpiryDate ist in Extension gespeichert (als DateType, nicht DateTimeType)
         return task.getExtension().stream()
             .filter(ext -> "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate".equals(ext.getUrl()))
-            .map(ext -> ((DateTimeType) ext.getValue()).getValue())
+            .map(ext -> ((DateType) ext.getValue()).getValue())
             .findFirst()
             .orElse(null);
     }

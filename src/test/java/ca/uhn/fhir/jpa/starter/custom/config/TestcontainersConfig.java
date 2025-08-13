@@ -20,18 +20,16 @@ public class TestcontainersConfig {
     public static GenericContainer<?> startIdpContainer() {
         if (idpContainer == null || !idpContainer.isRunning()) {
             idpContainer = new GenericContainer<>(
-                    DockerImageName.parse("ghcr.io/odilab/ipd-server/idp-server:latest"))
-                    .withExposedPorts(10000)
+                    DockerImageName.parse("ghcr.io/odilab/erp-services/ref-idp-server:29.3.2"))
+                    .withExposedPorts(8080)
                     .withNetwork(network)
                     .withNetworkAliases("idp-server")
-                    .withEnv("SPRING_PROFILES_ACTIVE", "ssl")
-                    .withCreateContainerCmdModifier(cmd ->
-                            cmd.withEntrypoint(
-                                    "java", "-Dspring.profiles.active=ssl", "-jar", "/app/idp-server-19.1.0.jar"
-                            ));
+                    // IDP_SERVER_URL wird in discoveryDocuments kodiert
+                    // Da der Service den IDP über http://idp-server:8080 erreicht
+                    .withEnv("IDP_SERVER_URL", "http://idp-server:8080");
 
             idpContainer.start();
-            logger.info("IDP Container gestartet auf Port: {}", idpContainer.getMappedPort(10000));
+            logger.info("IDP Container gestartet auf Port: {}", idpContainer.getMappedPort(8080));
         }
         return idpContainer;
     }
@@ -48,7 +46,7 @@ public class TestcontainersConfig {
                     .withNetwork(network)
                     .withNetworkAliases("erp-service")
                     .withEnv("SPRING_PROFILES_ACTIVE", "ssl,test")
-                    .withEnv("default.string.idp.urlHttps", "https://idp-server:10000")
+                    .withEnv("default.string.idp.urlHttps", "http://idp-server:8080")
                     .withEnv("default.string.fd.urlFachdienstTools", "http://fachdienst-tool:8080")
                     .withCreateContainerCmdModifier(cmd ->
                             cmd.withEntrypoint(
@@ -92,15 +90,17 @@ public class TestcontainersConfig {
         @Override
         public void initialize(ConfigurableApplicationContext context) {
             GenericContainer<?> idp = startIdpContainer();
-            String idpUrl = String.format("https://%s:%d/.well-known/openid-configuration",
+            String idpUrl = String.format("http://%s:%d/.well-known/openid-configuration",
                     idp.getHost(),
-                    idp.getMappedPort(10000));
+                    idp.getMappedPort(8080));
             
             logger.info("Konfiguriere IDP URL: {}", idpUrl);
             
             TestPropertyValues.of(
                     "hapi.fhir.auth.discovery_url=" + idpUrl,
-                    "hapi.fhir.auth.update_interval_seconds=43200"
+                    "hapi.fhir.auth.update_interval_seconds=43200",
+                    // JWT-Validierung wieder aktivieren (skip_jwt_validation entfernt)
+                    "hapi.fhir.auth.skip_jwt_validation=false"
             ).applyTo(context.getEnvironment());
         }
     }
@@ -111,9 +111,9 @@ public class TestcontainersConfig {
             GenericContainer<?> idp = startIdpContainer();
             GenericContainer<?> erp = startErpServiceContainer();
             
-            String idpUrl = String.format("https://%s:%d/.well-known/openid-configuration",
+            String idpUrl = String.format("http://%s:%d/.well-known/openid-configuration",
                     idp.getHost(),
-                    idp.getMappedPort(10000));
+                    idp.getMappedPort(8080));
             
             String erpServiceUrl = String.format("http://%s:%d",
                     erp.getHost(),
@@ -125,6 +125,8 @@ public class TestcontainersConfig {
             TestPropertyValues.of(
                     "hapi.fhir.auth.discovery_url=" + idpUrl,
                     "hapi.fhir.auth.update_interval_seconds=43200",
+                    // JWT-Validierung wieder aktivieren (skip_jwt_validation entfernt)
+                    "hapi.fhir.auth.skip_jwt_validation=false",
                     "hapi.fhir.erp.service.url=" + erpServiceUrl
             ).applyTo(context.getEnvironment());
         }

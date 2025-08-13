@@ -356,6 +356,12 @@ public class ActivateTaskService {
         task.getRestriction().setPeriod(new Period());
         task.getRestriction().getPeriod().setEnd(Date.from(expiryDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         
+        // ExpiryDate auch als Extension setzen (wird von gematik-Profil erwartet)
+        // DateType erwartet nur das Datum ohne Zeit im Format YYYY-MM-DD
+        task.addExtension()
+            .setUrl("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate")
+            .setValue(new DateType(expiryDate.toString()));  // LocalDate.toString() gibt YYYY-MM-DD zurück
+        
         // AcceptDate abhängig vom FlowType
         String flowType = extractFlowType(task);
         LocalDate acceptDate;
@@ -368,10 +374,11 @@ public class ActivateTaskService {
             acceptDate = signingDate.plusMonths(3);
         }
         
-        // AcceptDate als Extension setzen
+        // AcceptDate als Extension setzen (muss DateType sein, nicht DateTimeType)
+        // DateType erwartet nur das Datum ohne Zeit im Format YYYY-MM-DD
         task.addExtension()
             .setUrl("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate")
-            .setValue(new DateTimeType(Date.from(acceptDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+            .setValue(new DateType(acceptDate.toString()));  // LocalDate.toString() gibt YYYY-MM-DD zurück
     }
 
     /**

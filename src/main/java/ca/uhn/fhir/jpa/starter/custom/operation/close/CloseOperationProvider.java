@@ -122,12 +122,21 @@ public class CloseOperationProvider implements IResourceProvider {
             }
 
             // 5. Validiere Secret (A_19231-02)
-            // Secret kann als Query-Parameter oder Operation-Parameter kommen
+            // Secret kann als Query-Parameter, Operation-Parameter oder HTTP-Header 'X-Secret' kommen
             if (secret == null || !secret.hasValue()) {
                 // Versuche aus Query-Parameter zu lesen
                 String[] secretParams = theRequestDetails.getParameters().get("secret");
                 String secretParam = (secretParams != null && secretParams.length > 0) ? secretParams[0] : null;
-                secret = secretParam != null ? new StringType(secretParam) : null;
+                if (secretParam != null && !secretParam.isEmpty()) {
+                    secret = new StringType(secretParam);
+                }
+            }
+            if (secret == null || !secret.hasValue()) {
+                // Versuche aus Header 'X-Secret' zu lesen
+                String headerSecret = theRequestDetails.getHeader("X-Secret");
+                if (headerSecret != null && !headerSecret.isEmpty()) {
+                    secret = new StringType(headerSecret);
+                }
             }
             validateSecret(secret, task);
 

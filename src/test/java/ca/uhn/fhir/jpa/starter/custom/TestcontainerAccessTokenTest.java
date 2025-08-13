@@ -46,7 +46,7 @@ public class TestcontainerAccessTokenTest {
         assertTrue(idpContainer.isRunning(), "IDP Container sollte laufen");
         assertTrue(erpContainer.isRunning(), "ERP Container sollte laufen");
         
-        LOGGER.info("IDP Container läuft auf Port: {}", idpContainer.getMappedPort(10000));
+        LOGGER.info("IDP Container läuft auf Port: {}", idpContainer.getMappedPort(8080));
         LOGGER.info("ERP Container läuft auf Port: {}", erpContainer.getMappedPort(3001));
         LOGGER.info("IDP Container ID: {}", idpContainer.getContainerId());
         LOGGER.info("ERP Container ID: {}", erpContainer.getContainerId());
@@ -168,9 +168,9 @@ public class TestcontainerAccessTokenTest {
         
         // Teste IDP Health
         try {
-            URL idpHealthUrl = new URL(String.format("https://%s:%d/.well-known/openid-configuration",
+            URL idpHealthUrl = new URL(String.format("http://%s:%d/.well-known/openid-configuration",
                     idpContainer.getHost(),
-                    idpContainer.getMappedPort(10000)));
+                    idpContainer.getMappedPort(8080)));
             
             LOGGER.info("Teste IDP Health: {}", idpHealthUrl);
             

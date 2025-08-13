@@ -1,0 +1,126 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Datenbank für HAPI FHIR
+  hapi-fhir-postgres:
+    image: postgres:15-alpine
+    container_name: hapi-fhir-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: "hapi"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
+    ports:
+      - "5432:5432"
+    volumes:
+      - hapi-fhir-postgres:/var/lib/postgresql/data
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d hapi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # IDP Server (Identity Provider) - Neues Image ohne SSL
+  idp-server:
+    image: ghcr.io/odilab/erp-services/ref-idp-server:29.3.2
+    container_name: idp-server
+    ports:
+      - "8084:8080"  # Auf 8084 gemappt, da 8080-8083 bereits verwendet werden
+    environment:
+      # IDP_SERVER_URL wird in discoveryDocuments kodiert
+      # WICHTIG: Muss http://idp-server:8080 sein für Docker-interne Kommunikation!
+      IDP_SERVER_URL: http://idp-server:8080
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/.well-known/openid-configuration"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Fachdienst Tool Webservice (für Signierung)
+  fachdienst-tool:
+    image: ghcr.io/odilab/fachdienst-tool-webservice/fachdienst_tool_webservice:latest
+    container_name: fachdienst-tool
+    ports:
+      - "8083:8080"  # Auf 8083 gemappt, da 8080 und 8081 bereits verwendet werden
+    volumes:
+      - ./src/main/resources/credentials/service_qes:/app/credentials:ro
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ERP Service (Access Token Generation)
+  erp-service:
+    image: ghcr.io/odilab/spring-erp-services/erp-service:latest
+    container_name: erp-service
+    ports:
+      - "3001:3001"
+    environment:
+      SPRING_PROFILES_ACTIVE: ssl,test
+      default.string.idp.urlHttps: http://idp-server:8080
+      default.string.fd.urlFachdienstTools: http://fachdienst-tool:8080
+    command: >
+      java
+      -Dspring.profiles.active=ssl,test
+      -Ddefault.string.fd.urlFachdienstTools=http://fachdienst-tool:8080
+      -jar /app/app.jar
+    depends_on:
+      - idp-server
+      - fachdienst-tool
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:3001/", "-k"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Optional: Adminer für PostgreSQL Management
+  adminer:
+    image: adminer:latest
+    container_name: hapi-adminer
+    ports:
+      - "8082:8080"  # Auf 8082 gemappt
+    environment:
+      ADMINER_DEFAULT_SERVER: hapi-fhir-postgres
+    depends_on:
+      - hapi-fhir-postgres
+    networks:
+      - erp-network
+
+  # AUSKOMMENTIERT: HAPI FHIR Server soll lokal gestartet werden
+  # hapi-fhir-jpaserver-start:
+  #   build: .
+  #   container_name: hapi-fhir-jpaserver-start
+  #   restart: on-failure
+  #   environment:
+  #     SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgres:5432/hapi"
+  #     SPRING_DATASOURCE_USERNAME: "admin"
+  #     SPRING_DATASOURCE_PASSWORD: "admin"
+  #     SPRING_DATASOURCE_DRIVERCLASSNAME: "org.postgresql.Driver"
+  #     HAPI_FHIR_AUTH_DISCOVERY_URL: "http://idp-server:8080/.well-known/openid-configuration"
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - hapi-fhir-postgres
+  #     - idp-server
+  #     - erp-service
+  #   networks:
+  #     - erp-network
+
+networks:
+  erp-network:
+    driver: bridge
+    name: erp-network
+
+volumes:
+  hapi-fhir-postgres:

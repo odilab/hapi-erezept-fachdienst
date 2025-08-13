@@ -80,9 +80,13 @@ public class AccessTokenService {
     }
     
     private JWTVerifier createVerifier(Algorithm algorithm) {
+        // Issuer dynamisch vom PukTokenManager holen
+        String expectedIssuer = pukTokenManager.getCurrentIssuer();
+        logger.debug("Verwende dynamischen Issuer für JWT-Validierung: {}", expectedIssuer);
+        
         com.auth0.jwt.JWTVerifier.BaseVerification verification = 
             (com.auth0.jwt.JWTVerifier.BaseVerification) JWT.require(algorithm)
-                .withIssuer("https://idp.zentral.idp.splitdns.ti-dienste.de");
+                .withIssuer(expectedIssuer);
         
         if (skipTimeValidation) {
             verification.acceptExpiresAt(Instant.now().getEpochSecond() + MAX_FUTURE_SECONDS)
