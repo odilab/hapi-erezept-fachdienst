@@ -150,6 +150,157 @@ public class CloseOperationIntegrationTest extends BaseProviderTest {
     }
     
     @Test
+    void testCloseTask_WithDifferentWorkflowTypes() {
+        LOGGER.info("Teste Close-Operation mit verschiedenen Workflow-Typen");
+        
+        String[] flowTypes = {"160", "169", "200", "209"}; // FlowType 210 existiert nicht
+        
+        for (String flowType : flowTypes) {
+            LOGGER.info("Teste Close für FlowType {}", flowType);
+            
+            try {
+                // Erstelle und führe Task bis in-progress
+                TaskTestData testData = createAcceptedTaskWithFlowType(flowType);
+                
+                // Hole die korrekte KVNR aus dem Task (wurde beim Aktivieren gesetzt)
+                String taskKvnr = testData.task.getFor() != null && testData.task.getFor().hasIdentifier() 
+                    ? testData.task.getFor().getIdentifier().getValue() 
+                    : versichertenKvnr;
+                
+                // Erstelle MedicationDispense mit der korrekten KVNR
+                MedicationDispense medicationDispense = createMedicationDispenseWithKvnr(
+                    testData.prescriptionId, 
+                    taskKvnr
+                );
+                
+                // Hauptparameter für die Operation
+                Parameters closeParams = new Parameters();
+                closeParams.addParameter()
+                    .setName("secret")
+                    .setValue(new StringType(testData.secret));
+                
+                // rxDispensation als separates Parameters-Objekt
+                Parameters rxDispensationParams = new Parameters();
+                rxDispensationParams.addParameter()
+                    .setName("medicationDispense")
+                    .setResource(medicationDispense);
+                
+                closeParams.addParameter()
+                    .setName("rxDispensation")
+                    .setResource(rxDispensationParams);
+                
+                String accessTokenApotheke = getValidAccessToken("SMCB_APOTHEKE");
+                
+                // Act
+                Bundle result = client
+                    .operation()
+                    .onInstance(new IdType("Task", testData.prescriptionId))
+                    .named("$close")
+                    .withParameters(closeParams)
+                    .withAdditionalHeader("Authorization", "Bearer " + accessTokenApotheke)
+                    .returnResourceType(Bundle.class)
+                    .execute();
+                
+                // Assert
+                assertNotNull(result);
+                assertEquals(Bundle.BundleType.DOCUMENT, result.getType());
+                
+                // Prüfe Task-Status
+                Task completedTask = client
+                    .read()
+                    .resource(Task.class)
+                    .withId(testData.prescriptionId)
+                    .withAdditionalHeader("Authorization", "Bearer " + accessTokenApotheke)
+                    .execute();
+                
+                assertEquals(Task.TaskStatus.COMPLETED, completedTask.getStatus());
+                
+                LOGGER.info("Close erfolgreich für FlowType {}", flowType);
+                
+            } catch (Exception e) {
+                LOGGER.error("Fehler bei FlowType {}: ", flowType, e);
+                fail("Test fehlgeschlagen für FlowType " + flowType + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Helper-Methode: Erstellt einen Task und führt ihn bis in-progress mit spezifischem FlowType
+     */
+    private TaskTestData createAcceptedTaskWithFlowType(String flowType) {
+        // 1. Create Task
+        Parameters createParams = new Parameters();
+        createParams.addParameter()
+            .setName("workflowType")
+            .setValue(new Coding()
+                .setSystem("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType")
+                .setCode(flowType));
+        
+        String accessTokenArzt = getValidAccessToken("SMCB_KRANKENHAUS");
+        
+        Parameters createResult = client
+            .operation()
+            .onType(Task.class)
+            .named("$create")
+            .withParameters(createParams)
+            .withAdditionalHeader("Authorization", "Bearer " + accessTokenArzt)
+            .returnResourceType(Parameters.class)
+            .execute();
+        
+        Task createdTask = (Task) createResult.getParameter().get(0).getResource();
+        String prescriptionId = createdTask.getIdElement().getIdPart();
+        String taskAccessCode = createdTask.getIdentifier().stream()
+            .filter(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode".equals(id.getSystem()))
+            .findFirst()
+            .map(Identifier::getValue)
+            .orElseThrow();
+        
+        // 2. Activate Task
+        String signedBundle = createSignedBundleForTest(prescriptionId, versichertenKvnr);
+        
+        Binary ePrescription = new Binary();
+        ePrescription.setContentType("application/pkcs7-mime");
+        ePrescription.setDataElement(new Base64BinaryType(signedBundle));
+        
+        Parameters activateParams = new Parameters();
+        activateParams.addParameter()
+            .setName("ePrescription")
+            .setResource(ePrescription);
+        
+        Parameters activateResult = client
+            .operation()
+            .onInstance(new IdType("Task", prescriptionId))
+            .named("$activate")
+            .withParameters(activateParams)
+            .withAdditionalHeader("Authorization", "Bearer " + accessTokenArzt)
+            .withAdditionalHeader("X-AccessCode", taskAccessCode)
+            .returnResourceType(Parameters.class)
+            .execute();
+        
+        // 3. Accept Task
+        String accessTokenApotheke = getValidAccessToken("SMCB_APOTHEKE");
+        
+        Bundle acceptResult = client
+            .operation()
+            .onInstance(new IdType("Task", prescriptionId))
+            .named("$accept")
+            .withNoParameters(Parameters.class)
+            .withAdditionalHeader("Authorization", "Bearer " + accessTokenApotheke)
+            .withAdditionalHeader("X-AccessCode", taskAccessCode)
+            .returnResourceType(Bundle.class)
+            .execute();
+        
+        Task acceptedTask = (Task) acceptResult.getEntry().get(0).getResource();
+        String taskSecret = acceptedTask.getIdentifier().stream()
+            .filter(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_Secret".equals(id.getSystem()))
+            .findFirst()
+            .map(Identifier::getValue)
+            .orElseThrow();
+        
+        return new TaskTestData(acceptedTask, taskAccessCode, prescriptionId, taskSecret);
+    }
+
+    @Test
     void testCloseWithMedicationDispense() {
         // Extrahiere KVNR aus dem Task
         String kvnr = testTask.getFor() != null && testTask.getFor().hasIdentifier() 

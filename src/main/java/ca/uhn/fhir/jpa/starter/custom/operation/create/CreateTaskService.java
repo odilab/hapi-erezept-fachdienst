@@ -33,10 +33,10 @@ public class CreateTaskService {
     private static final Map<String, String> FLOW_TYPE_TO_PERFORMER_TYPE = new HashMap<>();
     static {
         FLOW_TYPE_TO_PERFORMER_TYPE.put("160", "urn:oid:1.2.276.0.76.4.54"); // Öffentliche Apotheke
-        FLOW_TYPE_TO_PERFORMER_TYPE.put("169", "urn:oid:1.2.276.0.76.4.54"); // Öffentliche Apotheke
+        FLOW_TYPE_TO_PERFORMER_TYPE.put("162", "urn:oid:1.2.276.0.76.4.59"); // Kostenträger (DiGA)
+        FLOW_TYPE_TO_PERFORMER_TYPE.put("169", "urn:oid:1.2.276.0.76.4.54"); // Öffentliche Apotheke (BTM)
         FLOW_TYPE_TO_PERFORMER_TYPE.put("200", "urn:oid:1.2.276.0.76.4.54"); // Öffentliche Apotheke (PKV)
-        FLOW_TYPE_TO_PERFORMER_TYPE.put("209", "urn:oid:1.2.276.0.76.4.59"); // Apotheke (DiGA)
-        FLOW_TYPE_TO_PERFORMER_TYPE.put("210", "urn:oid:1.2.276.0.76.4.30"); // Kostenträger
+        FLOW_TYPE_TO_PERFORMER_TYPE.put("209", "urn:oid:1.2.276.0.76.4.54"); // Öffentliche Apotheke (Direkte Zuweisung PKV)
     }
 
     private final DaoRegistry daoRegistry;
@@ -174,12 +174,13 @@ public class CreateTaskService {
      * Gibt den Display-Text für einen PerformerType zurück.
      */
     private String getPerformerTypeDisplay(String oid) {
-        switch (oid) {
-            case "urn:oid:1.2.276.0.76.4.54":
+        // Entferne urn:oid: Präfix falls vorhanden
+        String cleanOid = oid.startsWith("urn:oid:") ? oid.substring(8) : oid;
+        
+        switch (cleanOid) {
+            case "1.2.276.0.76.4.54":
                 return "Öffentliche Apotheke";
-            case "urn:oid:1.2.276.0.76.4.59":
-                return "Apotheke";
-            case "urn:oid:1.2.276.0.76.4.30":
+            case "1.2.276.0.76.4.59":
                 return "Kostenträger";
             default:
                 return "";

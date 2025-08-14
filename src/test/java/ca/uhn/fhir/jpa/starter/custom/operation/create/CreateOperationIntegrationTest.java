@@ -120,7 +120,7 @@ public class CreateOperationIntegrationTest extends BaseProviderTest {
     public void testCreateTask_WithDifferentFlowTypes() {
         LOGGER.info("Teste verschiedene FlowTypes");
         
-        String[] validFlowTypes = {"160", "169", "200", "209", "210"};
+        String[] validFlowTypes = {"160", "162", "169", "200", "209"};
         
         try {
             String accessToken = getValidAccessToken("SMCB_KRANKENHAUS");

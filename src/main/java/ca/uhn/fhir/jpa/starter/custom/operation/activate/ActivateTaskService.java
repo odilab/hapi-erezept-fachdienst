@@ -94,14 +94,14 @@ public class ActivateTaskService {
             // 5. Führe alle Validierungen durch
             performAllValidations(task, kbvBundle, signingTime);
             
-            // 6. Extrahiere KVNR und setze sie im Task
-            String kvnr = extractKvnrFromBundle(kbvBundle);
-            // Setze Patient-Referenz mit KVNR als Identifier (nicht als ID)
+            // 6. Extrahiere Patient-ID und setze sie im Task
+            PatientIdentifierInfo patientInfo = extractPatientIdentifierFromBundle(kbvBundle);
+            // Setze Patient-Referenz mit korrektem System und Identifier
             Reference patientRef = new Reference();
             patientRef.setType("Patient");
             patientRef.setIdentifier(new Identifier()
-                .setSystem("http://fhir.de/sid/gkv/kvid-10")
-                .setValue(kvnr));
+                .setSystem(patientInfo.system)
+                .setValue(patientInfo.value));
             task.setFor(patientRef);
             
             // 7. Setze Status auf ready
@@ -134,7 +134,7 @@ public class ActivateTaskService {
             IFhirResourceDao<Task> taskDao = daoRegistry.getResourceDao(Task.class);
             Task updatedTask = (Task) taskDao.update(task).getResource();
             
-            LOGGER.info("Task erfolgreich aktiviert - Status: ready, KVNR: {}", kvnr);
+            LOGGER.info("Task erfolgreich aktiviert - Status: ready, Patient-ID: {}", patientInfo.value);
             
             return updatedTask;
             
@@ -163,11 +163,11 @@ public class ActivateTaskService {
         // 4. BTM/Thalidomid Prüfung
         validateNoNarcotics(kbvBundle);
         
-        // 5. KVNR Validierung
-        String kvnr = extractKvnrFromBundle(kbvBundle);
-        if (!isValidKvnr(kvnr)) {
+        // 5. Patient-ID Validierung (KVNR oder PKV-ID)
+        PatientIdentifierInfo patientInfo = extractPatientIdentifierFromBundle(kbvBundle);
+        if (!isValidPatientIdentifier(patientInfo)) {
             throw new UnprocessableEntityException(
-                "Ungültige Versichertennummer (KVNR): Die übergebene Versichertennummer entspricht nicht den " +
+                "Ungültige Versichertennummer: Die übergebene Versichertennummer entspricht nicht den " +
                 "Prüfziffer-Validierungsregeln."
             );
         }
@@ -244,13 +244,13 @@ public class ActivateTaskService {
         String coverageType = coverage.getType().getCodingFirstRep().getCode();
         
         // PKV (SEL) nur bei 200er Workflows
-        if ("SEL".equals(coverageType) && !flowType.startsWith("20")) {
+        if ("SEL".equals(coverageType) && !flowType.equals("200")) {
             throw new UnprocessableEntityException("PKV coverage not allowed for workflow " + flowType);
         }
         
-        // GKV nur bei nicht-200er Workflows
-        if ("GKV".equals(coverageType) && flowType.startsWith("20")) {
-            throw new UnprocessableEntityException("GKV coverage not allowed for workflow " + flowType);
+        // GKV nicht bei FlowType 200 (PKV-spezifisch)
+        if ("GKV".equals(coverageType) && flowType.equals("200")) {
+            throw new UnprocessableEntityException("GKV coverage not allowed for PKV workflow " + flowType);
         }
     }
 
@@ -303,8 +303,59 @@ public class ActivateTaskService {
     }
 
     /**
-     * Extrahiert die KVNR aus dem Bundle.
+     * Interne Klasse zur Rückgabe von Patient-Identifier Informationen.
      */
+    private static class PatientIdentifierInfo {
+        String value;
+        String system;
+        boolean isPkv;
+        
+        PatientIdentifierInfo(String value, String system, boolean isPkv) {
+            this.value = value;
+            this.system = system;
+            this.isPkv = isPkv;
+        }
+    }
+    
+    /**
+     * Extrahiert die Patient-ID (KVNR oder PKV-ID) aus dem Bundle.
+     */
+    private PatientIdentifierInfo extractPatientIdentifierFromBundle(Bundle bundle) {
+        // Finde Patient
+        Patient patient = bundle.getEntry().stream()
+            .filter(e -> e.hasResource() && e.getResource() instanceof Patient)
+            .map(e -> (Patient) e.getResource())
+            .findFirst()
+            .orElseThrow(() -> new UnprocessableEntityException("Bundle contains no Patient resource"));
+        
+        // Suche nach KVNR (GKV Patient)
+        Identifier kvnrIdentifier = patient.getIdentifier().stream()
+            .filter(id -> "http://fhir.de/sid/gkv/kvid-10".equals(id.getSystem()))
+            .findFirst()
+            .orElse(null);
+        
+        if (kvnrIdentifier != null) {
+            return new PatientIdentifierInfo(kvnrIdentifier.getValue(), kvnrIdentifier.getSystem(), false);
+        }
+        
+        // Suche nach PKV-ID (PKV Patient)
+        Identifier pkvIdentifier = patient.getIdentifier().stream()
+            .filter(id -> "http://fhir.de/sid/pkv/kvid-10".equals(id.getSystem()))
+            .findFirst()
+            .orElse(null);
+        
+        if (pkvIdentifier != null) {
+            return new PatientIdentifierInfo(pkvIdentifier.getValue(), pkvIdentifier.getSystem(), true);
+        }
+        
+        throw new UnprocessableEntityException("Patient has neither KVNR nor PKV-ID");
+    }
+    
+    /**
+     * Extrahiert die KVNR aus dem Bundle.
+     * @deprecated Nutze extractPatientIdentifierFromBundle stattdessen
+     */
+    @Deprecated
     private String extractKvnrFromBundle(Bundle bundle) {
         // Finde Patient
         Patient patient = bundle.getEntry().stream()
@@ -313,12 +364,22 @@ public class ActivateTaskService {
             .findFirst()
             .orElseThrow(() -> new UnprocessableEntityException("Bundle contains no Patient resource"));
         
-        // Finde KVNR (suche nach kvid-10 System)
+        // Finde KVNR (GKV) oder PKV-ID
+        // Zuerst versuche KVNR zu finden (für GKV Patienten)
         String kvnr = patient.getIdentifier().stream()
             .filter(id -> "http://fhir.de/sid/gkv/kvid-10".equals(id.getSystem()))
             .findFirst()
             .map(Identifier::getValue)
-            .orElseThrow(() -> new UnprocessableEntityException("Patient has no KVNR"));
+            .orElse(null);
+        
+        // Falls keine KVNR gefunden, suche nach PKV-ID (für PKV Patienten)
+        if (kvnr == null) {
+            kvnr = patient.getIdentifier().stream()
+                .filter(id -> "http://fhir.de/sid/pkv/kvid-10".equals(id.getSystem()))
+                .findFirst()
+                .map(Identifier::getValue)
+                .orElseThrow(() -> new UnprocessableEntityException("Patient has neither KVNR nor PKV-ID"));
+        }
         
         return kvnr;
     }
@@ -427,6 +488,24 @@ public class ActivateTaskService {
         }
     }
 
+    /**
+     * Prüft ob eine Patient-ID gültig ist (KVNR oder PKV-ID).
+     */
+    private boolean isValidPatientIdentifier(PatientIdentifierInfo patientInfo) {
+        if (patientInfo == null || patientInfo.value == null) {
+            return false;
+        }
+        
+        if (patientInfo.isPkv) {
+            // PKV-ID Validierung
+            // PKV-IDs beginnen meist mit 'P' gefolgt von Ziffern
+            return patientInfo.value.matches("P[0-9]{9}");
+        } else {
+            // KVNR Validierung
+            return isValidKvnr(patientInfo.value);
+        }
+    }
+    
     /**
      * Prüft ob eine KVNR gültig ist (Prüfziffer).
      */

@@ -487,6 +487,123 @@ public class ActivateOperationIntegrationTest extends BaseProviderTest {
     }
 
     @Test
+    public void testActivateTask_WithDifferentBundleTypes() {
+        LOGGER.info("Teste Aktivierung mit verschiedenen Bundle-Typen");
+        
+        // Test-Konfiguration für verschiedene Bundle-Typen
+        String[][] testConfigs = {
+            {"160", "e-rezept-bundles/valid/Beispiel_4.xml", "S040464113"},
+            {"169", "e-rezept-bundles/valid/BtM_169_Betaeubungsmittel.xml", "S040464113"},
+            {"200", "e-rezept-bundles/valid/PKV_200_PrivatRezept.xml", "P123456789"},
+            {"209", "e-rezept-bundles/valid/DZ_209_DirekteZuweisung.xml", "T024791905"}
+            // FlowType 210 existiert nicht in der offiziellen Spezifikation
+        };
+        
+        for (String[] config : testConfigs) {
+            String flowType = config[0];
+            String bundlePath = config[1];
+            String kvnr = config[2];
+            
+            LOGGER.info("Teste Aktivierung für FlowType {} mit Bundle {}", flowType, bundlePath);
+            
+            try {
+                // Erstelle Task mit entsprechendem FlowType
+                Task draftTask = createTaskForTest(flowType);
+                String prescriptionId = draftTask.getIdElement().getIdPart();
+                String accessCode = draftTask.getIdentifier().stream()
+                    .filter(id -> id.getSystem().contains("AccessCode"))
+                    .findFirst()
+                    .map(Identifier::getValue)
+                    .orElseThrow();
+                
+                // Lade und adaptiere Bundle
+                ClassPathResource resource = new ClassPathResource(bundlePath);
+                String bundleXml = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                
+                // Ersetze PrescriptionID im Bundle
+                // Das Bundle hat das Format:
+                // <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId" />
+                // <value value="160.100.000.000.008.18" />
+                bundleXml = bundleXml.replaceAll(
+                    "(<system value=\"https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId\"\\s*/?>\\s*\n?\\s*<value value=\")[^\"]+\"",
+                    "$1" + prescriptionId + "\""
+                );
+                
+                // Ersetze authoredOn mit heutigem Datum
+                String today = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+                bundleXml = bundleXml.replaceAll(
+                    "<authoredOn value=\"[^\"]+\"",
+                    "<authoredOn value=\"" + today + "\""
+                );
+                
+                // Signiere Bundle
+                java.nio.file.Path tempFile = java.nio.file.Files.createTempFile("test-bundle-" + flowType + "-", ".xml");
+                java.nio.file.Files.write(tempFile, bundleXml.getBytes(StandardCharsets.UTF_8));
+                
+                RestTemplate restTemplate = ca.uhn.fhir.jpa.starter.custom.util.TestSslUtils.createTrustAllRestTemplate();
+                MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                body.add("kbvBundleFromFile", new org.springframework.core.io.FileSystemResource(tempFile.toFile()));
+                body.add("kbvBundleAsString", "");
+                
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+                HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+                
+                String signUrl = String.format("https://localhost:%d/signDocumentWithTool",
+                    ca.uhn.fhir.jpa.starter.custom.config.TestcontainersConfig.startErpServiceContainer().getMappedPort(3001));
+                ResponseEntity<String> response = restTemplate.postForEntity(signUrl, request, String.class);
+                String signedBundle = response.getBody();
+                
+                // Aktiviere Task
+                Binary ePrescription = new Binary();
+                ePrescription.setContentType("application/pkcs7-mime");
+                ePrescription.setDataElement(new Base64BinaryType(signedBundle));
+                
+                Parameters inParams = new Parameters();
+                inParams.addParameter()
+                    .setName("ePrescription")
+                    .setResource(ePrescription);
+                
+                String accessToken = getValidAccessToken("SMCB_KRANKENHAUS");
+                
+                Parameters result = client
+                    .operation()
+                    .onInstance(draftTask.getIdElement())
+                    .named("$activate")
+                    .withParameters(inParams)
+                    .withAdditionalHeader("Authorization", "Bearer " + accessToken)
+                    .withAdditionalHeader("X-AccessCode", accessCode)
+                    .returnResourceType(Parameters.class)
+                    .execute();
+                
+                // Assertions
+                assertNotNull(result);
+                Task activatedTask = (Task) result.getParameter().get(0).getResource();
+                assertNotNull(activatedTask);
+                assertEquals(Task.TaskStatus.READY, activatedTask.getStatus());
+                
+                // Prüfe KVNR/PKV-ID
+                assertNotNull(activatedTask.getFor());
+                assertNotNull(activatedTask.getFor().getIdentifier());
+                if (kvnr != null) {
+                    // Für GKV-Patienten prüfe KVNR
+                    assertEquals(kvnr, activatedTask.getFor().getIdentifier().getValue());
+                } else {
+                    // Für PKV-Patienten (FlowType 200) wird keine KVNR erwartet
+                    // PKV-ID wird als separater Identifier gespeichert
+                    assertTrue("200".equals(flowType), "Nur FlowType 200 sollte keine KVNR haben");
+                }
+                
+                LOGGER.info("FlowType {} erfolgreich aktiviert mit KVNR {}", flowType, kvnr);
+                
+            } catch (Exception e) {
+                LOGGER.error("Fehler bei FlowType {}: ", flowType, e);
+                fail("Test fehlgeschlagen für FlowType " + flowType + ": " + e.getMessage());
+            }
+        }
+    }
+
+    @Test
     public void testActivateTask_WithUnauthorizedRole_ThrowsForbidden() {
         LOGGER.info("Starte Test: testActivateTask_WithUnauthorizedRole_ThrowsForbidden");
         

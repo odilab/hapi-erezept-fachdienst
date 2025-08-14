@@ -230,6 +230,115 @@ public class AcceptOperationIntegrationTest extends BaseProviderTest {
     }
 
     @Test
+    public void testAcceptTask_WithDifferentWorkflowTypes() {
+        LOGGER.info("Teste Accept-Operation mit verschiedenen Workflow-Typen");
+        
+        String[] flowTypes = {"160", "169", "200", "209"}; // FlowType 210 existiert nicht
+        
+        for (String flowType : flowTypes) {
+            LOGGER.info("Teste Accept für FlowType {}", flowType);
+            
+            try {
+                // Erstelle und aktiviere Task mit spezifischem FlowType
+                TaskTestData testData = createAndActivateTaskWithFlowType(flowType);
+                String accessTokenApotheke = getValidAccessToken("SMCB_APOTHEKE");
+                
+                // Act
+                Bundle result = client
+                    .operation()
+                    .onInstance(new IdType("Task", testData.prescriptionId))
+                    .named("$accept")
+                    .withParameter(Parameters.class, "ac", new StringType(testData.accessCode))
+                    .withAdditionalHeader("Authorization", "Bearer " + accessTokenApotheke)
+                    .returnResourceType(Bundle.class)
+                    .execute();
+                
+                // Assert
+                assertNotNull(result);
+                assertEquals(Bundle.BundleType.COLLECTION, result.getType());
+                
+                // Prüfe Task-Status
+                Task acceptedTask = (Task) result.getEntry().stream()
+                    .map(Bundle.BundleEntryComponent::getResource)
+                    .filter(r -> r instanceof Task)
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("Bundle sollte einen Task enthalten"));
+                
+                assertEquals(Task.TaskStatus.INPROGRESS, acceptedTask.getStatus());
+                
+                // Prüfe Secret
+                boolean hasSecret = acceptedTask.getIdentifier().stream()
+                    .anyMatch(id -> id.getSystem().contains("Secret"));
+                assertTrue(hasSecret, "Task sollte ein Secret haben für FlowType " + flowType);
+                
+                LOGGER.info("Accept erfolgreich für FlowType {}", flowType);
+                
+            } catch (Exception e) {
+                LOGGER.error("Fehler bei FlowType {}: ", flowType, e);
+                fail("Test fehlgeschlagen für FlowType " + flowType + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Helper-Methode: Erstellt und aktiviert einen Task mit spezifischem FlowType
+     */
+    private TaskTestData createAndActivateTaskWithFlowType(String flowType) {
+        // Create Task
+        Parameters createParams = new Parameters();
+        createParams.addParameter()
+            .setName("workflowType")
+            .setValue(new Coding()
+                .setSystem("https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_FlowType")
+                .setCode(flowType));
+        
+        String accessTokenArzt = getValidAccessToken("SMCB_KRANKENHAUS");
+        
+        Parameters createResult = client
+            .operation()
+            .onType(Task.class)
+            .named("$create")
+            .withParameters(createParams)
+            .withAdditionalHeader("Authorization", "Bearer " + accessTokenArzt)
+            .returnResourceType(Parameters.class)
+            .execute();
+        
+        Task createdTask = (Task) createResult.getParameter().get(0).getResource();
+        String prescriptionId = createdTask.getIdElement().getIdPart();
+        String accessCode = createdTask.getIdentifier().stream()
+            .filter(id -> "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode".equals(id.getSystem()))
+            .findFirst()
+            .map(Identifier::getValue)
+            .orElseThrow();
+        
+        // Activate Task
+        String signedBundle = createSignedBundleForTest(prescriptionId, "S040464113");
+        
+        Binary ePrescription = new Binary();
+        ePrescription.setContentType("application/pkcs7-mime");
+        ePrescription.setDataElement(new Base64BinaryType(signedBundle));
+        
+        Parameters activateParams = new Parameters();
+        activateParams.addParameter()
+            .setName("ePrescription")
+            .setResource(ePrescription);
+        
+        Parameters activateResult = client
+            .operation()
+            .onInstance(new IdType("Task", prescriptionId))
+            .named("$activate")
+            .withParameters(activateParams)
+            .withAdditionalHeader("Authorization", "Bearer " + accessTokenArzt)
+            .withAdditionalHeader("X-AccessCode", accessCode)
+            .returnResourceType(Parameters.class)
+            .execute();
+        
+        Task activatedTask = (Task) activateResult.getParameter().get(0).getResource();
+        
+        return new TaskTestData(activatedTask, accessCode, prescriptionId);
+    }
+
+    @Test
     public void testAcceptTask_TaskInDraftStatus_Returns409() {
         // Arrange - Erstelle Task aber aktiviere ihn nicht
         Parameters createParams = new Parameters();

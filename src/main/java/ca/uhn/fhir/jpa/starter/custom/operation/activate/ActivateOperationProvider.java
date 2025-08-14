@@ -239,7 +239,7 @@ public class ActivateOperationProvider implements IResourceProvider {
                 ? accessToken.getOrganizationName() 
                 : accessToken.getIdNumber();
             
-            String kvnr = task.getFor() != null && task.getFor().hasIdentifier() 
+            String patientId = task.getFor() != null && task.getFor().hasIdentifier() 
                 ? task.getFor().getIdentifier().getValue()
                 : "Unknown";
             
@@ -259,7 +259,7 @@ public class ActivateOperationProvider implements IResourceProvider {
                 description,
                 actorName,
                 accessToken.getIdNumber(),
-                new Reference("Patient/" + kvnr) // Patient-Bezug
+                new Reference("Patient/" + patientId) // Patient-Bezug
             );
 
             // Füge Details zum aktivierten Task hinzu
@@ -267,7 +267,7 @@ public class ActivateOperationProvider implements IResourceProvider {
                 auditService.addEntityDetail(auditEvent, "prescription-id", 
                     task.getIdentifierFirstRep().getValue());
                 auditService.addEntityDetail(auditEvent, "task-status", task.getStatus().toCode());
-                auditService.addEntityDetail(auditEvent, "kvnr", kvnr);
+                auditService.addEntityDetail(auditEvent, "patient-id", patientId);
             }
 
         } catch (Exception e) {
