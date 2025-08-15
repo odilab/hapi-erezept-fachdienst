@@ -113,10 +113,46 @@ Wenn `java-implementation/service-template.java` existiert:
 
 ### SCHRITT 7: PROVIDER REGISTRIEREN
 
-1. **application.yaml anpassen**:
-   - Öffne `/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/main/resources/application.yaml`
-   - Finde `custom-provider-classes:` (ca. Zeile 311)
-   - Füge hinzu wie in `implementation-guide.md` beschrieben
+**WICHTIG**: Neue Operationen müssen an DREI Stellen registriert werden!
+
+1. **Haupt-Konfiguration** (`/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/main/resources/application.yaml`):
+   ```yaml
+   hapi:
+     fhir:
+       custom-provider-classes:
+         - ca.uhn.fhir.jpa.starter.custom.operation.{operation}.{Operation}OperationProvider
+   ```
+
+2. **Test-Konfiguration** (`/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/test/resources/application.yaml`):
+   ```yaml
+   hapi:
+     fhir:
+       custom-provider-classes:
+         - ca.uhn.fhir.jpa.starter.custom.operation.{operation}.{Operation}OperationProvider
+   ```
+
+3. **BaseProviderTest** (`/Users/rene/Desktop/Arbeit/hapi-erezept-fachdienst/src/test/java/ca/uhn/fhir/jpa/starter/custom/BaseProviderTest.java`):
+   
+   In der `@SpringBootTest` Annotation, properties Array:
+   
+   a) Falls die Operation ein neues Package hat, ergänze in `custom-bean-packages`:
+   ```java
+   "hapi.fhir.custom-bean-packages=...existing...,ca.uhn.fhir.jpa.starter.custom.operation.{operation}",
+   ```
+   
+   b) Füge die Provider-Klasse in `custom-provider-classes` hinzu:
+   ```java
+   "hapi.fhir.custom-provider-classes=...existing...,ca.uhn.fhir.jpa.starter.custom.operation.{operation}.{Operation}OperationProvider",
+   ```
+   
+   Beispiel für abort Operation (Zeile 49-51):
+   ```java
+   properties = {
+       "hapi.fhir.custom-bean-packages=ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.operation,ca.uhn.fhir.jpa.starter.custom.operation.abort",
+       "hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.close.CloseOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.abort.AbortOperationProvider",
+       // ... andere properties
+   }
+   ```
 
 ### SCHRITT 8: VALIDIERUNG DER IMPLEMENTIERUNG
 
@@ -298,7 +334,27 @@ public void setupTask() throws Exception {
 
 ### PROVIDER-IMPLEMENTIERUNG HINWEISE
 
-#### 1. Query-Parameter vs Operation-Parameter
+#### 1. KRITISCH: Operations MÜSSEN einen Rückgabewert haben!
+**Problem**: Operations ohne Rückgabewert (void) führen dazu, dass der Task nach der Operation nicht mehr abrufbar ist
+```java
+// FALSCH - Task ist nach Operation nicht mehr auffindbar:
+@Operation(name = "$abort", idempotent = false, type = Task.class)
+public void abortTaskOperation(...) {
+    // ...
+    taskDao.update(task, theRequestDetails);
+    // Kein return!
+}
+
+// RICHTIG - Task bleibt nach Operation abrufbar:
+@Operation(name = "$abort", idempotent = false, type = Task.class)
+public Task abortTaskOperation(...) {
+    // ...
+    DaoMethodOutcome outcome = taskDao.update(task, theRequestDetails);
+    return (Task) outcome.getResource();  // WICHTIG: Task zurückgeben!
+}
+```
+
+#### 2. Query-Parameter vs Operation-Parameter
 - Query-Parameter (wie `secret`) NICHT als `@OperationParam` definieren
 - Stattdessen aus `RequestDetails.getParameters()` lesen
 - Dokumentation in JavaDoc anpassen

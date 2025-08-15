@@ -1,0 +1,14 @@
+{
+  "method": "POST",
+  "url": "/Task/160.000.033.491.280.78/$abort",
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "Content-Type": "application/fhir+json",
+    "Accept": "application/fhir+json"
+  },
+  "description": "Patient löscht eigenes Rezept. KVNR im Token stimmt mit Task.for überein.",
+  "expected_response": {
+    "status": 204,
+    "body": null
+  }
+}

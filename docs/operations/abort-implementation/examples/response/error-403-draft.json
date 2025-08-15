@@ -1,0 +1,16 @@
+{
+  "resourceType": "OperationOutcome",
+  "issue": [
+    {
+      "severity": "error",
+      "code": "forbidden",
+      "details": {
+        "text": "Abort not expected for newly created Task"
+      },
+      "diagnostics": "Task is in status 'draft' which cannot be aborted"
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2025-08-05T10:15:30Z"
+  }
+}
