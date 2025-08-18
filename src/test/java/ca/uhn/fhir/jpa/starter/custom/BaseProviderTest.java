@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 }, properties = {
     "hapi.fhir.custom-bean-packages=ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.operation,ca.uhn.fhir.jpa.starter.custom.operation.abort",
     "hapi.fhir.custom-interceptor-classes=ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator",
-    "hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.close.CloseOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.abort.AbortOperationProvider",
+    "hapi.fhir.custom-provider-classes=ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.close.CloseOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.abort.AbortOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.reject.RejectOperationProvider",
     "spring.datasource.url=jdbc:h2:mem:dbr4",
     "hapi.fhir.cr_enabled=false",
     "hapi.fhir.fhir_version=r4",

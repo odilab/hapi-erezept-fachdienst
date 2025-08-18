@@ -306,9 +306,9 @@ hapi:
     #      responses_enabled: true
     #    binary_storage_enabled: true
     inline_resource_storage_below_size: 4000
-    custom-bean-packages: ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth,ca.uhn.fhir.jpa.starter.custom.operation,ca.uhn.fhir.jpa.starter.custom.operation.create,ca.uhn.fhir.jpa.starter.custom.operation.activate,ca.uhn.fhir.jpa.starter.custom.operation.accept,ca.uhn.fhir.jpa.starter.custom.operation.close,ca.uhn.fhir.jpa.starter.custom.operation.abort
+    custom-bean-packages: ca.uhn.fhir.jpa.starter.custom.interceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth,ca.uhn.fhir.jpa.starter.custom.operation,ca.uhn.fhir.jpa.starter.custom.operation.create,ca.uhn.fhir.jpa.starter.custom.operation.activate,ca.uhn.fhir.jpa.starter.custom.operation.accept,ca.uhn.fhir.jpa.starter.custom.operation.close,ca.uhn.fhir.jpa.starter.custom.operation.abort,ca.uhn.fhir.jpa.starter.custom.operation.reject
     custom-interceptor-classes: ca.uhn.fhir.jpa.starter.custom.interceptor.CustomValidator,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.AuthenticationInterceptor,ca.uhn.fhir.jpa.starter.custom.interceptor.auth.ResourceAuthorizationInterceptor
-    custom-provider-classes: ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.close.CloseOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.abort.AbortOperationProvider
+    custom-provider-classes: ca.uhn.fhir.jpa.starter.custom.operation.create.CreateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.activate.ActivateOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.accept.AcceptOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.close.CloseOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.abort.AbortOperationProvider,ca.uhn.fhir.jpa.starter.custom.operation.reject.RejectOperationProvider
     auth:
       skip_tsl_time_validation: true
       # JWT-Validierung wieder aktiviert (skip_jwt_validation entfernt)
